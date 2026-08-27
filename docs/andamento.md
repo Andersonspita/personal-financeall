@@ -46,6 +46,7 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 | App iOS/Android | Pendente (API já client-agnostic) |
 | Recuperação de senha / verificação de e-mail | Pendente |
 | Postgres / deploy em nuvem | Pendente |
+| Deploy VPS (systemd, porta 3000) | Pronto (roteiro em `docs/tecnico.md`; HTTP com `AUTH_COOKIE_SECURE=false`) |
 
 ## Histórico
 
@@ -57,6 +58,10 @@ O código já entregava o fluxo completo de cadastro, lançamentos com emoção,
 - README passou a ser o índice do produto, não o template do `create-next-app`.
 - Definida a regra Cursor para atualizar as três docs a cada mudança de sistema.
 - Projeto versionado e publicado em https://github.com/Andersonspita/personal-financeall.git
+
+### 2026-08-27 — Deploy na VPS (porta 3000)
+
+As portas 80, 443, 8000, 8080 e 8081 já estavam em uso na VPS. O app sobe em **3000** (livre). Cookie `Secure` passou a respeitar `AUTH_COOKIE_SECURE` para login funcionar em `http://IP:porta`. Roteiro em `docs/tecnico.md`.
 
 ## Próximos passos sugeridos
 

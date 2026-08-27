@@ -29,7 +29,7 @@ npm run db:seed    # opcional
 npm run dev
 ```
 
-Detalhes de variáveis, APIs e schema: [docs/tecnico.md](docs/tecnico.md).
+Detalhes de variáveis, APIs, schema e **deploy na VPS** (porta 3000): [docs/tecnico.md](docs/tecnico.md).
 
 Conta demo após o seed: `demo@bussola.app` / `demo12345` (somente desenvolvimento).
 

@@ -32,6 +32,7 @@ Preencha `.env`:
 | `DATABASE_URL` | Caminho do SQLite, ex. `file:./prisma/dev.db` |
 | `EMOTION_ENCRYPTION_KEY` | Segredo para AES-256-GCM das notas emocionais |
 | `AUTH_SECRET` | Segredo do JWT |
+| `AUTH_COOKIE_SECURE` | `true`/`false`. Em `http://IP:porta` use `false`; em HTTPS omita ou use `true` |
 | `OPENAI_API_KEY` | Opcional. Sem ela, o resto do app funciona; a IA fica indisponível |
 | `OPENAI_MODEL` | Opcional. Padrão `gpt-4o-mini` |
 
@@ -74,7 +75,7 @@ Fluxo único em `src/lib/auth/service.ts`, reutilizado por actions e APIs.
 
 1. Registro cria `User`, hash da senha e dados iniciais (`createDefaultDataForUser`).
 2. Login verifica senha e emite JWT (30 dias).
-3. Web: cookie `session` httpOnly, `SameSite=lax`, `Secure` em produção.
+3. Web: cookie `session` httpOnly, `SameSite=lax`. `Secure` segue `AUTH_COOKIE_SECURE` (padrão: ligado em `NODE_ENV=production`). Sem HTTPS (acesso por `http://IP:porta`), defina `AUTH_COOKIE_SECURE=false` ou o navegador ignora o cookie e o login parece falhar.
 4. API / app móvel: `Authorization: Bearer <token>` tem prioridade sobre o cookie (`src/lib/auth/session.ts`).
 5. `middleware.ts` protege tudo exceto `/login`, `/registrar`, `/api/auth/login`, `/api/auth/register` e estáticos PWA.
 
@@ -168,6 +169,105 @@ Cubram lógica pura. Mutações de banco e UI ainda não têm suíte.
 ## PWA
 
 `PwaRegister` registra `/sw.js`. O worker **não** cacheia páginas HTML (evitar saldo desatualizado). Só `manifest.json` e `icon.svg`.
+
+## Deploy na VPS (porta 3000)
+
+Não use 80, 443, 8000, 8080 nem 8081 — já estão ocupadas nesta VPS (`vps10606` / `184.107.179.70`). A 3000 estava livre na varredura externa. Confirme **dentro** da máquina antes de subir:
+
+```bash
+ss -tlnp | grep -E ':(80|443|3000|8000|8080|8081)\s'
+```
+
+Se 3000 aparecer na lista, escolha outra (ex. `8082`) e troque `PORT` / UFW / systemd.
+
+Rode como usuário `deploy` (pasta `/home/deploy/personal-financeall`), com `sudo` só onde indicado.
+
+### 1. Pacotes (root ou sudo)
+
+```bash
+sudo apt-get update
+sudo apt-get install -y git curl ca-certificates build-essential python3
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v   # precisa ser v20+
+```
+
+### 2. Clone e build (`deploy`)
+
+```bash
+sudo mkdir -p /home/deploy/personal-financeall
+sudo chown -R deploy:deploy /home/deploy/personal-financeall
+su - deploy
+cd /home/deploy/personal-financeall
+git clone https://github.com/Andersonspita/personal-financeall.git .
+```
+
+Se o GitHub pedir senha, o repo está privado: use um Personal Access Token no lugar da senha, ou um deploy key SSH.
+
+```bash
+cp .env.example .env
+AUTH=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+EMO=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+cat > .env <<EOF
+DATABASE_URL="file:./prisma/prod.db"
+EMOTION_ENCRYPTION_KEY="$EMO"
+AUTH_SECRET="$AUTH"
+AUTH_COOKIE_SECURE="false"
+EOF
+chmod 600 .env
+
+npm ci
+npx prisma generate
+npx prisma migrate deploy
+npm run build
+```
+
+Não rode `npm run db:seed` em produção (cria `demo@bussola.app` com senha conhecida). Crie a conta em `/registrar`.
+
+### 3. Firewall e systemd (sudo)
+
+```bash
+sudo ufw allow 3000/tcp
+sudo tee /etc/systemd/system/bussola-financeira.service >/dev/null <<'EOF'
+[Unit]
+Description=Bussola Financeira
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/home/deploy/personal-financeall
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOSTNAME=0.0.0.0
+EnvironmentFile=/home/deploy/personal-financeall/.env
+ExecStart=/usr/bin/node node_modules/next/dist/bin/next start -H 0.0.0.0 -p 3000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo systemctl daemon-reload
+sudo systemctl enable --now bussola-financeira
+sudo systemctl status bussola-financeira --no-pager
+curl -sS -o /dev/null -w "%{http_code}\n" http://127.0.0.1:3000/login
+```
+
+Acesso: `http://184.107.179.70:3000`
+
+### Atualizar depois
+
+```bash
+su - deploy
+cd /home/deploy/personal-financeall
+git pull
+npm ci
+npx prisma generate
+npx prisma migrate deploy
+npm run build
+sudo systemctl restart bussola-financeira
+```
 
 ## Extensão futura (já prevista no desenho)
 

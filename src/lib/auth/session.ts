@@ -48,12 +48,23 @@ export async function requireUser(): Promise<AuthUser> {
   return user;
 }
 
+/**
+ * Cookie `Secure` só via HTTPS. Em VPS acessada por `http://IP:porta`, defina
+ * AUTH_COOKIE_SECURE=false — senão o login grava o cookie e o navegador descarta.
+ */
+function cookieSecure(): boolean {
+  const explicit = process.env.AUTH_COOKIE_SECURE?.trim().toLowerCase();
+  if (explicit === "false" || explicit === "0") return false;
+  if (explicit === "true" || explicit === "1") return true;
+  return process.env.NODE_ENV === "production";
+}
+
 export async function createSession(userId: string, email: string): Promise<void> {
   const token = await signSessionToken({ sub: userId, email });
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: cookieSecure(),
     sameSite: "lax",
     path: "/",
     maxAge: SESSION_COOKIE_MAX_AGE,
