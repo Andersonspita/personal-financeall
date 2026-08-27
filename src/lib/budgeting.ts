@@ -12,11 +12,30 @@ export function getBudgetAlertLevel(spent: number, limitAmount: number): BudgetA
   return "dentro_do_limite";
 }
 
-export const CATEGORY_GROUPS = ["essencial", "variavel", "poupanca"] as const;
+export const BUDGET_GROUPS = ["essencial", "variavel", "poupanca"] as const;
+export type BudgetGroup = (typeof BUDGET_GROUPS)[number];
+
+/** `renda` é para receitas (salário, freelance). Não entra no 50-30-20 nem nos tetos de gasto. */
+export const INCOME_CATEGORY_GROUP = "renda";
+export const CATEGORY_GROUPS = ["essencial", "variavel", "poupanca", "renda"] as const;
 export type CategoryGroup = (typeof CATEGORY_GROUPS)[number];
 
+export function isIncomeCategoryGroup(group: string): boolean {
+  return group === INCOME_CATEGORY_GROUP;
+}
+
+/** No lançamento, receita só vê categorias de renda; despesa só vê categorias de gasto. */
+export function filterCategoriesByLaunchType<T extends { group: string }>(
+  categories: T[],
+  type: "receita" | "despesa",
+): T[] {
+  return categories.filter((c) =>
+    type === "receita" ? isIncomeCategoryGroup(c.group) : !isIncomeCategoryGroup(c.group),
+  );
+}
+
 // Metas de referência do modelo 50-30-20 (percentual da renda líquida).
-export const CATEGORY_GROUP_TARGET_RATIO: Record<CategoryGroup, number> = {
+export const CATEGORY_GROUP_TARGET_RATIO: Record<BudgetGroup, number> = {
   essencial: 0.5,
   variavel: 0.3,
   poupanca: 0.2,

@@ -3,28 +3,60 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { clsx } from "clsx";
-import { createTransaction } from "@/actions/transactions";
+import { createTransaction, updateTransaction } from "@/actions/transactions";
 import { EmotionPicker } from "@/components/transactions/emotion-picker";
 import type { Emotion } from "@/lib/emotions";
 import { VULNERABILITY_LEVEL_COPY } from "@/lib/copy";
 import type { VulnerabilityLevel } from "@/lib/vulnerability";
+import { filterCategoriesByLaunchType } from "@/lib/budgeting";
 
-interface Option {
+interface AccountOption {
+  id: string;
+  name: string;
+}
+
+interface CategoryOption {
   id: string;
   name: string;
   icon?: string | null;
+  group: string;
 }
 
-export function TransactionForm({ accounts, categories }: { accounts: Option[]; categories: Option[] }) {
+export interface TransactionFormInitial {
+  id: string;
+  type: "receita" | "despesa";
+  amount: number;
+  description: string;
+  accountId: string;
+  categoryId: string;
+  occurredAt: string;
+  essential: boolean;
+  emotion: Emotion | null;
+  note: string;
+}
+
+export function TransactionForm({
+  accounts,
+  categories,
+  initial,
+}: {
+  accounts: AccountOption[];
+  categories: CategoryOption[];
+  initial?: TransactionFormInitial;
+}) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [type, setType] = useState<"despesa" | "receita">("despesa");
-  const [essential, setEssential] = useState(true);
-  const [emotion, setEmotion] = useState<Emotion | null>(null);
-  const [note, setNote] = useState("");
+  const [type, setType] = useState<"despesa" | "receita">(initial?.type ?? "despesa");
+  const [essential, setEssential] = useState(initial?.essential ?? true);
+  const [emotion, setEmotion] = useState<Emotion | null>(initial?.emotion ?? null);
+  const [note, setNote] = useState(initial?.note ?? "");
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ isImpulse: boolean; nudge: string | null; level: VulnerabilityLevel } | null>(
     null,
+  );
+
+  const [nowLocal] = useState(() =>
+    new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
   );
 
   function handleSubmit(formData: FormData) {
@@ -34,7 +66,7 @@ export function TransactionForm({ accounts, categories }: { accounts: Option[]; 
       categoryId: (formData.get("categoryId") as string) || undefined,
       type,
       amount: Number(formData.get("amount")),
-      essential,
+      essential: type === "despesa" ? essential : true,
       description: (formData.get("description") as string) || undefined,
       occurredAt: new Date(String(formData.get("occurredAt"))),
       emotion:
@@ -45,8 +77,14 @@ export function TransactionForm({ accounts, categories }: { accounts: Option[]; 
 
     startTransition(async () => {
       try {
-        const result = await createTransaction(payload);
-        setFeedback({ isImpulse: result.isImpulse, nudge: result.nudge?.message ?? null, level: result.vulnerabilityLevel as VulnerabilityLevel });
+        const result = initial
+          ? await updateTransaction(initial.id, payload)
+          : await createTransaction(payload);
+        setFeedback({
+          isImpulse: result.isImpulse,
+          nudge: result.nudge?.message ?? null,
+          level: result.vulnerabilityLevel as VulnerabilityLevel,
+        });
         setTimeout(() => router.push("/transacoes"), result.isImpulse || result.nudge ? 1800 : 0);
       } catch {
         setError("Não foi possível salvar o lançamento. Confira os campos e tente novamente.");
@@ -54,9 +92,13 @@ export function TransactionForm({ accounts, categories }: { accounts: Option[]; 
     });
   }
 
-  const [nowLocal] = useState(() =>
-    new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
-  );
+  const visibleCategories = filterCategoriesByLaunchType(categories, type);
+  const defaultCategoryId =
+    initial && type === initial.type
+      ? initial.categoryId
+      : type === "receita"
+        ? (visibleCategories.find((c) => c.name === "Salário")?.id ?? "")
+        : "";
 
   return (
     <form action={handleSubmit} className="flex flex-col gap-4">
@@ -84,6 +126,7 @@ export function TransactionForm({ accounts, categories }: { accounts: Option[]; 
           step="0.01"
           min="0.01"
           required
+          defaultValue={initial?.amount}
           placeholder="0,00"
           className="rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
         />
@@ -95,14 +138,20 @@ export function TransactionForm({ accounts, categories }: { accounts: Option[]; 
           name="description"
           type="text"
           maxLength={200}
-          placeholder="Ex: mercado da semana"
+          defaultValue={initial?.description}
+          placeholder={type === "receita" ? "Ex: salário do mês" : "Ex: mercado da semana"}
           className="rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
         />
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
         Conta
-        <select name="accountId" required className="rounded-lg border border-border bg-surface px-3 py-2.5 text-base">
+        <select
+          name="accountId"
+          required
+          defaultValue={initial?.accountId}
+          className="rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
+        >
           {accounts.map((a) => (
             <option key={a.id} value={a.id}>
               {a.name}
@@ -112,15 +161,25 @@ export function TransactionForm({ accounts, categories }: { accounts: Option[]; 
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
-        Categoria
-        <select name="categoryId" className="rounded-lg border border-border bg-surface px-3 py-2.5 text-base">
+        Categoria {type === "receita" ? "(renda)" : "(gasto)"}
+        <select
+          key={type}
+          name="categoryId"
+          defaultValue={defaultCategoryId}
+          className="rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
+        >
           <option value="">Sem categoria</option>
-          {categories.map((c) => (
+          {visibleCategories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.icon} {c.name}
             </option>
           ))}
         </select>
+        <span className="text-xs text-foreground-muted">
+          {type === "receita"
+            ? "Só categorias de renda (salário, freelance…). Crie outras em Orçamentos, grupo Renda."
+            : "Só categorias de gasto. Salário e outras entradas ficam em Receita."}
+        </span>
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
@@ -129,7 +188,7 @@ export function TransactionForm({ accounts, categories }: { accounts: Option[]; 
           name="occurredAt"
           type="datetime-local"
           required
-          defaultValue={nowLocal}
+          defaultValue={initial?.occurredAt ?? nowLocal}
           className="rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
         />
       </label>
@@ -175,7 +234,7 @@ export function TransactionForm({ accounts, categories }: { accounts: Option[]; 
         disabled={isPending}
         className="rounded-full bg-primary py-3 text-sm font-semibold text-white disabled:opacity-60"
       >
-        {isPending ? "Salvando..." : "Salvar lançamento"}
+        {isPending ? "Salvando..." : initial ? "Salvar alterações" : "Salvar lançamento"}
       </button>
     </form>
   );

@@ -14,6 +14,7 @@ export const DEFAULT_CATEGORIES = [
   { name: "Assinaturas", group: "variavel", icon: "📺", monthlyLimit: 100 },
   { name: "Reserva de Emergência", group: "poupanca", icon: "🛟" },
   { name: "Investimentos", group: "poupanca", icon: "📈" },
+  { name: "Salário", group: "renda", icon: "💰" },
 ] as const;
 
 export async function createDefaultDataForUser(userId: string) {
@@ -22,5 +23,14 @@ export async function createDefaultDataForUser(userId: string) {
   });
   await prisma.category.createMany({
     data: DEFAULT_CATEGORIES.map((c) => ({ ...c, userId })),
+  });
+}
+
+/** Contas já criadas antes da categoria Salário passam a tê-la na primeira tela que precisa. */
+export async function ensureDefaultIncomeCategories(userId: string) {
+  const existing = await prisma.category.findFirst({ where: { userId, name: "Salário" } });
+  if (existing) return existing;
+  return prisma.category.create({
+    data: { userId, name: "Salário", group: "renda", icon: "💰" },
   });
 }

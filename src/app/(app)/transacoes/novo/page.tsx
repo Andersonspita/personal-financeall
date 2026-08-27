@@ -3,11 +3,13 @@ import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/session";
 import { TransactionForm } from "@/components/transactions/transaction-form";
+import { ensureDefaultIncomeCategories } from "@/lib/onboarding";
 
 export const dynamic = "force-dynamic";
 
 export default async function NewTransactionPage() {
   const user = await requireUser();
+  await ensureDefaultIncomeCategories(user.id);
   const [accounts, categories] = await Promise.all([
     prisma.account.findMany({ where: { userId: user.id, archived: false }, orderBy: { createdAt: "asc" } }),
     prisma.category.findMany({ where: { userId: user.id }, orderBy: { name: "asc" } }),

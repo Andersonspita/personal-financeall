@@ -63,11 +63,16 @@ export default async function TransactionsPage() {
               <span className={`tabular-nums text-sm font-semibold ${t.type === "receita" ? "text-primary" : ""}`}>
                 {t.type === "receita" ? "+" : "-"} {formatCurrency(t.amount)}
               </span>
-              <form action={deleteTransaction.bind(null, t.id)}>
-                <button type="submit" className="text-xs text-foreground-muted underline underline-offset-2">
-                  excluir
-                </button>
-              </form>
+              <div className="flex items-center gap-2">
+                <Link href={`/transacoes/${t.id}/editar`} className="text-xs text-primary underline underline-offset-2">
+                  editar
+                </Link>
+                <form action={deleteTransaction.bind(null, t.id)}>
+                  <button type="submit" className="text-xs text-foreground-muted underline underline-offset-2">
+                    excluir
+                  </button>
+                </form>
+              </div>
             </div>
           </Card>
         ))}

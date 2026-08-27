@@ -8,7 +8,7 @@ Este guia descreve o que você consegue fazer hoje no app.
 
 1. Abra o app e escolha **Criar conta** (`/registrar`).
 2. Informe nome, e-mail e uma senha com pelo menos 8 caracteres.
-3. Na primeira conta, o app já cria uma **Conta Principal** e categorias iniciais (Moradia, Alimentação, Delivery, Lazer, etc.). Você pode editá-las depois.
+3. Na primeira conta, o app já cria uma **Conta Principal** e categorias iniciais de gasto (Moradia, Alimentação, Delivery…) mais **Salário** (renda). Você pode criar outras depois em Orçamentos.
 4. Para sair, use **Sair** no menu (computador) ou no topo da tela (celular).
 
 Quem já tem conta entra em **Entrar** (`/login`).
@@ -43,27 +43,36 @@ O botão **Lançar** abre o cadastro de uma nova receita ou despesa.
 
 Lista as movimentações. Em cada uma você vê data, conta, categoria e, se registrou, o estado emocional.
 
+Use **editar** para corrigir valor, data, categoria ou tipo. Use **excluir** se o lançamento não deveria existir.
+
 Se o app marcar um gasto como **possível impulso**, você pode tocar em **não foi impulso**. O marcador é informativo: você sempre tem a última palavra.
 
 ### Novo lançamento
 
+1. Escolha **receita** ou **despesa**. A lista de categorias muda junto: receita mostra só entradas (Salário, freelance…); despesa mostra só gastos (Moradia, Delivery…).
+2. Para o salário: **Receita** → categoria **Salário** (criada automaticamente) → valor → conta → data → **Salvar**.
+3. Descrição ajuda (ex.: “salário agosto”). Estado emocional só aparece em despesa.
+
+Outras entradas (freelance, 13º, reembolso): em **Orçamentos**, crie uma categoria com grupo **Renda**.
+
 Campos principais:
 
 - tipo (receita ou despesa)
-- valor, conta e categoria
+- valor, conta e categoria (filtrada pelo tipo)
 - se a despesa é essencial (fixa) ou variável
 - data e hora
 - estado emocional no momento da compra (opcional): ansioso, entediado, estressado, triste, feliz, neutro ou necessidade real
-- intensidade de 1 a 5 e um comentário privado (opcional)
+- um comentário privado (opcional)
 
 O comentário emocional fica protegido e **não** entra no extrato financeiro exportado.
 
 ### Orçamentos
 
-- teto mensal por categoria
+- categorias de **renda** (só para receitas) separadas dos **tetos de gasto**
+- teto mensal por categoria de gasto
 - alerta visual ao chegar em 80% e ao atingir 100% do teto
 - visão 50-30-20: essencial, variável e poupança em relação à renda do mês
-- cadastro de novas categorias
+- cadastro de novas categorias: grupo **Renda** para entradas; os outros grupos para gastos
 
 Os avisos usam linguagem de orientação, não de culpa.
 

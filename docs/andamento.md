@@ -16,8 +16,8 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 
 | ID | Requisito | Status | Onde vive | Observação |
 |---|---|---|---|---|
-| RF01 | Lançamento com tag emocional | Pronto | `/transacoes/novo`, `EmotionLog` | Emoção + intensidade; nota cifrada |
-| RF02 | Tetos e 50-30-20, alerta 80%/100% | Parcial | `/orcamentos`, `budgeting.ts` | Alertas na UI. `alert80SentAt`/`alert100SentAt` ainda não são gravados; não há push |
+| RF01 | Lançamento com tag emocional | Pronto | `/transacoes/novo`, `/transacoes/[id]/editar`, `EmotionLog` | Edição; nota cifrada. Categorias filtradas por receita/despesa |
+| RF02 | Tetos e 50-30-20, alerta 80%/100% | Parcial | `/orcamentos`, `budgeting.ts` | Grupo `renda` separado dos tetos. Alertas na UI; timestamps de alerta ainda não gravados |
 | RF03 | Dashboard de fluxo de caixa | Pronto | `/`, `dashboard.ts` | Saldo, fixas vs variáveis, projeção linear |
 | RF04 | Detector de anomalias | Pronto | `anomaly-detection.ts` | Frequência 24h e madrugada; flag descartável |
 | RF05 | Matriz emoção × gasto | Pronto | `/correlacao` | Últimos 30 dias |
@@ -62,6 +62,10 @@ O código já entregava o fluxo completo de cadastro, lançamentos com emoção,
 ### 2026-08-27 — Deploy na VPS (porta 3000)
 
 As portas 80, 443, 8000, 8080 e 8081 já estavam em uso na VPS. O app sobe em **3000** (livre). Cookie `Secure` passou a respeitar `AUTH_COOKIE_SECURE` para login funcionar em `http://IP:porta`. Roteiro em `docs/tecnico.md`.
+
+### 2026-08-27 — Categorias renda/gasto e edição de lançamento
+
+Categorias de **renda** (ex.: Salário) ficam separadas das de **gasto**. No lançamento, receita e despesa mostram listas diferentes. Dá para **editar** um lançamento depois de salvar. Contas antigas ganham a categoria Salário na primeira visita a Lançar ou Orçamentos.
 
 ## Próximos passos sugeridos
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getBudgetAlertLevel, projectEndOfMonthBalance } from "./budgeting";
+import { getBudgetAlertLevel, projectEndOfMonthBalance, filterCategoriesByLaunchType } from "./budgeting";
 
 describe("getBudgetAlertLevel", () => {
   it("dentro do limite abaixo de 80%", () => {
@@ -20,6 +20,22 @@ describe("getBudgetAlertLevel", () => {
 
   it("nunca estoura com limite zero ou negativo", () => {
     expect(getBudgetAlertLevel(50, 0)).toBe("dentro_do_limite");
+  });
+});
+
+describe("filterCategoriesByLaunchType", () => {
+  const cats = [
+    { name: "Moradia", group: "essencial" },
+    { name: "Salário", group: "renda" },
+    { name: "Lazer", group: "variavel" },
+  ];
+
+  it("na receita mostra só categorias de renda", () => {
+    expect(filterCategoriesByLaunchType(cats, "receita").map((c) => c.name)).toEqual(["Salário"]);
+  });
+
+  it("na despesa omite categorias de renda", () => {
+    expect(filterCategoriesByLaunchType(cats, "despesa").map((c) => c.name)).toEqual(["Moradia", "Lazer"]);
   });
 });
 

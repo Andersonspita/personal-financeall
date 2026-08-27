@@ -107,7 +107,7 @@ Isolamento por `userId` em todo dado do usuário. Actions conferem dono da conta
 
 ### Orçamento (RF02)
 
-`src/lib/budgeting.ts`: alerta em 80% e 100% do teto; grupos `essencial` / `variavel` / `poupanca` (50-30-20). Alertas são **calculados na leitura** e mostrados na UI. Os campos `alert80SentAt` / `alert100SentAt` existem no schema e **ainda não são gravados** (não há push/e-mail).
+`src/lib/budgeting.ts`: alerta em 80% e 100% do teto; grupos de **gasto** `essencial` / `variavel` / `poupanca` (50-30-20) e grupo de **renda** `renda` (salário e outras entradas). No lançamento, receita só lista categorias `renda` e despesa só lista as de gasto (`filterCategoriesByLaunchType`). Alertas são **calculados na leitura** e mostrados na UI. Os campos `alert80SentAt` / `alert100SentAt` existem no schema e **ainda não são gravados** (não há push/e-mail). Lançamentos existentes podem ser alterados em `/transacoes/[id]/editar` (`updateTransaction`).
 
 ### Detector de impulso (RF04)
 
@@ -142,9 +142,10 @@ Escopo fechado (`src/lib/ai/prompts.ts`): no máximo 3–4 frases, tom não-puni
 | Rota | Função |
 |---|---|
 | `/` | Dashboard |
-| `/transacoes` | Lista |
-| `/transacoes/novo` | Formulário RF01 |
-| `/orcamentos` | Tetos e 50-30-20 |
+| `/transacoes` | Lista (editar / excluir) |
+| `/transacoes/novo` | Formulário RF01; categorias filtradas por receita/despesa |
+| `/transacoes/[id]/editar` | Correção de lançamento |
+| `/orcamentos` | Renda vs tetos de gasto e 50-30-20 |
 | `/desejos` | Cooling-off 24–72h |
 | `/correlacao` | Matriz emoção × gasto |
 | `/panico` | Desvio de foco |

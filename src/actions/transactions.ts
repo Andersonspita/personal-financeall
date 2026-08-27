@@ -8,6 +8,16 @@ import { transactionInputSchema } from "@/lib/validation";
 import { evaluateTransactionForAnomalies, type AnomalyCandidateTransaction } from "@/lib/rules/anomaly-detection";
 import { recordVulnerabilityAssessment } from "@/lib/insights";
 import { maybeGenerateNudge } from "@/lib/nudges";
+import { isIncomeCategoryGroup } from "@/lib/budgeting";
+
+function assertCategoryMatchesLaunchType(type: "receita" | "despesa", group: string) {
+  if (type === "receita" && !isIncomeCategoryGroup(group)) {
+    throw new Error("Categoria de gasto não pode ser usada em receita.");
+  }
+  if (type === "despesa" && isIncomeCategoryGroup(group)) {
+    throw new Error("Categoria de renda não pode ser usada em despesa.");
+  }
+}
 
 export interface CreateTransactionResult {
   isImpulse: boolean;
@@ -26,6 +36,7 @@ export async function createTransaction(input: unknown): Promise<CreateTransacti
   if (data.categoryId) {
     const category = await prisma.category.findFirst({ where: { id: data.categoryId, userId: user.id } });
     if (!category) throw new Error("Categoria não encontrada.");
+    assertCategoryMatchesLaunchType(data.type, category.group);
   }
 
   // Janela de +/-24h ao redor do lançamento para o detector de frequência (RF04) funcionar
@@ -82,6 +93,97 @@ export async function createTransaction(input: unknown): Promise<CreateTransacti
   revalidatePath("/");
   revalidatePath("/transacoes");
   revalidatePath("/correlacao");
+  revalidatePath("/orcamentos");
+
+  return { isImpulse, nudge, vulnerabilityLevel: assessment.level };
+}
+
+export async function updateTransaction(transactionId: string, input: unknown): Promise<CreateTransactionResult> {
+  const user = await requireUser();
+  const data = transactionInputSchema.parse(input);
+
+  const existing = await prisma.transaction.findFirst({
+    where: { id: transactionId, userId: user.id },
+    include: { emotionLog: true },
+  });
+  if (!existing) throw new Error("Lançamento não encontrado.");
+
+  const account = await prisma.account.findFirst({ where: { id: data.accountId, userId: user.id } });
+  if (!account) throw new Error("Conta não encontrada.");
+  if (data.categoryId) {
+    const category = await prisma.category.findFirst({ where: { id: data.categoryId, userId: user.id } });
+    if (!category) throw new Error("Categoria não encontrada.");
+    assertCategoryMatchesLaunchType(data.type, category.group);
+  }
+
+  const windowStart = new Date(data.occurredAt.getTime() - 24 * 60 * 60 * 1000);
+  const windowEnd = new Date(data.occurredAt.getTime() + 24 * 60 * 60 * 1000);
+  const nearbyRaw = await prisma.transaction.findMany({
+    where: {
+      userId: user.id,
+      id: { not: transactionId },
+      occurredAt: { gte: windowStart, lte: windowEnd },
+    },
+    select: { type: true, essential: true, occurredAt: true },
+  });
+  const nearby: AnomalyCandidateTransaction[] = nearbyRaw.map((t) => ({
+    type: t.type as "receita" | "despesa",
+    essential: t.essential,
+    occurredAt: t.occurredAt,
+  }));
+  const current: AnomalyCandidateTransaction = {
+    type: data.type,
+    essential: data.essential,
+    occurredAt: data.occurredAt,
+  };
+  const { isImpulse } = evaluateTransactionForAnomalies(current, [...nearby, current]);
+
+  await prisma.transaction.update({
+    where: { id: transactionId },
+    data: {
+      accountId: data.accountId,
+      categoryId: data.categoryId ?? null,
+      type: data.type,
+      amount: data.amount,
+      essential: data.essential,
+      description: data.description,
+      occurredAt: data.occurredAt,
+      isImpulse,
+    },
+  });
+
+  if (data.type === "receita" || !data.emotion) {
+    if (existing.emotionLog) {
+      await prisma.emotionLog.delete({ where: { transactionId } });
+    }
+  } else if (data.emotion) {
+    const noteEncrypted = data.emotion.note ? encryptSensitive(data.emotion.note) : null;
+    await prisma.emotionLog.upsert({
+      where: { transactionId },
+      create: {
+        transactionId,
+        emotion: data.emotion.emotion,
+        intensity: data.emotion.intensity,
+        noteEncrypted: noteEncrypted ?? undefined,
+      },
+      update: {
+        emotion: data.emotion.emotion,
+        intensity: data.emotion.intensity,
+        noteEncrypted,
+      },
+    });
+  }
+
+  const [nudge, { assessment }] = await Promise.all([
+    maybeGenerateNudge(user.id, transactionId),
+    recordVulnerabilityAssessment(user.id),
+  ]);
+
+  revalidatePath("/");
+  revalidatePath("/transacoes");
+  revalidatePath("/correlacao");
+  revalidatePath("/orcamentos");
+  revalidatePath(`/transacoes/${transactionId}/editar`);
 
   return { isImpulse, nudge, vulnerabilityLevel: assessment.level };
 }

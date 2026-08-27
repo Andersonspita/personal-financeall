@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/session";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import { getBudgetAlertLevel, CATEGORY_GROUP_TARGET_RATIO, CATEGORY_GROUPS, type CategoryGroup } from "@/lib/budgeting";
+import { getBudgetAlertLevel, CATEGORY_GROUP_TARGET_RATIO, CATEGORY_GROUPS, BUDGET_GROUPS, type CategoryGroup, type BudgetGroup } from "@/lib/budgeting";
 import { upsertBudgetFromForm } from "@/actions/budgets";
 import { createCategoryFromForm } from "@/actions/categories";
 import { formatCurrency } from "@/lib/format";
 import { BUDGET_ALERT_COPY } from "@/lib/copy";
+import { ensureDefaultIncomeCategories } from "@/lib/onboarding";
 
 export const dynamic = "force-dynamic";
 
@@ -15,10 +16,12 @@ const GROUP_LABEL: Record<CategoryGroup, string> = {
   essencial: "Essencial",
   variavel: "Variável",
   poupanca: "Poupança",
+  renda: "Renda",
 };
 
 export default async function BudgetsPage() {
   const user = await requireUser();
+  await ensureDefaultIncomeCategories(user.id);
   const now = new Date();
   const month = format(now, "yyyy-MM");
   const monthStart = startOfMonth(now);
@@ -42,9 +45,10 @@ export default async function BudgetsPage() {
   const budgetMap = new Map(budgets.map((b) => [b.categoryId, b.limitAmount]));
   const totalIncome = income._sum.amount ?? 0;
 
-  const groupTotals: Record<CategoryGroup, number> = { essencial: 0, variavel: 0, poupanca: 0 };
+  const groupTotals: Record<BudgetGroup, number> = { essencial: 0, variavel: 0, poupanca: 0 };
   for (const c of categories) {
-    groupTotals[c.group as CategoryGroup] += spentMap.get(c.id) ?? 0;
+    if (!(BUDGET_GROUPS as readonly string[]).includes(c.group)) continue;
+    groupTotals[c.group as BudgetGroup] += spentMap.get(c.id) ?? 0;
   }
 
   return (
@@ -54,7 +58,7 @@ export default async function BudgetsPage() {
       <Card>
         <CardTitle>Distribuição 50-30-20</CardTitle>
         <div className="flex flex-col gap-3">
-          {CATEGORY_GROUPS.map((group) => {
+          {BUDGET_GROUPS.map((group) => {
             const spent = groupTotals[group];
             const ratio = totalIncome > 0 ? spent / totalIncome : 0;
             const target = CATEGORY_GROUP_TARGET_RATIO[group];
@@ -81,9 +85,27 @@ export default async function BudgetsPage() {
       </Card>
 
       <Card>
-        <CardTitle>Tetos por categoria</CardTitle>
+        <CardTitle>Categorias de renda</CardTitle>
+        <p className="mb-3 text-sm text-foreground-muted">
+          Usadas só em lançamentos do tipo receita (salário, freelance, 13º). Não entram nos tetos nem no 50-30-20.
+        </p>
+        <ul className="flex flex-col gap-2 text-sm">
+          {categories
+            .filter((c) => c.group === "renda")
+            .map((c) => (
+              <li key={c.id}>
+                {c.icon} {c.name}
+              </li>
+            ))}
+        </ul>
+      </Card>
+
+      <Card>
+        <CardTitle>Tetos por categoria de gasto</CardTitle>
         <div className="flex flex-col gap-4">
-          {categories.map((c) => {
+          {categories
+            .filter((c) => c.group !== "renda")
+            .map((c) => {
             const spent = spentMap.get(c.id) ?? 0;
             const limit = budgetMap.get(c.id) ?? c.monthlyLimit ?? null;
             const alertLevel = limit ? getBudgetAlertLevel(spent, limit) : "dentro_do_limite";
@@ -164,6 +186,10 @@ export default async function BudgetsPage() {
               className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm"
             />
           </div>
+          <p className="text-xs text-foreground-muted">
+            Grupo <strong>Renda</strong> = entradas. Essencial, variável e poupança = gastos (50-30-20). Teto mensal só
+            faz sentido para gasto.
+          </p>
           <button type="submit" className="rounded-full bg-primary py-2.5 text-sm font-semibold text-white">
             Criar categoria
           </button>

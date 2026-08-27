@@ -58,7 +58,7 @@ model Account {
   @@index([userId])
 }
 
-/// Categoria de gasto/receita. `group` segue a lógica 50-30-20 (essencial/variavel/poupanca) — RF02.
+/// Categoria. `group`: essencial/variavel/poupanca (gastos, RF02) ou renda (receitas).
 model Category {
   id            String         @id @default(cuid())
   userId        String

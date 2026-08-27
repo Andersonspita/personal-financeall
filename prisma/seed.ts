@@ -61,6 +61,7 @@ async function main() {
       { name: "Assinaturas", group: "variavel", icon: "📺", monthlyLimit: 100 },
       { name: "Reserva de Emergência", group: "poupanca", icon: "🛟" },
       { name: "Investimentos", group: "poupanca", icon: "📈" },
+      { name: "Salário", group: "renda", icon: "💰" },
     ].map((c) => prisma.category.create({ data: { ...c, userId: user.id } })),
   );
 
@@ -93,8 +94,7 @@ async function main() {
   const seedTransactions: SeedTxn[] = [
     {
       accountId: contaCorrente.id,
-      categoryId: byName("Moradia").id,
-      type: "receita",
+      categoryId: byName("Salário").id,
       amount: 4500,
       essential: true,
       description: "Salário",
