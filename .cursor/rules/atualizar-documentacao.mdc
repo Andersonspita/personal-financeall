@@ -1,0 +1,29 @@
+---
+description: Sempre atualizar as documentações de usuário, técnica e andamento quando o sistema mudar
+alwaysApply: true
+---
+
+# Documentação acompanha o sistema
+
+Toda alteração funcional, de arquitetura, de API, de fluxo de tela ou de requisito **deve** atualizar as docs no mesmo trabalho. Não deixe a documentação para um commit posterior.
+
+## Onde atualizar
+
+| Mudança | Arquivos |
+|---|---|
+| Fluxo que a pessoa usa (telas, botões, cadastro, PWA) | `docs/usuario.md` e, se o README resumir o fluxo, `README.md` |
+| Arquitetura, schema, APIs, regras, segurança, setup | `docs/tecnico.md` |
+| Status de RF/RNF, o que ficou pronto, o que falta, decisões | `docs/andamento.md` (nova entrada no histórico + tabela de status) |
+| Requisitos de produto novos ou alterados | `Requisito.MD` e as três docs acima |
+
+## Como atualizar `docs/andamento.md`
+
+1. Ajuste a tabela de status dos requisitos (Pronto / Parcial / Pendente).
+2. Acrescente uma entrada no histórico com a data (AAAA-MM-DD), o que mudou e o porquê.
+3. Atualize a seção de próximos passos se a mudança abrir ou fechar trabalho.
+
+## O que não fazer
+
+- Não inventar status “pronto” para recurso incompleto.
+- Não documentar senha, chave ou conteúdo de `.env`.
+- Não omitir a atualização porque a mudança “é pequena”: se o usuário ou o desenvolvedor percebe a diferença, a doc muda.

@@ -1,0 +1,221 @@
+// Prisma schema — Finanças Comportamentais & Apoio Emocional
+// SQLite não suporta enums nativamente: campos de domínio fechado (type, status, group, level,
+// emotion) são String e validados na borda da aplicação (ver src/lib/validation.ts / zod).
+//
+// RNF02 (sigilo dos dados emocionais): EmotionLog é uma tabela própria, separada de Transaction,
+// com o campo de nota sempre armazenado criptografado (ver src/lib/crypto.ts) e nunca incluída
+// nas rotas de exportação financeira (ver src/app/api/export).
+//
+// Multiusuário: todo dado pertence a um User (userId). O modelo de auth é client-agnostic de
+// propósito — o mesmo token (cookie na web, Bearer em apps móveis) autentica contra as mesmas
+// rotas, então o backend já nasce pronto para um futuro app iOS/Android sem mudar o schema.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+/// Conta de usuário. Senha nunca em texto plano — ver src/lib/auth/password.ts.
+model User {
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  passwordHash       String
+  name               String
+  // Opt-in explícito: liga o assistente de IA (RNF02 — envia sinais agregados a um provedor
+  // externo, então fica desligado por padrão até o usuário decidir ativar em /configuracoes).
+  aiAssistantEnabled Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  accounts            Account[]
+  categories          Category[]
+  transactions        Transaction[]
+  budgets             Budget[]
+  wishlistItems       WishlistItem[]
+  vulnerabilityScores VulnerabilityScore[]
+  nudges              Nudge[]
+  panicSessions       PanicSession[]
+  contentProgress     ContentProgress[]
+}
+
+/// Conta financeira (corrente, poupança, cartão de crédito, dinheiro).
+model Account {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  type           String
+  initialBalance Float         @default(0)
+  archived       Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  transactions   Transaction[]
+
+  @@index([userId])
+}
+
+/// Categoria de gasto/receita. `group` segue a lógica 50-30-20 (essencial/variavel/poupanca) — RF02.
+model Category {
+  id            String         @id @default(cuid())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  group         String
+  icon          String?
+  color         String?
+  monthlyLimit  Float?
+  createdAt     DateTime       @default(now())
+  transactions  Transaction[]
+  budgets       Budget[]
+  wishlistItems WishlistItem[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+/// Lançamento financeiro (RF01). O estado emocional fica em EmotionLog, não aqui.
+model Transaction {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId   String
+  account     Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  categoryId  String?
+  category    Category?   @relation(fields: [categoryId], references: [id])
+  type        String // "receita" | "despesa"
+  amount      Float // sempre positivo; o sinal é dado por `type`
+  essential   Boolean     @default(true) // despesa fixa vs. variável — RF03
+  description String?
+  occurredAt  DateTime
+  isImpulse   Boolean     @default(false) // sinalizado pelo motor de anomalias — RF04 (não-punitivo: usuário pode descartar o sinalizador)
+  createdAt   DateTime    @default(now())
+  emotionLog  EmotionLog?
+
+  @@index([userId, occurredAt])
+  @@index([accountId])
+  @@index([categoryId])
+}
+
+/// Estado emocional associado a um lançamento (RF01). Isolado de Transaction para permitir
+/// controle de acesso/retention diferenciado e para nunca vazar em exports financeiros (RNF02).
+model EmotionLog {
+  id            String      @id @default(cuid())
+  transactionId String      @unique
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  emotion       String // ver src/lib/emotions.ts (ansioso, entediado, estressado, triste, feliz, neutro, necessidade_real)
+  intensity     Int? // 1-5, opcional
+  noteEncrypted String? // criptografado via src/lib/crypto.ts — nunca em texto plano
+  createdAt     DateTime    @default(now())
+}
+
+/// Teto mensal por categoria + rastreio de alertas de 80%/100% (RF02).
+model Budget {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId     String
+  category       Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  month          String // formato "YYYY-MM"
+  limitAmount    Float
+  alert80SentAt  DateTime?
+  alert100SentAt DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@unique([categoryId, month])
+  @@index([userId])
+}
+
+/// Item de desejo com trava de resfriamento de 24-72h (RF06).
+model WishlistItem {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  amount        Float
+  categoryId    String?
+  category      Category? @relation(fields: [categoryId], references: [id])
+  cooldownHours Int       @default(48)
+  status        String    @default("pendente") // pendente | confirmado | descartado
+  createdAt     DateTime  @default(now())
+  availableAt   DateTime // createdAt + cooldownHours, calculado na criação
+  resolvedAt    DateTime?
+
+  @@index([userId])
+}
+
+/// Score de propensão à compulsão, recalculado periodicamente pelo motor de regras (RF09).
+model VulnerabilityScore {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime @default(now())
+  score     Int // 0-100
+  level     String // baixo | medio | alto | critico
+  factors   String // JSON com o detalhamento (frequência, mix emocional, horário atípico...)
+  createdAt DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+/// Microdica contextual do feed de nudges (RF07).
+model Nudge {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message     String
+  triggerRule String
+  category    String?
+  createdAt   DateTime  @default(now())
+  seenAt      DateTime?
+  dismissedAt DateTime?
+
+  @@index([userId])
+}
+
+/// Sessão do Botão de Pânico / Desvio de Foco (RF08). Registro opcional e não-julgador do desfecho.
+model PanicSession {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startedAt   DateTime  @default(now())
+  activityId  String?
+  completedAt DateTime?
+  outcome     String? // "evitou_compra" | "comprou_mesmo" — autodeclarado, sem julgamento
+
+  @@index([userId])
+}
+
+/// Biblioteca de educação emocional-financeira (extensão do RF07): conteúdo curado, igual para
+/// todo mundo — não tem userId aqui porque não é dado do usuário, é o material em si.
+model EducationalContent {
+  id               String            @id @default(cuid())
+  slug             String            @unique
+  title            String
+  summary          String
+  body             String // parágrafos separados por \n\n, sem markdown — texto simples de propósito
+  tag              String // emoção (ver src/lib/emotions.ts) ou tema geral (orcamento, poupanca, compulsao, autoconhecimento)
+  estimatedMinutes Int
+  order            Int               @default(0)
+  createdAt        DateTime          @default(now())
+  progress         ContentProgress[]
+
+  @@index([tag])
+}
+
+/// Progresso de leitura por usuário — o conteúdo em si é compartilhado, o progresso não.
+model ContentProgress {
+  id          String             @id @default(cuid())
+  userId      String
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contentId   String
+  content     EducationalContent @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  viewedAt    DateTime?
+  completedAt DateTime?
+
+  @@unique([userId, contentId])
+  @@index([userId])
+}

@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+/* Paleta calma e não-punitiva (RNF03): sem vermelho de alarme — o "crítico" usa um rosé suave,
+   e alertas de orçamento usam âmbar, nunca tons de "erro"/"falha". */
+:root {
+  --background: #faf9f6;
+  --surface: #ffffff;
+  --surface-muted: #f2f0ea;
+  --foreground: #292524;
+  --foreground-muted: #78716c;
+  --border: #e7e4dc;
+
+  --color-primary: #3f6f5e;
+  --color-primary-soft: #e7efe9;
+  --color-accent: #b78a3d;
+  --color-warm: #c98a2b;
+  --color-warm-soft: #faf0dd;
+  --color-critical: #b3555a;
+  --color-critical-soft: #f7e9ea;
+  --color-calm: #4d7c8a;
+  --color-calm-soft: #e5eff1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #17181a;
+    --surface: #202224;
+    --surface-muted: #26282b;
+    --foreground: #ede9e3;
+    --foreground-muted: #a3a09a;
+    --border: #34363a;
+
+    --color-primary: #7fb69d;
+    --color-primary-soft: #223028;
+    --color-accent: #d9b876;
+    --color-warm: #e0ac5c;
+    --color-warm-soft: #322a1c;
+    --color-critical: #d98a8e;
+    --color-critical-soft: #362325;
+    --color-calm: #8fc1cf;
+    --color-calm-soft: #1f2d31;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-border: var(--border);
+  --color-primary: var(--color-primary);
+  --color-primary-soft: var(--color-primary-soft);
+  --color-accent: var(--color-accent);
+  --color-warm: var(--color-warm);
+  --color-warm-soft: var(--color-warm-soft);
+  --color-critical: var(--color-critical);
+  --color-critical-soft: var(--color-critical-soft);
+  --color-calm: var(--color-calm);
+  --color-calm-soft: var(--color-calm-soft);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
