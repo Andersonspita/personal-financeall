@@ -95,6 +95,7 @@ async function main() {
     {
       accountId: contaCorrente.id,
       categoryId: byName("Salário").id,
+      type: "receita",
       amount: 4500,
       essential: true,
       description: "Salário",
