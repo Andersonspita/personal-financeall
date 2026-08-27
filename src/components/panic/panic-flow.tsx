@@ -70,16 +70,16 @@ export function PanicFlow() {
         <p className="text-lg font-medium">{activity?.title}</p>
         <p className="text-sm text-foreground-muted">{activity?.description}</p>
         <p className="text-sm text-foreground-muted">Sem pressa. Quando terminar, volte aqui.</p>
-        <div className="flex gap-2">
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
           <button
             onClick={() => handleOutcome("evitou_compra")}
-            className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white"
+            className="w-full rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white sm:w-auto"
           >
             Consegui esperar
           </button>
           <button
             onClick={() => handleOutcome("comprou_mesmo")}
-            className="rounded-full border border-border px-4 py-2.5 text-sm font-medium"
+            className="w-full rounded-full border border-border px-4 py-2.5 text-sm font-medium sm:w-auto"
           >
             Comprei mesmo assim
           </button>

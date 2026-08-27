@@ -155,22 +155,26 @@ export default async function BudgetsPage() {
       <Card>
         <CardTitle>Nova categoria</CardTitle>
         <form action={createCategoryFromForm} className="flex flex-col gap-3">
-          <div className="flex gap-2">
+          <div className="flex min-w-0 gap-2">
             <input
               name="icon"
               maxLength={4}
               placeholder="🏷️"
-              className="w-16 rounded-lg border border-border bg-surface px-2 py-2 text-center text-base"
+              className="w-16 shrink-0 rounded-lg border border-border bg-surface px-2 py-2 text-center text-base"
             />
             <input
               name="name"
               required
               placeholder="Nome da categoria"
-              className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+              className="min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm"
             />
           </div>
-          <div className="flex gap-2">
-            <select name="group" required className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm">
+          <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
+            <select
+              name="group"
+              required
+              className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm sm:flex-1"
+            >
               {CATEGORY_GROUPS.map((g) => (
                 <option key={g} value={g}>
                   {GROUP_LABEL[g]}
@@ -183,7 +187,7 @@ export default async function BudgetsPage() {
               step="0.01"
               min="0.01"
               placeholder="Teto mensal (opcional)"
-              className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+              className="w-full min-w-0 rounded-lg border border-border bg-surface px-3 py-2 text-sm sm:flex-1"
             />
           </div>
           <p className="text-xs text-foreground-muted">

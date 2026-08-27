@@ -67,6 +67,10 @@ As portas 80, 443, 8000, 8080 e 8081 já estavam em uso na VPS. O app sobe em **
 
 Categorias de **renda** (ex.: Salário) ficam separadas das de **gasto**. No lançamento, receita e despesa mostram listas diferentes. Dá para **editar** um lançamento depois de salvar. Contas antigas ganham a categoria Salário na primeira visita a Lançar ou Orçamentos.
 
+### 2026-08-27 — Layout da trava de resfriamento no celular
+
+O select de categoria ao lado do valor estourava o card (largura mínima nativa do `<select>`). Campos passam a empilhar em coluna; cards e o `select` não ultrapassam a tela.
+
 ## Próximos passos sugeridos
 
 1. Persistir `alert80SentAt` / `alert100SentAt` e, se fizer sentido, web push ou e-mail no teto.

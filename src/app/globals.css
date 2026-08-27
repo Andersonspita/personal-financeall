@@ -65,4 +65,10 @@
 body {
   background: var(--background);
   color: var(--foreground);
+  overflow-x: hidden;
+}
+
+/* Safari/Chrome: <select> usa a opção mais longa como largura mínima e estoura o card no celular. */
+select {
+  max-width: 100%;
 }

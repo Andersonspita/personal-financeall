@@ -128,7 +128,7 @@ export function TransactionForm({
           required
           defaultValue={initial?.amount}
           placeholder="0,00"
-          className="rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
+          className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
         />
       </label>
 
@@ -140,7 +140,7 @@ export function TransactionForm({
           maxLength={200}
           defaultValue={initial?.description}
           placeholder={type === "receita" ? "Ex: salário do mês" : "Ex: mercado da semana"}
-          className="rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
+          className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
         />
       </label>
 
@@ -150,7 +150,7 @@ export function TransactionForm({
           name="accountId"
           required
           defaultValue={initial?.accountId}
-          className="rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
+          className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
         >
           {accounts.map((a) => (
             <option key={a.id} value={a.id}>
@@ -166,7 +166,7 @@ export function TransactionForm({
           key={type}
           name="categoryId"
           defaultValue={defaultCategoryId}
-          className="rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
+          className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
         >
           <option value="">Sem categoria</option>
           {visibleCategories.map((c) => (
@@ -189,7 +189,7 @@ export function TransactionForm({
           type="datetime-local"
           required
           defaultValue={initial?.occurredAt ?? nowLocal}
-          className="rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
+          className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
         />
       </label>
 
