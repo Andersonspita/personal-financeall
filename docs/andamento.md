@@ -44,7 +44,8 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 | Seed demo | Pronto (`demo@bussola.app`) |
 | Testes unitários do domínio | Parcial (7 arquivos; sem suíte de banco/UI) |
 | App iOS/Android | Pendente (API já client-agnostic) |
-| Recuperação de senha / verificação de e-mail | Pendente |
+| Recuperação de senha / verificação de e-mail | Parcial (reset por e-mail; sem verificação de cadastro) |
+| Login Google | Pronto (opcional; `GOOGLE_CLIENT_ID` + secret + redirect) |
 | Postgres / deploy em nuvem | Pendente |
 | Deploy VPS (systemd, porta 3000) | Pronto (roteiro em `docs/tecnico.md`; HTTP com `AUTH_COOKIE_SECURE=false`) |
 
@@ -87,15 +88,20 @@ Menu inferior com espaço entre itens, rótulos curtos e recuo da safe-area do i
 
 Sem reescrever o App Router em “Clean Architecture” de pastas: a divisão continua página → Server Action → `src/lib`. Extraídos `cash-flow.ts`, `errors.ts`, `auth/schemas.ts` e componentes de orçamento/lançamento/desejos. Validação Zod em português com erro **por campo** (`Field`, `aria-invalid`). Falhas inesperadas vão para log JSON (`logAppError`); token JWT inválido continua sendo “sem sessão”. Suíte de testes passou de 3 para 7 arquivos (validação, cifra, série de fluxo, schemas de auth, bordas). Títulos em Source Serif; botões com spinner e microinteração de clique. A trava de resfriamento deixa de usar `Date.now()` no Server Component (isso gerava aviso de hidratação).
 
+### 2026-08-28 — Recuperação de senha e Google
+
+Dá para pedir um link em **Esqueci a senha** (token com hash, 1 hora, mensagem genérica). Sem SMTP/Resend o link só sai no log do servidor. **Continuar com Google** cria ou vincula a conta pelo e-mail verificado (PKCE). `passwordHash` passou a ser opcional. Não há verificação de e-mail no cadastro por senha.
+
 ## Próximos passos sugeridos
 
 1. Trocar SQLite por Postgres quando houver deploy multi-usuário.
-2. Recuperação de senha e rotação de `AUTH_SECRET` / chave de cifra.
-3. Testes de integração com banco (actions, export sem vazar EmotionLog).
-4. Cliente móvel usando as rotas `/api/auth/*` e Bearer.
-5. Cifrar ou tokenizar o rótulo `emotion` se a política de sigilo exigir mais do que o isolamento atual.
-6. Web push ou e-mail no teto, reusando os timestamps já gravados.
-7. Tela para criar/editar contas (`createAccount` já existe na action).
+2. Configurar SMTP/Resend e o OAuth do Google na VPS (`APP_BASE_URL`, redirect URI). Google costuma exigir HTTPS para o client de produção.
+3. Rotação de `AUTH_SECRET` / chave de cifra.
+4. Testes de integração com banco (actions, export sem vazar EmotionLog).
+5. Cliente móvel usando as rotas `/api/auth/*` e Bearer.
+6. Cifrar ou tokenizar o rótulo `emotion` se a política de sigilo exigir mais do que o isolamento atual.
+7. Web push ou e-mail no teto, reusando os timestamps já gravados.
+8. Tela para criar/editar contas (`createAccount` já existe na action).
 
 ## Como manter este arquivo
 

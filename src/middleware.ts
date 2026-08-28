@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifySessionToken } from "@/lib/auth/jwt";
 
 const PUBLIC_PAGE_PATHS = ["/login", "/registrar"];
-const PUBLIC_API_PATHS = ["/api/auth/login", "/api/auth/register"];
+const PUBLIC_API_PATHS = ["/api/auth/login", "/api/auth/register", "/api/auth/google", "/api/auth/google/callback"];
+
+function isPublicPagePath(pathname: string): boolean {
+  return PUBLIC_PAGE_PATHS.includes(pathname) || pathname.startsWith("/recuperar-senha");
+}
 
 async function getToken(request: NextRequest): Promise<string | null> {
   const authHeader = request.headers.get("authorization");
@@ -12,16 +16,15 @@ async function getToken(request: NextRequest): Promise<string | null> {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isPublicPage = PUBLIC_PAGE_PATHS.includes(pathname);
-  const isPublicApi = PUBLIC_API_PATHS.includes(pathname);
+  const pageIsPublic = isPublicPagePath(pathname);
+  const apiIsPublic = PUBLIC_API_PATHS.includes(pathname) || pathname.startsWith("/api/auth/google");
 
   const token = await getToken(request);
   const session = token ? await verifySessionToken(token) : null;
 
-  if (isPublicApi) return NextResponse.next();
+  if (apiIsPublic) return NextResponse.next();
 
-  if (isPublicPage) {
-    // Usuário já logado não precisa ver a tela de login/registro de novo.
+  if (pageIsPublic) {
     if (session) return NextResponse.redirect(new URL("/", request.url));
     return NextResponse.next();
   }

@@ -76,11 +76,13 @@ Telas grandes foram fatiadas: orçamentos (`components/budgets/`), lista de lan�
 
 Fluxo único em `src/lib/auth/service.ts` (schemas em `src/lib/auth/schemas.ts`), reutilizado por actions e APIs.
 
-1. Registro cria `User`, hash da senha e dados iniciais (`createDefaultDataForUser`: conta, categorias e `Budget` do mês para as que têm teto).
-2. Login verifica senha e emite JWT (30 dias).
+1. Registro cria `User`, hash da senha e dados iniciais (`createDefaultDataForUser`: conta, categorias e `Budget` do mês para as que têm teto). Contas só-Google nascem sem `passwordHash`.
+2. Login verifica senha e emite JWT (30 dias). Sem senha (só Google), a mensagem pede o botão Google — não revela se o e-mail existe quando a senha está errada.
 3. Web: cookie `session` httpOnly, `SameSite=lax`. `Secure` segue `AUTH_COOKIE_SECURE` (padrão: ligado em `NODE_ENV=production`). Sem HTTPS (acesso por `http://IP:porta`), defina `AUTH_COOKIE_SECURE=false` ou o navegador ignora o cookie e o login parece falhar.
 4. API / app móvel: `Authorization: Bearer <token>` tem prioridade sobre o cookie (`src/lib/auth/session.ts`).
-5. `middleware.ts` protege tudo exceto `/login`, `/registrar`, `/api/auth/login`, `/api/auth/register` e estáticos PWA.
+5. `middleware.ts` protege tudo exceto `/login`, `/registrar`, `/recuperar-senha`, `/api/auth/login`, `/api/auth/register`, `/api/auth/google` (+ callback) e estáticos PWA.
+6. Recuperação de senha: token aleatório no e-mail, **hash SHA-256** no banco (`PasswordResetToken`), 1 hora, uso único. Sem SMTP/Resend o link só vai para o log do servidor (útil no `npm run dev`). Não revela se o e-mail existe.
+7. Google OAuth (PKCE): `GET /api/auth/google` → callback. Precisa de `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` e redirect `{APP_BASE_URL}/api/auth/google/callback`. E-mail Google já cadastrado é **vinculado** (`googleId`), não duplicado.
 
 Rotas:
 
@@ -88,6 +90,8 @@ Rotas:
 |---|---|---|
 | POST | `/api/auth/register` | Cria conta; devolve `{ user, token }` (201) |
 | POST | `/api/auth/login` | Autentica; devolve `{ user, token }` |
+| GET | `/api/auth/google` | Inicia OAuth Google |
+| GET | `/api/auth/google/callback` | Troca o código, cria/vincula usuário, grava cookie |
 | POST | `/api/auth/logout` | Apaga o cookie |
 | GET | `/api/auth/me` | Usuário atual ou 401 |
 | GET | `/api/export` | Extrato financeiro JSON **sem** EmotionLog |
@@ -157,6 +161,8 @@ Escopo fechado (`src/lib/ai/prompts.ts`): no máximo 3–4 frases, tom não-puni
 | `/aprender` e `/aprender/[slug]` | Biblioteca |
 | `/configuracoes` | Conta e toggle de IA |
 | `/login` `/registrar` | Públicas |
+| `/recuperar-senha` | Pedido de link |
+| `/recuperar-senha/[token]` | Nova senha |
 
 ## Comunicação (RNF03)
 
@@ -170,6 +176,7 @@ src/lib/cash-flow.test.ts
 src/lib/crypto.test.ts
 src/lib/validation.test.ts
 src/lib/auth/schemas.test.ts
+src/lib/auth/reset-token.test.ts
 src/lib/rules/anomaly-detection.test.ts
 src/lib/rules/vulnerability-score.test.ts
 ```
@@ -233,6 +240,11 @@ DATABASE_URL="file:./prisma/prod.db"
 EMOTION_ENCRYPTION_KEY="$EMO"
 AUTH_SECRET="$AUTH"
 AUTH_COOKIE_SECURE="false"
+# APP_BASE_URL="http://184.107.179.70:3000"
+# GOOGLE_CLIENT_ID=""
+# GOOGLE_CLIENT_SECRET=""
+# MAIL_FROM=""
+# SMTP_HOST=""
 EOF
 chmod 600 .env
 

@@ -6,12 +6,16 @@ Este guia descreve o que você consegue fazer hoje no app.
 
 ## Conta e acesso
 
-1. Abra o app e escolha **Criar conta** (`/registrar`).
-2. Informe nome, e-mail e uma senha com pelo menos 8 caracteres. Se algum campo estiver incompleto (nome em branco, e-mail inválido, senha curta), o aviso aparece **embaixo do campo** que precisa de correção.
+1. Abra o app e escolha **Criar conta** (`/registrar`), ou **Continuar com Google** se o servidor tiver o login Google ligado.
+2. No cadastro por e-mail, informe nome, e-mail e uma senha com pelo menos 8 caracteres. Se algum campo estiver incompleto (nome em branco, e-mail inválido, senha curta), o aviso aparece **embaixo do campo** que precisa de correção.
 3. Na primeira conta, o app já cria uma **Conta Principal** e categorias iniciais de gasto (Moradia, Alimentação, Delivery…) mais **Salário** (renda). Você pode criar outras depois em Orçamentos.
 4. Para sair, use **Sair** no menu (computador) ou no topo da tela (celular).
 
 Quem já tem conta entra em **Entrar** (`/login`). E-mail inválido ou senha em branco são apontados no próprio campo; e-mail ou senha incorretos aparecem como recado geral, sem dizer se o e-mail existe. Enquanto o app processa o login ou o cadastro, o botão mostra um indicador de espera.
+
+**Esqueci a senha:** em `/login`, toque em **Esqueci a senha**, informe o e-mail e abra o link que chegar (vale 1 hora). O app não diz se o e-mail existe. Contas que só entram com Google também podem criar uma senha por esse caminho.
+
+Se o e-mail da conta Google já existir (cadastro anterior), o Google só **liga** as duas entradas — não cria uma segunda conta.
 
 ### Conta de demonstração (só em ambiente local)
 

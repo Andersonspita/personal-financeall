@@ -52,7 +52,7 @@ export async function requireUser(): Promise<AuthUser> {
  * Cookie `Secure` só via HTTPS. Em VPS acessada por `http://IP:porta`, defina
  * AUTH_COOKIE_SECURE=false — senão o login grava o cookie e o navegador descarta.
  */
-function cookieSecure(): boolean {
+export function cookieSecure(): boolean {
   const explicit = process.env.AUTH_COOKIE_SECURE?.trim().toLowerCase();
   if (explicit === "false" || explicit === "0") return false;
   if (explicit === "true" || explicit === "1") return true;

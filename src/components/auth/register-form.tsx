@@ -6,14 +6,23 @@ import { registerAction, type AuthFormState } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { fieldControlClass } from "@/components/ui/control";
+import { GoogleSignInButton } from "@/components/auth/google-button";
 
 const initialState: AuthFormState = {};
 
-export function RegisterForm() {
+export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
   const [state, formAction, isPending] = useActionState(registerAction, initialState);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
+      {googleEnabled && (
+        <>
+          <GoogleSignInButton />
+          <p className="text-center text-xs text-foreground-muted">ou crie com e-mail</p>
+        </>
+      )}
+
+      <form action={formAction} className="flex flex-col gap-4">
       <Field label="Nome" htmlFor="name" error={state.fieldErrors?.name}>
         <input
           id="name"
@@ -69,6 +78,7 @@ export function RegisterForm() {
           Entrar
         </Link>
       </p>
-    </form>
+      </form>
+    </div>
   );
 }

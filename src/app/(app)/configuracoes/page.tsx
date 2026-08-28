@@ -18,6 +18,13 @@ export default async function SettingsPage() {
         <CardTitle>Conta</CardTitle>
         <p className="text-sm">{user.name}</p>
         <p className="text-sm text-foreground-muted">{user.email}</p>
+        <p className="mt-2 text-xs text-foreground-muted">
+          {user.googleId && user.passwordHash
+            ? "Você entra com e-mail e senha ou com o Google."
+            : user.googleId
+              ? "Você entra com o Google. Em Esqueci a senha dá para criar uma senha também."
+              : "Você entra com e-mail e senha."}
+        </p>
       </Card>
 
       <Card>

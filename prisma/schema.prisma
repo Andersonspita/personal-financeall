@@ -20,10 +20,12 @@ datasource db {
 }
 
 /// Conta de usuário. Senha nunca em texto plano — ver src/lib/auth/password.ts.
+/// `passwordHash` é opcional: contas criadas só pelo Google não têm senha até definirem uma.
 model User {
   id                 String   @id @default(cuid())
   email              String   @unique
-  passwordHash       String
+  passwordHash       String?
+  googleId           String?  @unique
   name               String
   // Opt-in explícito: liga o assistente de IA (RNF02 — envia sinais agregados a um provedor
   // externo, então fica desligado por padrão até o usuário decidir ativar em /configuracoes).
@@ -40,6 +42,7 @@ model User {
   nudges              Nudge[]
   panicSessions       PanicSession[]
   contentProgress     ContentProgress[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 /// Conta financeira (corrente, poupança, cartão de crédito, dinheiro).
@@ -217,5 +220,18 @@ model ContentProgress {
   completedAt DateTime?
 
   @@unique([userId, contentId])
+  @@index([userId])
+}
+
+/// Token de recuperação de senha. Guarda só o hash SHA-256; o valor cru vai no e-mail.
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
   @@index([userId])
 }

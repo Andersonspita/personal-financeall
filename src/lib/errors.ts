@@ -30,6 +30,17 @@ export function fieldErrorsFromZod(error: z.ZodError): FormFieldErrors {
   return fields;
 }
 
+export function logAppInfo(scope: string, extra?: Record<string, unknown>): void {
+  console.info(
+    JSON.stringify({
+      level: "info",
+      scope,
+      ...extra,
+      at: new Date().toISOString(),
+    }),
+  );
+}
+
 export function logAppError(scope: string, err: unknown, extra?: Record<string, unknown>): void {
   const message = err instanceof Error ? err.message : String(err);
   console.error(
