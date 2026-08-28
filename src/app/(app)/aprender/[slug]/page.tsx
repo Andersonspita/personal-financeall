@@ -6,6 +6,7 @@ import { getContentBySlug } from "@/lib/education/service";
 import { markContentViewed, markContentCompleted } from "@/actions/education";
 import { Badge } from "@/components/ui/badge";
 import { tagEmoji, tagLabel } from "@/lib/education/tags";
+import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
@@ -43,13 +44,9 @@ export default async function EducationDetailPage({ params }: { params: Promise<
       </div>
 
       <form action={markContentCompleted.bind(null, content.id)}>
-        <button
-          type="submit"
-          disabled={!!content.completedAt}
-          className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
-        >
+        <Button type="submit" disabled={!!content.completedAt}>
           {content.completedAt ? "Concluído ✓" : "Marcar como concluído"}
-        </button>
+        </Button>
       </form>
     </div>
   );

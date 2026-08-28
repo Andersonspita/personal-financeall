@@ -167,6 +167,13 @@ src/lib/rules/vulnerability-score.test.ts
 
 Cubram lógica pura (`getBudgetAlertLevel`, `nextBudgetAlertStamps`, anomalia, score). Mutações de banco e UI ainda não têm suíte.
 
+## UI
+
+- Botões: `src/components/ui/button.tsx` (`rounded-xl`). Não usar link sublinhado para ação primária/secundária.
+- Campos e selects: `controlClass` + `Select` (`appearance-none` + chevron). Cards: `rounded-2xl`, `p-5`.
+- Barra inferior: `env(safe-area-inset-bottom)` e `viewportFit: cover` para não ficar sob o indicador do iOS.
+- Gráfico: Recharts com grade horizontal suave, curva `monotone` e eixo Y compacto.
+
 ## PWA
 
 `PwaRegister` registra `/sw.js`. O worker **não** cacheia páginas HTML (evitar saldo desatualizado). Só `manifest.json` e `icon.svg`.

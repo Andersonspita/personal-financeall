@@ -30,7 +30,7 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 
 | ID | Requisito | Status | Observação |
 |---|---|---|---|
-| RNF01 | Mobile-first e PWA | Parcial | Layout responsivo + installable. SW não oferece modo offline das telas (de propósito, para não cachear saldo) |
+| RNF01 | Mobile-first e PWA | Parcial | Layout responsivo + installable + safe-area no menu. SW não oferece modo offline das telas (de propósito, para não cachear saldo) |
 | RNF02 | Sigilo e isolamento (LGPD) | Parcial | EmotionLog separado, nota AES-256-GCM, export sem emoção, IA opt-in. O rótulo `emotion` não é cifrado; SQLite em arquivo local não é isolamento multi-tenant de nuvem |
 | RNF03 | Tom não-punitivo | Pronto | `src/lib/copy.ts` e textos das telas |
 
@@ -78,6 +78,10 @@ Ao cruzar 80% ou 100% do teto, o app grava `alert80SentAt` / `alert100SentAt` (u
 ### 2026-08-28 — Build na VPS: skipDuplicates no SQLite
 
 O `next build` na VPS falhou porque `createMany({ skipDuplicates: true })` não existe no Prisma 7 + SQLite (o tipo é `never`). O `systemctl restart` depois disso derrubou o processo sem um `.next` novo. Removido o flag; a filtragem de tetos já existentes continua no código.
+
+### 2026-08-28 — Polimento visual mobile
+
+Menu inferior com espaço entre itens, rótulos curtos e recuo da safe-area do iOS. Lançamentos usam ícones de editar/excluir com área de toque maior. Selects customizados (sem a seta nativa da Apple). Gráfico de fluxo com grade suave, curva monotone e eixo compacto. Botões e inputs padronizados em `rounded-xl`; cards em `rounded-2xl` com mais respiro.
 
 ## Próximos passos sugeridos
 

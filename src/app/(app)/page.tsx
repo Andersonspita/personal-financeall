@@ -17,6 +17,7 @@ import { BUDGET_ALERT_COPY } from "@/lib/copy";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { EMOTION_EMOJI, EMOTION_LABELS, type Emotion } from "@/lib/emotions";
 import { NudgeBanner } from "@/components/nudge-banner";
+import { buttonClass } from "@/components/ui/control";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -26,13 +27,10 @@ export default async function DashboardPage() {
   ]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Visão geral</h1>
-        <Link
-          href="/transacoes/novo"
-          className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-medium text-white"
-        >
+        <Link href="/transacoes/novo" className={buttonClass("primary", "px-4 py-2")}>
           <Plus size={16} /> Lançar
         </Link>
       </div>
@@ -81,14 +79,14 @@ export default async function DashboardPage() {
               ver todos
             </Link>
           </div>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-5">
             {data.budgetsWithSpent.slice(0, 4).map((b) => (
-              <div key={b.id}>
-                <div className="mb-1 flex items-center justify-between text-sm">
-                  <span className="font-medium">
+              <div key={b.id} className="flex flex-col gap-2">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="min-w-0 truncate font-medium">
                     {b.category.icon} {b.category.name}
                   </span>
-                  <span className="tabular-nums text-foreground-muted">
+                  <span className="shrink-0 tabular-nums text-sm text-foreground-muted">
                     {formatCurrency(b.spent)} / {formatCurrency(b.limitAmount)}
                   </span>
                 </div>
@@ -118,10 +116,10 @@ export default async function DashboardPage() {
             <li className="py-3 text-sm text-foreground-muted">Nenhum lançamento este mês ainda.</li>
           )}
           {data.recentTransactions.map((t) => (
-            <li key={t.id} className="flex items-center justify-between gap-3 py-2.5">
+            <li key={t.id} className="flex items-center justify-between gap-3 py-3">
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{t.description || t.category?.name || "Lançamento"}</p>
-                <p className="flex items-center gap-1 text-xs text-foreground-muted">
+                <p className="truncate text-base font-medium">{t.description || t.category?.name || "Lançamento"}</p>
+                <p className="mt-0.5 flex items-center gap-1 text-xs text-foreground-muted/80">
                   {formatDate(t.occurredAt)} · {t.category?.name ?? "Sem categoria"}
                   {t.emotionLog && (
                     <span title={EMOTION_LABELS[t.emotionLog.emotion as Emotion]}>
@@ -132,7 +130,7 @@ export default async function DashboardPage() {
                 </p>
               </div>
               <span
-                className={`shrink-0 tabular-nums text-sm font-semibold ${t.type === "receita" ? "text-primary" : ""}`}
+                className={`shrink-0 tabular-nums text-base font-semibold ${t.type === "receita" ? "text-primary" : ""}`}
               >
                 {t.type === "receita" ? "+" : "-"} {formatCurrency(t.amount)}
               </span>

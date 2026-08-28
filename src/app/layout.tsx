@@ -25,6 +25,7 @@ export const viewport: Viewport = {
   themeColor: "#3f6f5e",
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
 };
 
 // Layout raiz: só o essencial (fontes, tema, PWA). A navegação autenticada vive em

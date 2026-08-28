@@ -9,6 +9,9 @@ import type { Emotion } from "@/lib/emotions";
 import { VULNERABILITY_LEVEL_COPY } from "@/lib/copy";
 import type { VulnerabilityLevel } from "@/lib/vulnerability";
 import { filterCategoriesByLaunchType } from "@/lib/budgeting";
+import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
+import { controlClass } from "@/components/ui/control";
 
 interface AccountOption {
   id: string;
@@ -101,7 +104,7 @@ export function TransactionForm({
         : "";
 
   return (
-    <form action={handleSubmit} className="flex flex-col gap-4">
+    <form action={handleSubmit} className="flex flex-col gap-5">
       <div className="flex rounded-xl border border-border p-1">
         {(["despesa", "receita"] as const).map((t) => (
           <button
@@ -109,7 +112,7 @@ export function TransactionForm({
             type="button"
             onClick={() => setType(t)}
             className={clsx(
-              "flex-1 rounded-lg py-2 text-sm font-medium capitalize transition-colors",
+              "flex-1 rounded-xl py-2 text-sm font-medium capitalize transition-colors",
               type === t ? "bg-primary text-white" : "text-foreground-muted",
             )}
           >
@@ -118,7 +121,7 @@ export function TransactionForm({
         ))}
       </div>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="flex flex-col gap-1.5 text-sm">
         Valor
         <input
           name="amount"
@@ -128,11 +131,11 @@ export function TransactionForm({
           required
           defaultValue={initial?.amount}
           placeholder="0,00"
-          className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
+          className={controlClass}
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="flex flex-col gap-1.5 text-sm">
         Descrição
         <input
           name="description"
@@ -140,41 +143,31 @@ export function TransactionForm({
           maxLength={200}
           defaultValue={initial?.description}
           placeholder={type === "receita" ? "Ex: salário do mês" : "Ex: mercado da semana"}
-          className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
+          className={controlClass}
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="flex flex-col gap-1.5 text-sm">
         Conta
-        <select
-          name="accountId"
-          required
-          defaultValue={initial?.accountId}
-          className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
-        >
+        <Select name="accountId" required defaultValue={initial?.accountId}>
           {accounts.map((a) => (
             <option key={a.id} value={a.id}>
               {a.name}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="flex flex-col gap-1.5 text-sm">
         Categoria {type === "receita" ? "(renda)" : "(gasto)"}
-        <select
-          key={type}
-          name="categoryId"
-          defaultValue={defaultCategoryId}
-          className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
-        >
+        <Select key={type} name="categoryId" defaultValue={defaultCategoryId}>
           <option value="">Sem categoria</option>
           {visibleCategories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.icon} {c.name}
             </option>
           ))}
-        </select>
+        </Select>
         <span className="text-xs text-foreground-muted">
           {type === "receita"
             ? "Só categorias de renda (salário, freelance…). Crie outras em Orçamentos, grupo Renda."
@@ -182,14 +175,14 @@ export function TransactionForm({
         </span>
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="flex flex-col gap-1.5 text-sm">
         Data e hora
         <input
           name="occurredAt"
           type="datetime-local"
           required
           defaultValue={initial?.occurredAt ?? nowLocal}
-          className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base"
+          className={controlClass}
         />
       </label>
 
@@ -211,7 +204,7 @@ export function TransactionForm({
               maxLength={500}
               rows={2}
               placeholder="Quer registrar mais alguma coisa sobre esse momento? (privado, só seu)"
-              className="rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+              className={`${controlClass} text-sm`}
             />
           )}
         </div>
@@ -220,7 +213,7 @@ export function TransactionForm({
       {error && <p className="text-sm text-critical">{error}</p>}
 
       {feedback && (
-        <div className="rounded-lg bg-calm-soft p-3 text-sm text-calm">
+        <div className="rounded-xl bg-calm-soft p-4 text-sm text-calm">
           {feedback.isImpulse && (
             <p>Sinalizamos esse lançamento como possível compra por impulso — você pode revisar em Lançamentos.</p>
           )}
@@ -229,13 +222,9 @@ export function TransactionForm({
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded-full bg-primary py-3 text-sm font-semibold text-white disabled:opacity-60"
-      >
+      <Button type="submit" disabled={isPending}>
         {isPending ? "Salvando..." : initial ? "Salvar alterações" : "Salvar lançamento"}
-      </button>
+      </Button>
     </form>
   );
 }

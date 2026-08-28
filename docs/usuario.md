@@ -24,7 +24,7 @@ Essa conta **não** deve ser usada em produção.
 
 ## Telas
 
-No celular, a navegação fica na barra inferior. No computador, fica na coluna à esquerda.
+No celular, a navegação fica na barra inferior (acima da faixa do iPhone). No computador, fica na coluna à esquerda.
 
 ### Início
 
@@ -44,7 +44,7 @@ O botão **Lançar** abre o cadastro de uma nova receita ou despesa.
 
 Lista as movimentações. Em cada uma você vê data, conta, categoria e, se registrou, o estado emocional.
 
-Use **editar** para corrigir valor, data, categoria ou tipo. Use **excluir** se o lançamento não deveria existir.
+Use o ícone de lápis para corrigir valor, data, categoria ou tipo. Use a lixeira se o lançamento não deveria existir.
 
 Se o app marcar um gasto como **possível impulso**, você pode tocar em **não foi impulso**. O marcador é informativo: você sempre tem a última palavra.
 
@@ -75,6 +75,7 @@ O comentário emocional fica protegido e **não** entra no extrato financeiro ex
 - ao cruzar o teto num lançamento, o recado aparece na hora e também no Início (uma vez por mês, por categoria)
 - visão 50-30-20: essencial, variável e poupança em relação à renda do mês
 - cadastro de novas categorias: grupo **Renda** para entradas; os outros grupos para gastos
+- botão **Salvar** ao lado do teto (não é um link sublinhado)
 
 Os avisos usam linguagem de orientação, não de culpa.
 

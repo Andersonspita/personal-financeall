@@ -5,6 +5,7 @@ import { LifeBuoy } from "lucide-react";
 import { startPanicSession, completePanicSession } from "@/actions/panic";
 import { PANIC_ACTIVITIES } from "@/lib/copy";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 type Step = "start" | "choose" | "doing" | "done";
 
@@ -38,9 +39,9 @@ export function PanicFlow() {
           Vamos dar um tempinho antes de decidir. Não tem problema estar aqui — é exatamente para isso que esse botão
           existe.
         </p>
-        <button onClick={handleStart} className="rounded-full bg-warm px-6 py-3 text-sm font-semibold text-white">
+        <Button onClick={handleStart} variant="warm" className="px-6 py-3">
           Me ajuda a pausar
-        </button>
+        </Button>
       </Card>
     );
   }
@@ -71,18 +72,12 @@ export function PanicFlow() {
         <p className="text-sm text-foreground-muted">{activity?.description}</p>
         <p className="text-sm text-foreground-muted">Sem pressa. Quando terminar, volte aqui.</p>
         <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
-          <button
-            onClick={() => handleOutcome("evitou_compra")}
-            className="w-full rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white sm:w-auto"
-          >
+          <Button onClick={() => handleOutcome("evitou_compra")} className="w-full sm:w-auto">
             Consegui esperar
-          </button>
-          <button
-            onClick={() => handleOutcome("comprou_mesmo")}
-            className="w-full rounded-full border border-border px-4 py-2.5 text-sm font-medium sm:w-auto"
-          >
+          </Button>
+          <Button onClick={() => handleOutcome("comprou_mesmo")} variant="secondary" className="w-full sm:w-auto">
             Comprei mesmo assim
-          </button>
+          </Button>
         </div>
       </Card>
     );
@@ -94,16 +89,16 @@ export function PanicFlow() {
       <p className="text-sm text-foreground-muted">
         Não importa qual foi o resultado — o simples fato de ter parado para pensar já é um cuidado com você mesmo(a).
       </p>
-      <button
+      <Button
         onClick={() => {
           setStep("start");
           setSessionId(null);
           setActivityId(null);
         }}
-        className="text-sm font-medium text-primary underline underline-offset-2"
+        variant="subtle"
       >
         Voltar ao início
-      </button>
+      </Button>
     </Card>
   );
 }

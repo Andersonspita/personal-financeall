@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { dismissNudge } from "@/actions/nudges";
 import { Card, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export function NudgeBanner({ id, message }: { id: string; message: string }) {
   const [pending, startTransition] = useTransition();
@@ -11,14 +12,15 @@ export function NudgeBanner({ id, message }: { id: string; message: string }) {
     <Card className="bg-calm-soft">
       <CardTitle className="mb-2">Um recado para agora</CardTitle>
       <p className="text-sm">{message}</p>
-      <button
+      <Button
         type="button"
+        variant="subtle"
         disabled={pending}
         onClick={() => startTransition(() => dismissNudge(id))}
-        className="mt-3 text-xs font-medium text-primary underline underline-offset-2 disabled:opacity-60"
+        className="mt-4"
       >
         {pending ? "Ok..." : "Entendi"}
-      </button>
+      </Button>
     </Card>
   );
 }

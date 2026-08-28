@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/session";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { buttonClass, iconActionClass } from "@/components/ui/control";
 import { dismissImpulseFlag, deleteTransaction } from "@/actions/transactions";
 import { formatCurrency, formatDateTime } from "@/lib/format";
 import { EMOTION_EMOJI, EMOTION_LABELS, type Emotion } from "@/lib/emotions";
@@ -20,18 +22,15 @@ export default async function TransactionsPage() {
   });
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Lançamentos</h1>
-        <Link
-          href="/transacoes/novo"
-          className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-medium text-white"
-        >
+        <Link href="/transacoes/novo" className={buttonClass("primary", "px-4 py-2")}>
           <Plus size={16} /> Novo
         </Link>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         {transactions.length === 0 && (
           <Card>
             <p className="text-sm text-foreground-muted">Nenhum lançamento ainda.</p>
@@ -40,8 +39,8 @@ export default async function TransactionsPage() {
         {transactions.map((t) => (
           <Card key={t.id} className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium">{t.description || t.category?.name || "Lançamento"}</p>
-              <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-foreground-muted">
+              <p className="truncate text-base font-medium">{t.description || t.category?.name || "Lançamento"}</p>
+              <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-foreground-muted/80">
                 {formatDateTime(t.occurredAt)} · {t.account.name}
                 {t.category && <> · {t.category.name}</>}
                 {t.emotionLog && (
@@ -51,25 +50,30 @@ export default async function TransactionsPage() {
                 )}
               </p>
               {t.isImpulse && (
-                <form action={dismissImpulseFlag.bind(null, t.id)} className="mt-1.5 inline-flex items-center gap-2">
+                <form action={dismissImpulseFlag.bind(null, t.id)} className="mt-2 inline-flex items-center gap-2">
                   <Badge tone="warm">possível impulso</Badge>
-                  <button type="submit" className="text-xs font-medium text-primary underline underline-offset-2">
+                  <Button type="submit" variant="subtle" className="text-xs">
                     não foi impulso
-                  </button>
+                  </Button>
                 </form>
               )}
             </div>
-            <div className="flex shrink-0 flex-col items-end gap-1.5">
-              <span className={`tabular-nums text-sm font-semibold ${t.type === "receita" ? "text-primary" : ""}`}>
+            <div className="flex shrink-0 flex-col items-end gap-2">
+              <span className={`tabular-nums text-base font-semibold ${t.type === "receita" ? "text-primary" : ""}`}>
                 {t.type === "receita" ? "+" : "-"} {formatCurrency(t.amount)}
               </span>
-              <div className="flex items-center gap-2">
-                <Link href={`/transacoes/${t.id}/editar`} className="text-xs text-primary underline underline-offset-2">
-                  editar
+              <div className="flex items-center gap-1">
+                <Link
+                  href={`/transacoes/${t.id}/editar`}
+                  className={iconActionClass}
+                  aria-label="Editar lançamento"
+                  title="Editar"
+                >
+                  <Pencil size={16} />
                 </Link>
                 <form action={deleteTransaction.bind(null, t.id)}>
-                  <button type="submit" className="text-xs text-foreground-muted underline underline-offset-2">
-                    excluir
+                  <button type="submit" className={iconActionClass} aria-label="Excluir lançamento" title="Excluir">
+                    <Trash2 size={16} />
                   </button>
                 </form>
               </div>

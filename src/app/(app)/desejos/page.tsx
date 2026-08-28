@@ -6,6 +6,9 @@ import { Countdown } from "@/components/wishlist/countdown";
 import { createWishlistItemFromForm, confirmWishlistItem, discardWishlistItem } from "@/actions/wishlist";
 import { ReflectionQuestionButton } from "@/components/ai/reflection-question-button";
 import { formatCurrency } from "@/lib/format";
+import { Select } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { controlClass } from "@/components/ui/control";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +24,7 @@ export default async function WishlistPage() {
   const resolved = items.filter((i) => i.status !== "pendente");
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
       <h1 className="text-xl font-semibold">Trava de resfriamento</h1>
       <p className="text-sm text-foreground-muted">
         Antes de comprar algo por impulso, registre aqui e espere o prazo passar. Se ainda fizer sentido depois, é
@@ -30,14 +33,14 @@ export default async function WishlistPage() {
 
       <Card>
         <CardTitle>Novo item de desejo</CardTitle>
-        <form action={createWishlistItemFromForm} className="flex flex-col gap-3">
+        <form action={createWishlistItemFromForm} className="flex flex-col gap-4">
           <input
             name="name"
             required
             placeholder="O que você quer comprar?"
-            className="w-full min-w-0 rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+            className={controlClass}
           />
-          <label className="flex min-w-0 flex-col gap-1 text-sm">
+          <label className="flex min-w-0 flex-col gap-1.5 text-sm">
             Valor estimado
             <input
               name="amount"
@@ -46,15 +49,12 @@ export default async function WishlistPage() {
               min="0.01"
               required
               placeholder="0,00"
-              className="w-full min-w-0 rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+              className={controlClass}
             />
           </label>
-          <label className="flex min-w-0 flex-col gap-1 text-sm">
+          <label className="flex min-w-0 flex-col gap-1.5 text-sm">
             Categoria
-            <select
-              name="categoryId"
-              className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
-            >
+            <Select name="categoryId">
               <option value="">Sem categoria</option>
               {categories
                 .filter((c) => c.group !== "renda")
@@ -63,23 +63,17 @@ export default async function WishlistPage() {
                     {c.icon} {c.name}
                   </option>
                 ))}
-            </select>
+            </Select>
           </label>
-          <label className="flex flex-col gap-1 text-sm">
+          <label className="flex flex-col gap-1.5 text-sm">
             Tempo de espera
-            <select
-              name="cooldownHours"
-              defaultValue={48}
-              className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
-            >
-              <option value={24}>24 horas</option>
-              <option value={48}>48 horas</option>
-              <option value={72}>72 horas</option>
-            </select>
+            <Select name="cooldownHours" defaultValue="48">
+              <option value="24">24 horas</option>
+              <option value="48">48 horas</option>
+              <option value="72">72 horas</option>
+            </Select>
           </label>
-          <button type="submit" className="rounded-full bg-primary py-2.5 text-sm font-semibold text-white">
-            Colocar em espera
-          </button>
+          <Button type="submit">Colocar em espera</Button>
         </form>
       </Card>
 
@@ -105,20 +99,16 @@ export default async function WishlistPage() {
                   <Countdown availableAt={item.availableAt.toISOString()} />
                 </Badge>
               </div>
-              <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                 <form action={confirmWishlistItem.bind(null, item.id)} className="w-full sm:w-auto">
-                  <button
-                    type="submit"
-                    disabled={!available}
-                    className="w-full rounded-full bg-primary px-4 py-2 text-xs font-semibold text-white disabled:opacity-40 sm:w-auto"
-                  >
+                  <Button type="submit" disabled={!available} className="w-full sm:w-auto">
                     Confirmar necessidade real
-                  </button>
+                  </Button>
                 </form>
                 <form action={discardWishlistItem.bind(null, item.id)} className="w-full sm:w-auto">
-                  <button type="submit" className="w-full rounded-full border border-border px-4 py-2 text-xs font-medium sm:w-auto">
+                  <Button type="submit" variant="secondary" className="w-full sm:w-auto">
                     Deixar pra lá
-                  </button>
+                  </Button>
                 </form>
               </div>
               <ReflectionQuestionButton wishlistItemId={item.id} aiEnabled={dbUser.aiAssistantEnabled} />
@@ -132,7 +122,7 @@ export default async function WishlistPage() {
           <summary className="cursor-pointer text-foreground-muted">Histórico ({resolved.length})</summary>
           <div className="mt-2 flex flex-col gap-2">
             {resolved.map((item) => (
-              <div key={item.id} className="flex items-center justify-between rounded-lg bg-surface-muted px-3 py-2">
+              <div key={item.id} className="flex items-center justify-between rounded-xl bg-surface-muted px-3 py-2">
                 <span>{item.name}</span>
                 <Badge tone={item.status === "confirmado" ? "primary" : "neutral"}>{item.status}</Badge>
               </div>

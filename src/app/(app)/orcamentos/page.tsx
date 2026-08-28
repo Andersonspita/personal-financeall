@@ -10,6 +10,10 @@ import { formatCurrency } from "@/lib/format";
 import { BUDGET_ALERT_COPY } from "@/lib/copy";
 import { ensureDefaultIncomeCategories } from "@/lib/onboarding";
 import { ensureCurrentMonthBudgets } from "@/lib/budget-alerts";
+import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
+import { controlClass } from "@/components/ui/control";
+import { Check } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -54,23 +58,24 @@ export default async function BudgetsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
       <h1 className="text-xl font-semibold">Orçamentos</h1>
 
       <Card>
         <CardTitle>Distribuição 50-30-20</CardTitle>
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-5">
           {BUDGET_GROUPS.map((group) => {
             const spent = groupTotals[group];
             const ratio = totalIncome > 0 ? spent / totalIncome : 0;
             const target = CATEGORY_GROUP_TARGET_RATIO[group];
             return (
-              <div key={group}>
-                <div className="mb-1 flex items-center justify-between text-sm">
-                  <span className="font-medium">
-                    {GROUP_LABEL[group]} <span className="text-foreground-muted">(meta {target * 100}%)</span>
+              <div key={group} className="flex flex-col gap-2">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="min-w-0 truncate font-medium">
+                    {GROUP_LABEL[group]}{" "}
+                    <span className="font-normal text-foreground-muted">(meta {target * 100}%)</span>
                   </span>
-                  <span className="tabular-nums text-foreground-muted">
+                  <span className="shrink-0 tabular-nums text-sm text-foreground-muted">
                     {formatCurrency(spent)} · {(ratio * 100).toFixed(0)}%
                   </span>
                 </div>
@@ -104,7 +109,7 @@ export default async function BudgetsPage() {
 
       <Card>
         <CardTitle>Tetos por categoria de gasto</CardTitle>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
           {categories
             .filter((c) => c.group !== "renda")
             .map((c) => {
@@ -112,12 +117,12 @@ export default async function BudgetsPage() {
             const limit = budgetMap.get(c.id) ?? c.monthlyLimit ?? null;
             const alertLevel = limit ? getBudgetAlertLevel(spent, limit) : "dentro_do_limite";
             return (
-              <div key={c.id}>
-                <div className="mb-1 flex items-center justify-between text-sm">
-                  <span className="font-medium">
+              <div key={c.id} className="flex flex-col gap-2">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="min-w-0 truncate font-medium">
                     {c.icon} {c.name}
                   </span>
-                  <span className="tabular-nums text-foreground-muted">
+                  <span className="shrink-0 tabular-nums text-sm text-foreground-muted">
                     {formatCurrency(spent)}
                     {limit ? ` / ${formatCurrency(limit)}` : ""}
                   </span>
@@ -128,11 +133,11 @@ export default async function BudgetsPage() {
                   <p className="text-xs text-foreground-muted">Sem teto definido.</p>
                 )}
                 {limit && alertLevel !== "dentro_do_limite" && (
-                  <p className="mt-1 text-xs text-foreground-muted">
+                  <p className="text-xs text-foreground-muted">
                     {alertLevel === "alerta_80" ? BUDGET_ALERT_COPY.at80(c.name) : BUDGET_ALERT_COPY.at100(c.name)}
                   </p>
                 )}
-                <form action={upsertBudgetFromForm} className="mt-2 flex items-center gap-2">
+                <form action={upsertBudgetFromForm} className="mt-1 flex items-center gap-2">
                   <input type="hidden" name="categoryId" value={c.id} />
                   <input type="hidden" name="month" value={month} />
                   <input
@@ -142,11 +147,11 @@ export default async function BudgetsPage() {
                     min="0.01"
                     defaultValue={limit ?? undefined}
                     placeholder="Definir teto"
-                    className="w-32 rounded-lg border border-border bg-surface px-2 py-1.5 text-sm"
+                    className={`${controlClass} w-32 shrink-0 py-2 text-sm`}
                   />
-                  <button type="submit" className="text-xs font-medium text-primary underline underline-offset-2">
-                    salvar
-                  </button>
+                  <Button type="submit" variant="subtle" className="px-3 py-2 text-xs">
+                    <Check size={14} /> Salvar
+                  </Button>
                 </form>
               </div>
             );
@@ -156,49 +161,43 @@ export default async function BudgetsPage() {
 
       <Card>
         <CardTitle>Nova categoria</CardTitle>
-        <form action={createCategoryFromForm} className="flex flex-col gap-3">
+        <form action={createCategoryFromForm} className="flex flex-col gap-4">
           <div className="flex min-w-0 gap-2">
             <input
               name="icon"
               maxLength={4}
               placeholder="🏷️"
-              className="w-16 shrink-0 rounded-lg border border-border bg-surface px-2 py-2 text-center text-base"
+              className={`${controlClass} w-16 shrink-0 px-2 text-center`}
             />
             <input
               name="name"
               required
               placeholder="Nome da categoria"
-              className="min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+              className={controlClass}
             />
           </div>
           <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
-            <select
-              name="group"
-              required
-              className="w-full min-w-0 max-w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm sm:flex-1"
-            >
+            <Select name="group" required>
               {CATEGORY_GROUPS.map((g) => (
                 <option key={g} value={g}>
                   {GROUP_LABEL[g]}
                 </option>
               ))}
-            </select>
+            </Select>
             <input
               name="monthlyLimit"
               type="number"
               step="0.01"
               min="0.01"
               placeholder="Teto mensal (opcional)"
-              className="w-full min-w-0 rounded-lg border border-border bg-surface px-3 py-2 text-sm sm:flex-1"
+              className={controlClass}
             />
           </div>
           <p className="text-xs text-foreground-muted">
             Grupo <strong>Renda</strong> = entradas. Essencial, variável e poupança = gastos (50-30-20). Teto mensal só
             faz sentido para gasto.
           </p>
-          <button type="submit" className="rounded-full bg-primary py-2.5 text-sm font-semibold text-white">
-            Criar categoria
-          </button>
+          <Button type="submit">Criar categoria</Button>
         </form>
       </Card>
     </div>
