@@ -75,6 +75,10 @@ O select de categoria ao lado do valor estourava o card (largura mínima nativa 
 
 Ao cruzar 80% ou 100% do teto, o app grava `alert80SentAt` / `alert100SentAt` (uma vez por categoria/mês) e cria um nudge com o texto acolhedor. O recado aparece ao salvar o lançamento e no Início até **Entendi**. Contas novas já nascem com tetos do mês nas categorias que têm limite (Delivery, Lazer…). Sem web push nem e-mail.
 
+### 2026-08-28 — Build na VPS: skipDuplicates no SQLite
+
+O `next build` na VPS falhou porque `createMany({ skipDuplicates: true })` não existe no Prisma 7 + SQLite (o tipo é `never`). O `systemctl restart` depois disso derrubou o processo sem um `.next` novo. Removido o flag; a filtragem de tetos já existentes continua no código.
+
 ## Próximos passos sugeridos
 
 1. Trocar SQLite por Postgres quando houver deploy multi-usuário.

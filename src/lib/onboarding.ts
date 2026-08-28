@@ -39,7 +39,6 @@ export async function createDefaultDataForUser(userId: string) {
         month,
         limitAmount: c.monthlyLimit!,
       })),
-      skipDuplicates: true,
     });
   }
 }

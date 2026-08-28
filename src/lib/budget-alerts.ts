@@ -29,7 +29,6 @@ export async function ensureCurrentMonthBudgets(userId: string) {
       month,
       limitAmount: c.monthlyLimit!,
     })),
-    skipDuplicates: true,
   });
 }
 
