@@ -16,6 +16,7 @@ import { VulnerabilityBadge } from "@/components/vulnerability-badge";
 import { BUDGET_ALERT_COPY } from "@/lib/copy";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { EMOTION_EMOJI, EMOTION_LABELS, type Emotion } from "@/lib/emotions";
+import { NudgeBanner } from "@/components/nudge-banner";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -35,6 +36,8 @@ export default async function DashboardPage() {
           <Plus size={16} /> Lançar
         </Link>
       </div>
+
+      {data.openNudge && <NudgeBanner id={data.openNudge.id} message={data.openNudge.message} />}
 
       <Card>
         <CardTitle>Saldo disponível</CardTitle>

@@ -2,14 +2,17 @@ import { differenceInCalendarDays, endOfMonth, format, startOfMonth } from "date
 import { prisma } from "@/lib/prisma";
 import { getBudgetAlertLevel, projectEndOfMonthBalance } from "@/lib/budgeting";
 import { computeCurrentVulnerability } from "@/lib/insights";
+import { ensureCurrentMonthBudgets } from "@/lib/budget-alerts";
 
 export async function getDashboardData(userId: string) {
+  await ensureCurrentMonthBudgets(userId);
   const now = new Date();
   const monthStart = startOfMonth(now);
   const monthEnd = endOfMonth(now);
   const month = format(now, "yyyy-MM");
 
-  const [accounts, transactionsThisMonth, totalReceitas, totalDespesas, budgets, vulnerability] = await Promise.all([
+  const [accounts, transactionsThisMonth, totalReceitas, totalDespesas, budgets, vulnerability, openNudge] =
+    await Promise.all([
     prisma.account.findMany({ where: { userId, archived: false }, orderBy: { createdAt: "asc" } }),
     prisma.transaction.findMany({
       where: { userId, occurredAt: { gte: monthStart, lte: monthEnd } },
@@ -20,6 +23,10 @@ export async function getDashboardData(userId: string) {
     prisma.transaction.aggregate({ where: { userId, type: "despesa" }, _sum: { amount: true } }),
     prisma.budget.findMany({ where: { userId, month }, include: { category: true } }),
     computeCurrentVulnerability(userId),
+    prisma.nudge.findFirst({
+      where: { userId, dismissedAt: null },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
   const initialBalanceSum = accounts.reduce((sum, a) => sum + a.initialBalance, 0);
@@ -90,5 +97,6 @@ export async function getDashboardData(userId: string) {
     chartData,
     vulnerability,
     recentTransactions: transactionsThisMonth.slice(0, 6),
+    openNudge,
   };
 }

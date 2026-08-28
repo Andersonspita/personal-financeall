@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { budgetMonthKey, isIncomeCategoryGroup } from "@/lib/budgeting";
 
 // Conjunto inicial de categorias oferecido a toda conta nova, para que a primeira tela de
 // lançamento já tenha opções sensatas em vez de aparecer vazia. O usuário pode editar/remover
@@ -24,6 +25,23 @@ export async function createDefaultDataForUser(userId: string) {
   await prisma.category.createMany({
     data: DEFAULT_CATEGORIES.map((c) => ({ ...c, userId })),
   });
+
+  const month = budgetMonthKey(new Date());
+  const categories = await prisma.category.findMany({ where: { userId } });
+  const withLimit = categories.filter(
+    (c) => c.monthlyLimit && c.monthlyLimit > 0 && !isIncomeCategoryGroup(c.group),
+  );
+  if (withLimit.length > 0) {
+    await prisma.budget.createMany({
+      data: withLimit.map((c) => ({
+        userId,
+        categoryId: c.id,
+        month,
+        limitAmount: c.monthlyLimit!,
+      })),
+      skipDuplicates: true,
+    });
+  }
 }
 
 /** Contas já criadas antes da categoria Salário passam a tê-la na primeira tela que precisa. */

@@ -2,11 +2,11 @@
 
 Documento vivo do progresso frente a [`Requisito.MD`](../Requisito.MD). Atualize a tabela de status e acrescente uma linha no histórico **sempre que o sistema mudar**.
 
-**Última revisão:** 2026-08-27
+**Última revisão:** 2026-08-28
 
 ## Resumo
 
-O núcleo dos 9 requisitos funcionais e dos 3 não funcionais está implementado em um app web autenticado, mobile-first, com PWA básico, SQLite local e testes da lógica de orçamento, anomalia e score. Falta endurecer produção (banco compartilhado, recuperação de senha, persistência dos alertas de teto, app nativo).
+O núcleo dos 9 requisitos funcionais e dos 3 não funcionais está implementado em um app web autenticado, mobile-first, com PWA básico, SQLite local e testes da lógica de orçamento, anomalia e score. Falta endurecer produção (banco compartilhado, recuperação de senha, app nativo).
 
 ## Status dos requisitos
 
@@ -17,7 +17,7 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 | ID | Requisito | Status | Onde vive | Observação |
 |---|---|---|---|---|
 | RF01 | Lançamento com tag emocional | Pronto | `/transacoes/novo`, `/transacoes/[id]/editar`, `EmotionLog` | Edição; nota cifrada. Categorias filtradas por receita/despesa |
-| RF02 | Tetos e 50-30-20, alerta 80%/100% | Parcial | `/orcamentos`, `budgeting.ts` | Grupo `renda` separado dos tetos. Alertas na UI; timestamps de alerta ainda não gravados |
+| RF02 | Tetos e 50-30-20, alerta 80%/100% | Pronto | `/orcamentos`, `budgeting.ts`, `budget-alerts.ts` | Grupo `renda` separado. Timestamps gravados uma vez por mês; recado in-app. Sem push/e-mail |
 | RF03 | Dashboard de fluxo de caixa | Pronto | `/`, `dashboard.ts` | Saldo, fixas vs variáveis, projeção linear |
 | RF04 | Detector de anomalias | Pronto | `anomaly-detection.ts` | Frequência 24h e madrugada; flag descartável |
 | RF05 | Matriz emoção × gasto | Pronto | `/correlacao` | Últimos 30 dias |
@@ -71,14 +71,18 @@ Categorias de **renda** (ex.: Salário) ficam separadas das de **gasto**. No lan
 
 O select de categoria ao lado do valor estourava o card (largura mínima nativa do `<select>`). Campos passam a empilhar em coluna; cards e o `select` não ultrapassam a tela.
 
+### 2026-08-28 — Persistência dos alertas de teto (RF02)
+
+Ao cruzar 80% ou 100% do teto, o app grava `alert80SentAt` / `alert100SentAt` (uma vez por categoria/mês) e cria um nudge com o texto acolhedor. O recado aparece ao salvar o lançamento e no Início até **Entendi**. Contas novas já nascem com tetos do mês nas categorias que têm limite (Delivery, Lazer…). Sem web push nem e-mail.
+
 ## Próximos passos sugeridos
 
-1. Persistir `alert80SentAt` / `alert100SentAt` e, se fizer sentido, web push ou e-mail no teto.
-2. Trocar SQLite por Postgres quando houver deploy multi-usuário.
-3. Recuperação de senha e rotação de `AUTH_SECRET` / chave de cifra.
-4. Ampliar testes (actions, auth, export sem vazar EmotionLog).
-5. Cliente móvel usando as rotas `/api/auth/*` e Bearer.
-6. Cifrar ou tokenizar o rótulo `emotion` se a política de sigilo exigir mais do que o isolamento atual.
+1. Trocar SQLite por Postgres quando houver deploy multi-usuário.
+2. Recuperação de senha e rotação de `AUTH_SECRET` / chave de cifra.
+3. Ampliar testes (actions, auth, export sem vazar EmotionLog).
+4. Cliente móvel usando as rotas `/api/auth/*` e Bearer.
+5. Cifrar ou tokenizar o rótulo `emotion` se a política de sigilo exigir mais do que o isolamento atual.
+6. Web push ou e-mail no teto, reusando os timestamps já gravados.
 
 ## Como manter este arquivo
 

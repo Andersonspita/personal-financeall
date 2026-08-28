@@ -33,6 +33,7 @@ Visão geral do mês:
 - saldo disponível
 - despesas fixas versus variáveis
 - gráfico de projeção até o fim do mês
+- um recado pontual (teto de gasto ou dica contextual), se houver, com botão **Entendi**
 - orçamentos com barra de progresso
 - lançamentos recentes
 - um indicador de “como você está”, baseado nos padrões recentes de gasto — não é um diagnóstico
@@ -71,6 +72,7 @@ O comentário emocional fica protegido e **não** entra no extrato financeiro ex
 - categorias de **renda** (só para receitas) separadas dos **tetos de gasto**
 - teto mensal por categoria de gasto
 - alerta visual ao chegar em 80% e ao atingir 100% do teto
+- ao cruzar o teto num lançamento, o recado aparece na hora e também no Início (uma vez por mês, por categoria)
 - visão 50-30-20: essencial, variável e poupança em relação à renda do mês
 - cadastro de novas categorias: grupo **Renda** para entradas; os outros grupos para gastos
 

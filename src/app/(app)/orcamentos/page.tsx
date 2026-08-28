@@ -9,6 +9,7 @@ import { createCategoryFromForm } from "@/actions/categories";
 import { formatCurrency } from "@/lib/format";
 import { BUDGET_ALERT_COPY } from "@/lib/copy";
 import { ensureDefaultIncomeCategories } from "@/lib/onboarding";
+import { ensureCurrentMonthBudgets } from "@/lib/budget-alerts";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,7 @@ const GROUP_LABEL: Record<CategoryGroup, string> = {
 export default async function BudgetsPage() {
   const user = await requireUser();
   await ensureDefaultIncomeCategories(user.id);
+  await ensureCurrentMonthBudgets(user.id);
   const now = new Date();
   const month = format(now, "yyyy-MM");
   const monthStart = startOfMonth(now);

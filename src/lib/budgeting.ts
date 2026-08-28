@@ -12,6 +12,48 @@ export function getBudgetAlertLevel(spent: number, limitAmount: number): BudgetA
   return "dentro_do_limite";
 }
 
+/** Chave `YYYY-MM` no fuso local, alinhada ao campo `Budget.month`. */
+export function budgetMonthKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
+}
+
+export type BudgetAlertStampResult = {
+  alert80SentAt: Date | null;
+  alert100SentAt: Date | null;
+  newlyFired: Array<"alerta_80" | "estourado">;
+};
+
+/**
+ * Decide quais timestamps de alerta gravar. Cada limiar dispara no máximo uma vez por teto/mês:
+ * se o gasto salta de 70% para 110%, registra 80% e 100%. Não apaga o que já foi gravado.
+ */
+export function nextBudgetAlertStamps(input: {
+  spent: number;
+  limitAmount: number;
+  alert80SentAt: Date | null;
+  alert100SentAt: Date | null;
+  now?: Date;
+}): BudgetAlertStampResult {
+  const now = input.now ?? new Date();
+  const level = getBudgetAlertLevel(input.spent, input.limitAmount);
+  let alert80SentAt = input.alert80SentAt;
+  let alert100SentAt = input.alert100SentAt;
+  const newlyFired: Array<"alerta_80" | "estourado"> = [];
+
+  if ((level === "alerta_80" || level === "estourado") && !alert80SentAt) {
+    alert80SentAt = now;
+    newlyFired.push("alerta_80");
+  }
+  if (level === "estourado" && !alert100SentAt) {
+    alert100SentAt = now;
+    newlyFired.push("estourado");
+  }
+
+  return { alert80SentAt, alert100SentAt, newlyFired };
+}
+
 export const BUDGET_GROUPS = ["essencial", "variavel", "poupanca"] as const;
 export type BudgetGroup = (typeof BUDGET_GROUPS)[number];
 

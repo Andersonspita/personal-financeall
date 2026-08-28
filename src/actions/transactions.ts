@@ -8,6 +8,7 @@ import { transactionInputSchema } from "@/lib/validation";
 import { evaluateTransactionForAnomalies, type AnomalyCandidateTransaction } from "@/lib/rules/anomaly-detection";
 import { recordVulnerabilityAssessment } from "@/lib/insights";
 import { maybeGenerateNudge } from "@/lib/nudges";
+import { syncBudgetAlertsForCategory } from "@/lib/budget-alerts";
 import { isIncomeCategoryGroup } from "@/lib/budgeting";
 
 function assertCategoryMatchesLaunchType(type: "receita" | "despesa", group: string) {
@@ -85,10 +86,12 @@ export async function createTransaction(input: unknown): Promise<CreateTransacti
     });
   }
 
-  const [nudge, { assessment }] = await Promise.all([
+  const [emotionNudge, budgetNudge, { assessment }] = await Promise.all([
     maybeGenerateNudge(user.id, transaction.id),
+    syncBudgetAlertsForCategory(user.id, data.categoryId, data.occurredAt),
     recordVulnerabilityAssessment(user.id),
   ]);
+  const nudge = budgetNudge ?? emotionNudge;
 
   revalidatePath("/");
   revalidatePath("/transacoes");
@@ -174,10 +177,12 @@ export async function updateTransaction(transactionId: string, input: unknown): 
     });
   }
 
-  const [nudge, { assessment }] = await Promise.all([
+  const [emotionNudge, budgetNudge, { assessment }] = await Promise.all([
     maybeGenerateNudge(user.id, transactionId),
+    syncBudgetAlertsForCategory(user.id, data.categoryId, data.occurredAt),
     recordVulnerabilityAssessment(user.id),
   ]);
+  const nudge = budgetNudge ?? emotionNudge;
 
   revalidatePath("/");
   revalidatePath("/transacoes");
@@ -203,4 +208,5 @@ export async function deleteTransaction(transactionId: string): Promise<void> {
   await prisma.transaction.deleteMany({ where: { id: transactionId, userId: user.id } });
   revalidatePath("/");
   revalidatePath("/transacoes");
+  revalidatePath("/orcamentos");
 }

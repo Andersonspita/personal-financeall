@@ -73,7 +73,7 @@ src/
 
 Fluxo único em `src/lib/auth/service.ts`, reutilizado por actions e APIs.
 
-1. Registro cria `User`, hash da senha e dados iniciais (`createDefaultDataForUser`).
+1. Registro cria `User`, hash da senha e dados iniciais (`createDefaultDataForUser`: conta, categorias e `Budget` do mês para as que têm teto).
 2. Login verifica senha e emite JWT (30 dias).
 3. Web: cookie `session` httpOnly, `SameSite=lax`. `Secure` segue `AUTH_COOKIE_SECURE` (padrão: ligado em `NODE_ENV=production`). Sem HTTPS (acesso por `http://IP:porta`), defina `AUTH_COOKIE_SECURE=false` ou o navegador ignora o cookie e o login parece falhar.
 4. API / app móvel: `Authorization: Bearer <token>` tem prioridade sobre o cookie (`src/lib/auth/session.ts`).
@@ -107,7 +107,7 @@ Isolamento por `userId` em todo dado do usuário. Actions conferem dono da conta
 
 ### Orçamento (RF02)
 
-`src/lib/budgeting.ts`: alerta em 80% e 100% do teto; grupos de **gasto** `essencial` / `variavel` / `poupanca` (50-30-20) e grupo de **renda** `renda` (salário e outras entradas). No lançamento, receita só lista categorias `renda` e despesa só lista as de gasto (`filterCategoriesByLaunchType`). Alertas são **calculados na leitura** e mostrados na UI. Os campos `alert80SentAt` / `alert100SentAt` existem no schema e **ainda não são gravados** (não há push/e-mail). Lançamentos existentes podem ser alterados em `/transacoes/[id]/editar` (`updateTransaction`).
+`src/lib/budgeting.ts`: alerta em 80% e 100% do teto; grupos de **gasto** `essencial` / `variavel` / `poupanca` (50-30-20) e grupo de **renda** `renda` (salário e outras entradas). No lançamento, receita só lista categorias `renda` e despesa só lista as de gasto (`filterCategoriesByLaunchType`). `nextBudgetAlertStamps` decide o que gravar; `syncBudgetAlertsForCategory` persiste `alert80SentAt` / `alert100SentAt` (uma vez por teto/mês) e cria um nudge in-app com o texto de `BUDGET_ALERT_COPY`. Sem web push ou e-mail. Lançamentos existentes podem ser alterados em `/transacoes/[id]/editar` (`updateTransaction`).
 
 ### Detector de impulso (RF04)
 
@@ -127,7 +127,7 @@ O flag `Transaction.isImpulse` é informativo; o usuário pode descartar.
 
 ### Nudges (RF07)
 
-`maybeGenerateNudge`: 3+ despesas da mesma categoria, em 14 dias, ligadas a emoções de impulso (`ansioso`, `entediado`, `estressado`, `triste`), sem nudge aberto da mesma regra.
+`maybeGenerateNudge`: 3+ despesas da mesma categoria, em 14 dias, ligadas a emoções de impulso (`ansioso`, `entediado`, `estressado`, `triste`), sem nudge aberto da mesma regra. O teto de orçamento também gera nudge (`teto_80:` / `teto_100:`). O último nudge não descartado aparece no dashboard (`NudgeBanner`).
 
 ### Educação
 
@@ -165,7 +165,7 @@ src/lib/rules/anomaly-detection.test.ts
 src/lib/rules/vulnerability-score.test.ts
 ```
 
-Cubram lógica pura. Mutações de banco e UI ainda não têm suíte.
+Cubram lógica pura (`getBudgetAlertLevel`, `nextBudgetAlertStamps`, anomalia, score). Mutações de banco e UI ainda não têm suíte.
 
 ## PWA
 
@@ -274,7 +274,7 @@ sudo systemctl restart bussola-financeira
 
 - App iOS/Android: reutilizar `/api/auth/*` + Bearer; schema já é `userId`-centric.
 - Postgres: trocar provider/adapter no Prisma; o restante do domínio não depende de SQL específico além do SQLite atual.
-- Notificações de teto: preencher `alert80SentAt` / `alert100SentAt` e um canal (web push ou e-mail).
+- Notificações externas de teto: web push ou e-mail (os timestamps `alert80SentAt` / `alert100SentAt` já são gravados; o recado hoje é in-app).
 
 ## Convenção para quem altera o código
 
