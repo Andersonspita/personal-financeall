@@ -31,7 +31,7 @@ export function ReflectionQuestionButton({ wishlistItemId, aiEnabled }: { wishli
           disabled={isPending}
           className="flex items-center gap-1.5 text-xs font-medium text-primary disabled:opacity-60"
         >
-          <Sparkles size={13} /> {isPending ? "Pensando..." : "Pedir uma pergunta de reflexão"}
+          <Sparkles size={13} className={isPending ? "animate-spin" : ""} /> {isPending ? "Pensando..." : "Pedir uma pergunta de reflexão"}
         </button>
       )}
       {question && <p className="rounded-lg bg-calm-soft p-2.5 text-sm italic text-calm">{question}</p>}

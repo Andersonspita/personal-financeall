@@ -12,12 +12,20 @@ function formatRemaining(ms: number): string {
 
 export function Countdown({ availableAt }: { availableAt: string }) {
   const target = new Date(availableAt).getTime();
-  const [remaining, setRemaining] = useState(() => target - Date.now());
+  const [remaining, setRemaining] = useState<number | null>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => setRemaining(target - Date.now()), 30_000);
+    function tick() {
+      setRemaining(target - Date.now());
+    }
+    tick();
+    const interval = setInterval(tick, 30_000);
     return () => clearInterval(interval);
   }, [target]);
+
+  if (remaining === null) {
+    return <span>Aguardando…</span>;
+  }
 
   return <span>{formatRemaining(remaining)}</span>;
 }

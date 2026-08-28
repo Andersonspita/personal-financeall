@@ -1,14 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/session";
-import { Card, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Countdown } from "@/components/wishlist/countdown";
-import { createWishlistItemFromForm, confirmWishlistItem, discardWishlistItem } from "@/actions/wishlist";
-import { ReflectionQuestionButton } from "@/components/ai/reflection-question-button";
-import { formatCurrency } from "@/lib/format";
-import { Select } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { controlClass } from "@/components/ui/control";
+import { PendingWishCard } from "@/components/wishlist/pending-item-card";
+import { WishlistItemForm } from "@/components/wishlist/wishlist-item-form";
 
 export const dynamic = "force-dynamic";
 
@@ -20,8 +15,8 @@ export default async function WishlistPage() {
     prisma.user.findUniqueOrThrow({ where: { id: user.id }, select: { aiAssistantEnabled: true } }),
   ]);
 
-  const pending = items.filter((i) => i.status === "pendente");
-  const resolved = items.filter((i) => i.status !== "pendente");
+  const pending = items.filter((item) => item.status === "pendente");
+  const resolved = items.filter((item) => item.status !== "pendente");
 
   return (
     <div className="flex flex-col gap-5">
@@ -31,51 +26,11 @@ export default async function WishlistPage() {
         provavelmente uma necessidade real — não uma urgência do momento.
       </p>
 
-      <Card>
-        <CardTitle>Novo item de desejo</CardTitle>
-        <form action={createWishlistItemFromForm} className="flex flex-col gap-4">
-          <input
-            name="name"
-            required
-            placeholder="O que você quer comprar?"
-            className={controlClass}
-          />
-          <label className="flex min-w-0 flex-col gap-1.5 text-sm">
-            Valor estimado
-            <input
-              name="amount"
-              type="number"
-              step="0.01"
-              min="0.01"
-              required
-              placeholder="0,00"
-              className={controlClass}
-            />
-          </label>
-          <label className="flex min-w-0 flex-col gap-1.5 text-sm">
-            Categoria
-            <Select name="categoryId">
-              <option value="">Sem categoria</option>
-              {categories
-                .filter((c) => c.group !== "renda")
-                .map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.icon} {c.name}
-                  </option>
-                ))}
-            </Select>
-          </label>
-          <label className="flex flex-col gap-1.5 text-sm">
-            Tempo de espera
-            <Select name="cooldownHours" defaultValue="48">
-              <option value="24">24 horas</option>
-              <option value="48">48 horas</option>
-              <option value="72">72 horas</option>
-            </Select>
-          </label>
-          <Button type="submit">Colocar em espera</Button>
-        </form>
-      </Card>
+      <WishlistItemForm
+        categories={categories
+          .filter((category) => category.group !== "renda")
+          .map((category) => ({ id: category.id, name: category.name, icon: category.icon }))}
+      />
 
       <div className="flex flex-col gap-2">
         {pending.length === 0 && (
@@ -83,38 +38,16 @@ export default async function WishlistPage() {
             <p className="text-sm text-foreground-muted">Nenhum item aguardando no momento.</p>
           </Card>
         )}
-        {pending.map((item) => {
-          // Server Component: precisa do horário real da requisição para decidir se a espera já
-          // terminou; não há como derivar isso de forma "pura" sem perder o propósito da tela.
-          // eslint-disable-next-line react-hooks/purity
-          const available = item.availableAt.getTime() <= Date.now();
-          return (
-            <Card key={item.id}>
-              <div className="flex min-w-0 items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="truncate font-medium">{item.name}</p>
-                  <p className="text-sm text-foreground-muted">{formatCurrency(item.amount)}</p>
-                </div>
-                <Badge tone={available ? "primary" : "calm"}>
-                  <Countdown availableAt={item.availableAt.toISOString()} />
-                </Badge>
-              </div>
-              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                <form action={confirmWishlistItem.bind(null, item.id)} className="w-full sm:w-auto">
-                  <Button type="submit" disabled={!available} className="w-full sm:w-auto">
-                    Confirmar necessidade real
-                  </Button>
-                </form>
-                <form action={discardWishlistItem.bind(null, item.id)} className="w-full sm:w-auto">
-                  <Button type="submit" variant="secondary" className="w-full sm:w-auto">
-                    Deixar pra lá
-                  </Button>
-                </form>
-              </div>
-              <ReflectionQuestionButton wishlistItemId={item.id} aiEnabled={dbUser.aiAssistantEnabled} />
-            </Card>
-          );
-        })}
+        {pending.map((item) => (
+          <PendingWishCard
+            key={item.id}
+            id={item.id}
+            name={item.name}
+            amount={item.amount}
+            availableAt={item.availableAt.toISOString()}
+            aiEnabled={dbUser.aiAssistantEnabled}
+          />
+        ))}
       </div>
 
       {resolved.length > 0 && (

@@ -66,6 +66,13 @@ export function isIncomeCategoryGroup(group: string): boolean {
   return group === INCOME_CATEGORY_GROUP;
 }
 
+export const CATEGORY_GROUP_LABEL: Record<CategoryGroup, string> = {
+  essencial: "Essencial",
+  variavel: "Variável",
+  poupanca: "Poupança",
+  renda: "Renda",
+};
+
 /** No lançamento, receita só vê categorias de renda; despesa só vê categorias de gasto. */
 export function filterCategoriesByLaunchType<T extends { group: string }>(
   categories: T[],
@@ -74,6 +81,16 @@ export function filterCategoriesByLaunchType<T extends { group: string }>(
   return categories.filter((c) =>
     type === "receita" ? isIncomeCategoryGroup(c.group) : !isIncomeCategoryGroup(c.group),
   );
+}
+
+export function categoryLaunchTypeError(type: "receita" | "despesa", group: string): string | null {
+  if (type === "receita" && !isIncomeCategoryGroup(group)) {
+    return "Categoria de gasto não pode ser usada em receita.";
+  }
+  if (type === "despesa" && isIncomeCategoryGroup(group)) {
+    return "Categoria de renda não pode ser usada em despesa.";
+  }
+  return null;
 }
 
 // Metas de referência do modelo 50-30-20 (percentual da renda líquida).

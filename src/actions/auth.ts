@@ -4,15 +4,20 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { registerUser, authenticateUser, AuthError } from "@/lib/auth/service";
 import { createSession, destroySession } from "@/lib/auth/session";
+import { fieldErrorsFromZod, logAppError, type FormActionState } from "@/lib/errors";
 
-export interface AuthFormState {
-  error?: string;
-}
+export type AuthFormState = FormActionState;
 
-function messageFromError(err: unknown): string {
-  if (err instanceof AuthError) return err.message;
-  if (err instanceof z.ZodError) return err.issues[0]?.message ?? "Dados inválidos.";
-  return "Algo deu errado. Tente novamente em instantes.";
+function stateFromError(err: unknown): AuthFormState {
+  if (err instanceof AuthError) return { error: err.message };
+  if (err instanceof z.ZodError) {
+    return {
+      error: err.issues[0]?.message ?? "Revise os campos e tente de novo.",
+      fieldErrors: fieldErrorsFromZod(err),
+    };
+  }
+  logAppError("auth.form", err);
+  return { error: "Algo deu errado. Tente novamente em instantes." };
 }
 
 export async function registerAction(_prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {
@@ -24,7 +29,7 @@ export async function registerAction(_prevState: AuthFormState, formData: FormDa
       password: formData.get("password"),
     });
   } catch (err) {
-    return { error: messageFromError(err) };
+    return stateFromError(err);
   }
   await createSession(user.id, user.email);
   redirect("/");
@@ -38,7 +43,7 @@ export async function loginAction(_prevState: AuthFormState, formData: FormData)
       password: formData.get("password"),
     });
   } catch (err) {
-    return { error: messageFromError(err) };
+    return stateFromError(err);
   }
   await createSession(user.id, user.email);
   redirect("/");

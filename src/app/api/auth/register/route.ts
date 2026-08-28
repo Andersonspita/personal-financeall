@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { registerUser, AuthError } from "@/lib/auth/service";
 import { createSession, issueToken } from "@/lib/auth/session";
 import { z } from "zod";
+import { logAppError } from "@/lib/errors";
 
 // Rota pensada para um cliente que não é o navegador (app iOS/Android): recebe JSON e devolve
 // um token no corpo da resposta, além de também setar o cookie httpOnly (caso o chamador seja
@@ -20,6 +21,7 @@ export async function POST(request: Request) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: err.issues[0]?.message ?? "Dados inválidos." }, { status: 400 });
     }
+    logAppError("api.auth.register", err);
     return NextResponse.json({ error: "Não foi possível criar a conta." }, { status: 500 });
   }
 }

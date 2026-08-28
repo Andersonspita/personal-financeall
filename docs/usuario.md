@@ -7,11 +7,11 @@ Este guia descreve o que você consegue fazer hoje no app.
 ## Conta e acesso
 
 1. Abra o app e escolha **Criar conta** (`/registrar`).
-2. Informe nome, e-mail e uma senha com pelo menos 8 caracteres.
+2. Informe nome, e-mail e uma senha com pelo menos 8 caracteres. Se algum campo estiver incompleto (nome em branco, e-mail inválido, senha curta), o aviso aparece **embaixo do campo** que precisa de correção.
 3. Na primeira conta, o app já cria uma **Conta Principal** e categorias iniciais de gasto (Moradia, Alimentação, Delivery…) mais **Salário** (renda). Você pode criar outras depois em Orçamentos.
 4. Para sair, use **Sair** no menu (computador) ou no topo da tela (celular).
 
-Quem já tem conta entra em **Entrar** (`/login`).
+Quem já tem conta entra em **Entrar** (`/login`). E-mail inválido ou senha em branco são apontados no próprio campo; e-mail ou senha incorretos aparecem como recado geral, sem dizer se o e-mail existe. Enquanto o app processa o login ou o cadastro, o botão mostra um indicador de espera.
 
 ### Conta de demonstração (só em ambiente local)
 
@@ -44,7 +44,7 @@ O botão **Lançar** abre o cadastro de uma nova receita ou despesa.
 
 Lista as movimentações. Em cada uma você vê data, conta, categoria e, se registrou, o estado emocional.
 
-Use o ícone de lápis para corrigir valor, data, categoria ou tipo. Use a lixeira se o lançamento não deveria existir.
+Use o ícone de lápis para corrigir valor, data, categoria ou tipo. Use a lixeira se o lançamento não deveria existir. Se o comentário privado não puder ser lido (chave de cifra diferente, por exemplo), a tela avisa e você pode escrever um novo.
 
 Se o app marcar um gasto como **possível impulso**, você pode tocar em **não foi impulso**. O marcador é informativo: você sempre tem a última palavra.
 
@@ -67,6 +67,8 @@ Campos principais:
 
 O comentário emocional fica protegido e **não** entra no extrato financeiro exportado.
 
+Se o valor for zero, negativo ou a data estiver inválida, o app explica o problema no campo — não só com uma mensagem genérica no rodapé. O botão de salvar gira enquanto grava.
+
 ### Orçamentos
 
 - categorias de **renda** (só para receitas) separadas dos **tetos de gasto**
@@ -74,7 +76,7 @@ O comentário emocional fica protegido e **não** entra no extrato financeiro ex
 - alerta visual ao chegar em 80% e ao atingir 100% do teto
 - ao cruzar o teto num lançamento, o recado aparece na hora e também no Início (uma vez por mês, por categoria)
 - visão 50-30-20: essencial, variável e poupança em relação à renda do mês
-- cadastro de novas categorias: grupo **Renda** para entradas; os outros grupos para gastos
+- cadastro de novas categorias: grupo **Renda** para entradas; os outros grupos para gastos. Nome vazio ou teto inválido são apontados no campo
 - botão **Salvar** ao lado do teto (não é um link sublinhado)
 
 Os avisos usam linguagem de orientação, não de culpa.
@@ -83,7 +85,7 @@ Os avisos usam linguagem de orientação, não de culpa.
 
 Quando bater vontade de comprar algo que não é urgente:
 
-1. Cadastre o item, o valor estimado e o tempo de espera (24h, 48h ou 72h).
+1. Cadastre o item, o valor estimado e o tempo de espera (24h, 48h ou 72h). Nome em branco, valor zero ou espera fora desse intervalo são apontados no campo.
 2. Espere o prazo. O app mostra a contagem regressiva.
 3. Depois, confirme se ainda faz sentido ou descarte o item.
 

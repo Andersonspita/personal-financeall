@@ -68,6 +68,16 @@ body {
   overflow-x: hidden;
 }
 
+h1 {
+  font-family: var(--font-source-serif), ui-serif, Georgia, "Times New Roman", serif;
+  letter-spacing: -0.025em;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
 /* Safari/Chrome: <select> usa a opção mais longa como largura mínima e estoura o card no celular. */
 select {
   max-width: 100%;

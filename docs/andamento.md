@@ -18,7 +18,7 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 |---|---|---|---|---|
 | RF01 | Lançamento com tag emocional | Pronto | `/transacoes/novo`, `/transacoes/[id]/editar`, `EmotionLog` | Edição; nota cifrada. Categorias filtradas por receita/despesa |
 | RF02 | Tetos e 50-30-20, alerta 80%/100% | Pronto | `/orcamentos`, `budgeting.ts`, `budget-alerts.ts` | Grupo `renda` separado. Timestamps gravados uma vez por mês; recado in-app. Sem push/e-mail |
-| RF03 | Dashboard de fluxo de caixa | Pronto | `/`, `dashboard.ts` | Saldo, fixas vs variáveis, projeção linear |
+| RF03 | Dashboard de fluxo de caixa | Pronto | `/`, `dashboard.ts`, `cash-flow.ts` | Saldo, fixas vs variáveis, projeção linear; série do gráfico extraída e testada |
 | RF04 | Detector de anomalias | Pronto | `anomaly-detection.ts` | Frequência 24h e madrugada; flag descartável |
 | RF05 | Matriz emoção × gasto | Pronto | `/correlacao` | Últimos 30 dias |
 | RF06 | Trava de resfriamento 24–72h | Pronto | `/desejos` | Confirmar ou descartar após o prazo |
@@ -42,7 +42,7 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 | Biblioteca educativa com progresso | Pronto |
 | Assistente de IA de escopo fechado | Pronto (opcional; depende de `OPENAI_API_KEY`) |
 | Seed demo | Pronto (`demo@bussola.app`) |
-| Testes unitários do domínio | Parcial (3 arquivos) |
+| Testes unitários do domínio | Parcial (7 arquivos; sem suíte de banco/UI) |
 | App iOS/Android | Pendente (API já client-agnostic) |
 | Recuperação de senha / verificação de e-mail | Pendente |
 | Postgres / deploy em nuvem | Pendente |
@@ -83,14 +83,19 @@ O `next build` na VPS falhou porque `createMany({ skipDuplicates: true })` não 
 
 Menu inferior com espaço entre itens, rótulos curtos e recuo da safe-area do iOS. Lançamentos usam ícones de editar/excluir com área de toque maior. Selects customizados (sem a seta nativa da Apple). Gráfico de fluxo com grade suave, curva monotone e eixo compacto. Botões e inputs padronizados em `rounded-xl`; cards em `rounded-2xl` com mais respiro.
 
+### 2026-08-28 — Passagem de qualidade (arquitetura, testes, formulários)
+
+Sem reescrever o App Router em “Clean Architecture” de pastas: a divisão continua página → Server Action → `src/lib`. Extraídos `cash-flow.ts`, `errors.ts`, `auth/schemas.ts` e componentes de orçamento/lançamento/desejos. Validação Zod em português com erro **por campo** (`Field`, `aria-invalid`). Falhas inesperadas vão para log JSON (`logAppError`); token JWT inválido continua sendo “sem sessão”. Suíte de testes passou de 3 para 7 arquivos (validação, cifra, série de fluxo, schemas de auth, bordas). Títulos em Source Serif; botões com spinner e microinteração de clique. A trava de resfriamento deixa de usar `Date.now()` no Server Component (isso gerava aviso de hidratação).
+
 ## Próximos passos sugeridos
 
 1. Trocar SQLite por Postgres quando houver deploy multi-usuário.
 2. Recuperação de senha e rotação de `AUTH_SECRET` / chave de cifra.
-3. Ampliar testes (actions, auth, export sem vazar EmotionLog).
+3. Testes de integração com banco (actions, export sem vazar EmotionLog).
 4. Cliente móvel usando as rotas `/api/auth/*` e Bearer.
 5. Cifrar ou tokenizar o rótulo `emotion` se a política de sigilo exigir mais do que o isolamento atual.
 6. Web push ou e-mail no teto, reusando os timestamps já gravados.
+7. Tela para criar/editar contas (`createAccount` já existe na action).
 
 ## Como manter este arquivo
 

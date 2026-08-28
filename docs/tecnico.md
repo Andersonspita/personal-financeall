@@ -10,7 +10,7 @@ Aplicação web **Next.js 16** (App Router) + **React 19** + **Prisma 7** (SQLit
 | Persistência | Prisma 7, adapter `better-sqlite3`, SQLite (`prisma/dev.db`) |
 | Auth | JWT HS256 (`jose`, Edge-compatible), cookie httpOnly `session` e Bearer |
 | Senha | `bcryptjs` |
-| Validação | Zod 4 (`src/lib/validation.ts`) |
+| Validação | Zod 4 (`src/lib/validation.ts`, `src/lib/auth/schemas.ts`); erros por campo via `src/lib/errors.ts` |
 | Regras de negócio editáveis | `@gorules/zen-engine` + JDM em `src/lib/rules/vulnerability-level.json` |
 | IA (opcional) | OpenAI (`gpt-4o-mini` por padrão), opt-in por usuário |
 | Testes | Vitest (`src/**/*.test.ts`) |
@@ -65,13 +65,16 @@ src/
 ```
 
 - **Server Components** leem o banco a cada request (`export const dynamic = "force-dynamic"` nas páginas com saldo/score). Cache de página seria saldo velho.
-- **Server Actions** em `src/actions/` mutam dados e revalidam rotas.
+- **Server Actions** em `src/actions/` mutam dados e revalidam rotas. Erros de validação voltam como `{ error, fieldErrors }` (`src/lib/errors.ts`), não como `throw` genérico — Server Actions serializam mal classes de erro.
 - **Route Handlers** em `src/app/api/` servem a web e um futuro cliente móvel (mesmo JWT).
-- Lógica de negócio testável fica em `src/lib` sem I/O quando possível (`budgeting.ts`, `anomaly-detection.ts`, `vulnerability-score.ts`).
+- Lógica de negócio testável fica em `src/lib` sem I/O quando possível (`budgeting.ts`, `cash-flow.ts`, `anomaly-detection.ts`, `vulnerability-score.ts`, `auth/schemas.ts`).
+- Não há uma pasta `domain/application/infrastructure` no estilo Clean Architecture: no App Router isso costuma virar indireção vazia. A divisão real é **página → action → lib**.
+
+Telas grandes foram fatiadas: orçamentos (`components/budgets/`), lista de lançamentos (`transaction-row.tsx`), trava de resfriamento (`wishlist-item-form.tsx`). `createAccount` em `src/actions/accounts.ts` existe para um futuro cadastro de contas na UI; não é arquivo morto.
 
 ## Autenticação
 
-Fluxo único em `src/lib/auth/service.ts`, reutilizado por actions e APIs.
+Fluxo único em `src/lib/auth/service.ts` (schemas em `src/lib/auth/schemas.ts`), reutilizado por actions e APIs.
 
 1. Registro cria `User`, hash da senha e dados iniciais (`createDefaultDataForUser`: conta, categorias e `Budget` do mês para as que têm teto).
 2. Login verifica senha e emite JWT (30 dias).
@@ -107,7 +110,9 @@ Isolamento por `userId` em todo dado do usuário. Actions conferem dono da conta
 
 ### Orçamento (RF02)
 
-`src/lib/budgeting.ts`: alerta em 80% e 100% do teto; grupos de **gasto** `essencial` / `variavel` / `poupanca` (50-30-20) e grupo de **renda** `renda` (salário e outras entradas). No lançamento, receita só lista categorias `renda` e despesa só lista as de gasto (`filterCategoriesByLaunchType`). `nextBudgetAlertStamps` decide o que gravar; `syncBudgetAlertsForCategory` persiste `alert80SentAt` / `alert100SentAt` (uma vez por teto/mês) e cria um nudge in-app com o texto de `BUDGET_ALERT_COPY`. Sem web push ou e-mail. Lançamentos existentes podem ser alterados em `/transacoes/[id]/editar` (`updateTransaction`).
+`src/lib/budgeting.ts`: alerta em 80% e 100% do teto; grupos de **gasto** `essencial` / `variavel` / `poupanca` (50-30-20) e grupo de **renda** `renda` (salário e outras entradas). No lançamento, receita só lista categorias `renda` e despesa só lista as de gasto (`filterCategoriesByLaunchType`). `categoryLaunchTypeError` recusa combinação invertida. `nextBudgetAlertStamps` decide o que gravar; `syncBudgetAlertsForCategory` persiste `alert80SentAt` / `alert100SentAt` (uma vez por teto/mês) e cria um nudge in-app com o texto de `BUDGET_ALERT_COPY`. Sem web push ou e-mail. Lançamentos existentes podem ser alterados em `/transacoes/[id]/editar` (`updateTransaction`).
+
+A série do gráfico de fluxo (`accumulateDailyNet`, `buildCashFlowChartSeries`) vive em `src/lib/cash-flow.ts`; `dashboard.ts` só busca dados e monta os totais.
 
 ### Detector de impulso (RF04)
 
@@ -161,16 +166,23 @@ Textos de alerta, score e pânico centralizados em `src/lib/copy.ts`. Novas fras
 
 ```
 src/lib/budgeting.test.ts
+src/lib/cash-flow.test.ts
+src/lib/crypto.test.ts
+src/lib/validation.test.ts
+src/lib/auth/schemas.test.ts
 src/lib/rules/anomaly-detection.test.ts
 src/lib/rules/vulnerability-score.test.ts
 ```
 
-Cubram lógica pura (`getBudgetAlertLevel`, `nextBudgetAlertStamps`, anomalia, score). Mutações de banco e UI ainda não têm suíte.
+Cubram lógica pura e bordas (valor zero/NaN/Infinity, mês 13, cooldown 23h/73h, payload de cifra adulterado, lançamento fora do mês no gráfico). Mutações de banco e UI ainda não têm suíte de integração com SQLite. Falhas inesperadas nas actions/APIs vão para `logAppError` (JSON em stderr), não para `console.log(error)` solto.
 
 ## UI
 
-- Botões: `src/components/ui/button.tsx` (`rounded-xl`). Não usar link sublinhado para ação primária/secundária.
-- Campos e selects: `controlClass` + `Select` (`appearance-none` + chevron). Cards: `rounded-2xl`, `p-5`.
+- Títulos `h1` usam Source Serif 4 (identidade editorial); o restante permanece Geist.
+- Botões: `src/components/ui/button.tsx` (`rounded-xl`, `pending` com spinner, `active:scale-[0.98]`). Não usar link sublinhado para ação primária/secundária.
+- Campos: `Field` + `fieldControlClass` (borda crítica + `aria-invalid` + texto de erro no campo). Selects: `Select` (`appearance-none` + chevron). Cards: `rounded-2xl`, `p-5`.
+- Mensagens de Zod em `src/lib/validation.ts` e `src/lib/auth/schemas.ts` estão em português.
+- Relógio da trava de resfriamento (`Countdown`, `PendingWishCard`) só calcula `Date.now()` no cliente, depois do mount — evita mismatch de hidratação.
 - Barra inferior: `env(safe-area-inset-bottom)` e `viewportFit: cover` para não ficar sob o indicador do iOS.
 - Gráfico: Recharts com grade horizontal suave, curva `monotone` e eixo Y compacto.
 

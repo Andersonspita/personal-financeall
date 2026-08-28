@@ -9,7 +9,7 @@ interface Point {
   saldoProjetado: number | null;
 }
 
-function paddedDomain([dataMin, dataMax]: [number, number]): [number, number] {
+function paddedDomain([dataMin, dataMax]: readonly [number, number]): [number, number] {
   const min = Number.isFinite(dataMin) ? dataMin : 0;
   const max = Number.isFinite(dataMax) ? dataMax : 0;
   const span = Math.max(max - min, 200);

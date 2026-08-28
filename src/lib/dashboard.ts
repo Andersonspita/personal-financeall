@@ -1,6 +1,7 @@
 import { differenceInCalendarDays, endOfMonth, format, startOfMonth } from "date-fns";
 import { prisma } from "@/lib/prisma";
 import { getBudgetAlertLevel, projectEndOfMonthBalance } from "@/lib/budgeting";
+import { accumulateDailyNet, buildCashFlowChartSeries, openingBalanceBeforeSeries } from "@/lib/cash-flow";
 import { computeCurrentVulnerability } from "@/lib/insights";
 import { ensureCurrentMonthBudgets } from "@/lib/budget-alerts";
 
@@ -59,32 +60,23 @@ export async function getDashboardData(userId: string) {
     return { ...b, spent, alertLevel: getBudgetAlertLevel(spent, b.limitAmount) };
   });
 
-  // Série diária acumulada (real até hoje, projetada linearmente depois) para o gráfico de fluxo de caixa.
   const daysInMonth = differenceInCalendarDays(monthEnd, monthStart) + 1;
-  const dailyNet = new Array(daysInMonth).fill(0);
-  for (const t of transactionsThisMonth) {
-    const dayIndex = differenceInCalendarDays(t.occurredAt, monthStart);
-    if (dayIndex < 0 || dayIndex >= daysInMonth) continue;
-    dailyNet[dayIndex] += t.type === "receita" ? t.amount : -t.amount;
-  }
-
+  const dailyNet = accumulateDailyNet({
+    daysInMonth,
+    monthStart,
+    movements: transactionsThisMonth.map((row) => ({
+      occurredAt: row.occurredAt,
+      type: row.type as "receita" | "despesa",
+      amount: row.amount,
+    })),
+  });
   const todayIndex = differenceInCalendarDays(now, monthStart);
-  const startBalance = saldoDisponivel - dailyNet.slice(0, todayIndex + 1).reduce((s, v) => s + v, 0);
-  let running = startBalance;
-  const chartData: { day: number; saldoReal: number | null; saldoProjetado: number | null }[] = [];
-  for (let index = 0; index < daysInMonth; index++) {
-    if (index <= todayIndex) {
-      running += dailyNet[index];
-      chartData.push({
-        day: index + 1,
-        saldoReal: Math.round(running),
-        saldoProjetado: index === todayIndex ? Math.round(running) : null,
-      });
-    } else {
-      running += -averageDailyExpense;
-      chartData.push({ day: index + 1, saldoReal: null, saldoProjetado: Math.round(running) });
-    }
-  }
+  const chartData = buildCashFlowChartSeries({
+    dailyNet,
+    todayIndex,
+    monthStartBalance: openingBalanceBeforeSeries(saldoDisponivel, dailyNet, todayIndex),
+    averageDailyExpense,
+  });
 
   return {
     accounts,

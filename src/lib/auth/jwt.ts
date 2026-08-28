@@ -32,6 +32,7 @@ export async function verifySessionToken(token: string): Promise<SessionPayload 
     if (typeof payload.sub !== "string" || typeof payload.email !== "string") return null;
     return { sub: payload.sub, email: payload.email };
   } catch {
+    // Token expirado, adulterado ou malformado: sessão inexistente, não é falha operacional.
     return null;
   }
 }

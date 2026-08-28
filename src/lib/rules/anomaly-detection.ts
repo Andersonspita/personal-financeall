@@ -23,6 +23,18 @@ function hoursBetween(a: Date, b: Date): number {
   return Math.abs(a.getTime() - b.getTime()) / (1000 * 60 * 60);
 }
 
+/** Janela inclusiva de ±N horas usada no detector de frequência (lançamentos retroativos inclusive). */
+export function anomalyWindowAround(
+  occurredAt: Date,
+  windowHours: number = FREQUENCY_WINDOW_HOURS,
+): { from: Date; to: Date } {
+  const spanMs = windowHours * 60 * 60 * 1000;
+  return {
+    from: new Date(occurredAt.getTime() - spanMs),
+    to: new Date(occurredAt.getTime() + spanMs),
+  };
+}
+
 /** Conta quantas despesas não essenciais ocorreram na janela de 24h ao redor de `reference` (inclusive). */
 export function countNonEssentialWithinWindow(
   transactions: AnomalyCandidateTransaction[],

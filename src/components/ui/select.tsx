@@ -1,12 +1,21 @@
 import type { SelectHTMLAttributes } from "react";
 import { ChevronDown } from "lucide-react";
 import { clsx } from "clsx";
-import { controlClass } from "@/components/ui/control";
+import { fieldControlClass } from "@/components/ui/control";
 
-export function Select({ className, children, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
+export function Select({
+  className,
+  invalid,
+  children,
+  ...props
+}: SelectHTMLAttributes<HTMLSelectElement> & { invalid?: boolean }) {
   return (
     <div className="relative min-w-0 w-full">
-      <select className={clsx(controlClass, "cursor-pointer appearance-none pr-10", className)} {...props}>
+      <select
+        aria-invalid={invalid || undefined}
+        className={clsx(fieldControlClass(invalid), "cursor-pointer appearance-none pr-10", className)}
+        {...props}
+      >
         {children}
       </select>
       <ChevronDown

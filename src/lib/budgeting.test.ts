@@ -3,6 +3,7 @@ import {
   getBudgetAlertLevel,
   projectEndOfMonthBalance,
   filterCategoriesByLaunchType,
+  categoryLaunchTypeError,
   budgetMonthKey,
   nextBudgetAlertStamps,
 } from "./budgeting";
@@ -118,6 +119,21 @@ describe("filterCategoriesByLaunchType", () => {
 
   it("na despesa omite categorias de renda", () => {
     expect(filterCategoriesByLaunchType(cats, "despesa").map((c) => c.name)).toEqual(["Moradia", "Lazer"]);
+  });
+});
+
+describe("categoryLaunchTypeError", () => {
+  it("bloqueia categoria de gasto em receita", () => {
+    expect(categoryLaunchTypeError("receita", "essencial")).toBe("Categoria de gasto não pode ser usada em receita.");
+  });
+
+  it("bloqueia categoria de renda em despesa", () => {
+    expect(categoryLaunchTypeError("despesa", "renda")).toBe("Categoria de renda não pode ser usada em despesa.");
+  });
+
+  it("aceita combinação coerente", () => {
+    expect(categoryLaunchTypeError("receita", "renda")).toBeNull();
+    expect(categoryLaunchTypeError("despesa", "variavel")).toBeNull();
   });
 });
 

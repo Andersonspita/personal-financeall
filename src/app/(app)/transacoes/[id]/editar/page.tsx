@@ -7,12 +7,10 @@ import { decryptSensitive } from "@/lib/crypto";
 import { TransactionForm } from "@/components/transactions/transaction-form";
 import { ensureDefaultIncomeCategories } from "@/lib/onboarding";
 import type { Emotion } from "@/lib/emotions";
+import { toLocalDatetimeValue } from "@/lib/datetime-local";
+import { logAppError } from "@/lib/errors";
 
 export const dynamic = "force-dynamic";
-
-function toLocalDatetimeValue(date: Date): string {
-  return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-}
 
 export default async function EditTransactionPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await requireUser();
@@ -30,11 +28,13 @@ export default async function EditTransactionPage({ params }: { params: Promise<
   if (!transaction) notFound();
 
   let note = "";
+  let noteUnavailable = false;
   if (transaction.emotionLog?.noteEncrypted) {
     try {
       note = decryptSensitive(transaction.emotionLog.noteEncrypted);
-    } catch {
-      note = "";
+    } catch (err) {
+      logAppError("emotion.note.decrypt", err, { transactionId: transaction.id });
+      noteUnavailable = true;
     }
   }
 
@@ -58,6 +58,7 @@ export default async function EditTransactionPage({ params }: { params: Promise<
           essential: transaction.essential,
           emotion: (transaction.emotionLog?.emotion as Emotion | undefined) ?? null,
           note,
+          noteUnavailable,
         }}
       />
     </div>

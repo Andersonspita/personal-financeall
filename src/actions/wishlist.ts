@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/session";
 import { wishlistItemInputSchema } from "@/lib/validation";
+import { fieldErrorsFromZod, logAppError, type FormActionState } from "@/lib/errors";
 
 /** Trava de Resfriamento (RF06): cria o item já com a data em que a confirmação será liberada. */
 export async function createWishlistItem(input: unknown) {
@@ -18,14 +19,30 @@ export async function createWishlistItem(input: unknown) {
   return item;
 }
 
-export async function createWishlistItemFromForm(formData: FormData) {
-  const categoryId = formData.get("categoryId");
-  await createWishlistItem({
-    name: String(formData.get("name")),
+export async function createWishlistItemFromForm(
+  _prevState: FormActionState,
+  formData: FormData,
+): Promise<FormActionState> {
+  const categoryId = String(formData.get("categoryId") ?? "");
+  const parsed = wishlistItemInputSchema.safeParse({
+    name: String(formData.get("name") ?? ""),
     amount: Number(formData.get("amount")),
-    categoryId: categoryId ? String(categoryId) : undefined,
+    categoryId: categoryId || undefined,
     cooldownHours: Number(formData.get("cooldownHours")),
   });
+  if (!parsed.success) {
+    return {
+      error: parsed.error.issues[0]?.message ?? "Revise os campos e tente de novo.",
+      fieldErrors: fieldErrorsFromZod(parsed.error),
+    };
+  }
+  try {
+    await createWishlistItem(parsed.data);
+  } catch (err) {
+    logAppError("wishlist.create", err);
+    return { error: "Não foi possível guardar o item. Tente de novo em instantes." };
+  }
+  return { success: true };
 }
 
 /** Só permite confirmar "necessidade real" depois que o prazo de resfriamento passou. */

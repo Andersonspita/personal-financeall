@@ -1,10 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/session";
 import { categoryInputSchema } from "@/lib/validation";
 import { budgetMonthKey, isIncomeCategoryGroup } from "@/lib/budgeting";
+import { fieldErrorsFromZod, logAppError, type FormActionState } from "@/lib/errors";
 
 export async function createCategory(input: unknown) {
   const user = await requireUser();
@@ -26,12 +28,34 @@ export async function createCategory(input: unknown) {
   return category;
 }
 
-export async function createCategoryFromForm(formData: FormData) {
-  const monthlyLimit = formData.get("monthlyLimit");
-  await createCategory({
-    name: String(formData.get("name")),
-    group: String(formData.get("group")),
-    icon: (formData.get("icon") as string) || undefined,
-    monthlyLimit: monthlyLimit ? Number(monthlyLimit) : undefined,
+export async function createCategoryFromForm(
+  _prevState: FormActionState,
+  formData: FormData,
+): Promise<FormActionState> {
+  const monthlyLimitRaw = String(formData.get("monthlyLimit") ?? "").trim();
+  const parsed = categoryInputSchema.safeParse({
+    name: String(formData.get("name") ?? ""),
+    group: String(formData.get("group") ?? ""),
+    icon: String(formData.get("icon") ?? "").trim() || undefined,
+    monthlyLimit: monthlyLimitRaw ? Number(monthlyLimitRaw) : undefined,
   });
+  if (!parsed.success) {
+    return {
+      error: parsed.error.issues[0]?.message ?? "Revise os campos e tente de novo.",
+      fieldErrors: fieldErrorsFromZod(parsed.error),
+    };
+  }
+  try {
+    await createCategory(parsed.data);
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return {
+        error: err.issues[0]?.message ?? "Revise os campos e tente de novo.",
+        fieldErrors: fieldErrorsFromZod(err),
+      };
+    }
+    logAppError("categories.create", err);
+    return { error: "Não foi possível criar a categoria. Tente de novo em instantes." };
+  }
+  return { success: true };
 }

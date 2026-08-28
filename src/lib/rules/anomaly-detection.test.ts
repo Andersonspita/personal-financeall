@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  anomalyWindowAround,
   countNonEssentialWithinWindow,
   evaluateTransactionForAnomalies,
   isLateNightPurchase,
@@ -91,5 +92,14 @@ describe("evaluateTransactionForAnomalies", () => {
     };
     const result = evaluateTransactionForAnomalies(current, [current]);
     expect(result.isImpulse).toBe(false);
+  });
+});
+
+describe("anomalyWindowAround", () => {
+  it("abre 24h para cada lado", () => {
+    const occurredAt = new Date("2026-08-20T12:00:00Z");
+    const { from, to } = anomalyWindowAround(occurredAt);
+    expect(to.getTime() - from.getTime()).toBe(48 * 60 * 60 * 1000);
+    expect(occurredAt.getTime() - from.getTime()).toBe(24 * 60 * 60 * 1000);
   });
 });
