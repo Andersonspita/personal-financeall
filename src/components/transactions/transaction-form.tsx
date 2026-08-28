@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { clsx } from "clsx";
 import { createTransaction, updateTransaction } from "@/actions/transactions";
@@ -181,6 +182,11 @@ export function TransactionForm({
             </option>
           ))}
         </Select>
+        <p className="mt-1.5 text-xs text-foreground-muted">
+          <Link href="/configuracoes#contas" className="font-medium text-primary">
+            Gerenciar contas
+          </Link>
+        </p>
       </Field>
 
       <Field

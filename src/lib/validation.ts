@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { EMOTIONS } from "@/lib/emotions";
 import { CATEGORY_GROUPS } from "@/lib/budgeting";
+import { ACCOUNT_TYPES } from "@/lib/accounts";
 
 const moneyAmount = z
   .number({ error: "Informe um valor numérico" })
@@ -9,10 +10,11 @@ const moneyAmount = z
 
 export const accountInputSchema = z.object({
   name: z.string().trim().min(1, "Informe o nome da conta").max(80, "Nome muito longo"),
-  type: z.enum(["corrente", "poupanca", "cartao_credito", "dinheiro", "investimento"], {
-    error: "Escolha um tipo de conta",
-  }),
-  initialBalance: z.number({ error: "Informe um saldo inicial numérico" }).finite().default(0),
+  type: z.enum(ACCOUNT_TYPES, { error: "Escolha um tipo de conta" }),
+  initialBalance: z
+    .number({ error: "Informe um saldo inicial numérico" })
+    .finite("Informe um saldo inicial numérico")
+    .default(0),
 });
 
 export const categoryInputSchema = z.object({

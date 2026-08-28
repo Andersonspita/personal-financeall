@@ -14,7 +14,7 @@ export async function getDashboardData(userId: string) {
 
   const [accounts, transactionsThisMonth, totalReceitas, totalDespesas, budgets, vulnerability, openNudge] =
     await Promise.all([
-    prisma.account.findMany({ where: { userId, archived: false }, orderBy: { createdAt: "asc" } }),
+    prisma.account.findMany({ where: { userId }, orderBy: { createdAt: "asc" } }),
     prisma.transaction.findMany({
       where: { userId, occurredAt: { gte: monthStart, lte: monthEnd } },
       include: { category: true, emotionLog: true },

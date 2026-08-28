@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import { clsx } from "clsx";
 
-export function Card({ children, className }: { children: ReactNode; className?: string }) {
+export function Card({ children, className, id }: { children: ReactNode; className?: string; id?: string }) {
   return (
-    <div className={clsx("min-w-0 overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-[0_1px_2px_rgba(41,37,36,0.06)] transition-shadow duration-200", className)}>
+    <div id={id} className={clsx("min-w-0 overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-[0_1px_2px_rgba(41,37,36,0.06)] transition-shadow duration-200", className)}>
       {children}
     </div>
   );

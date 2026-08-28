@@ -70,7 +70,7 @@ src/
 - Lógica de negócio testável fica em `src/lib` sem I/O quando possível (`budgeting.ts`, `cash-flow.ts`, `anomaly-detection.ts`, `vulnerability-score.ts`, `auth/schemas.ts`).
 - Não há uma pasta `domain/application/infrastructure` no estilo Clean Architecture: no App Router isso costuma virar indireção vazia. A divisão real é **página → action → lib**.
 
-Telas grandes foram fatiadas: orçamentos (`components/budgets/`), lista de lançamentos (`transaction-row.tsx`), trava de resfriamento (`wishlist-item-form.tsx`). `createAccount` em `src/actions/accounts.ts` existe para um futuro cadastro de contas na UI; não é arquivo morto.
+Telas grandes foram fatiadas: orçamentos (`components/budgets/`), lista de lançamentos (`transaction-row.tsx`), trava de resfriamento (`wishlist-item-form.tsx`), contas de dinheiro em Configurações (`components/settings/money-account-*.tsx`). CRUD de `Account` em `src/actions/accounts.ts` (criar, editar, arquivar, reativar); a última conta ativa não pode ser arquivada.
 
 ## Autenticação
 

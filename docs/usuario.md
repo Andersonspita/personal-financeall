@@ -8,7 +8,7 @@ Este guia descreve o que você consegue fazer hoje no app.
 
 1. Abra o app e escolha **Criar conta** (`/registrar`), ou **Continuar com Google** se o servidor tiver o login Google ligado.
 2. No cadastro por e-mail, informe nome, e-mail e uma senha com pelo menos 8 caracteres. Se algum campo estiver incompleto (nome em branco, e-mail inválido, senha curta), o aviso aparece **embaixo do campo** que precisa de correção.
-3. Na primeira conta, o app já cria uma **Conta Principal** e categorias iniciais de gasto (Moradia, Alimentação, Delivery…) mais **Salário** (renda). Você pode criar outras depois em Orçamentos.
+3. Na primeira conta, o app já cria uma **Conta Principal** e categorias iniciais de gasto (Moradia, Alimentação, Delivery…) mais **Salário** (renda). Outras contas de dinheiro (carteira, cartão, poupança) você cria em **Configurações**.
 4. Para sair, use **Sair** no menu (computador) ou no topo da tela (celular).
 
 Quem já tem conta entra em **Entrar** (`/login`). E-mail inválido ou senha em branco são apontados no próprio campo; e-mail ou senha incorretos aparecem como recado geral, sem dizer se o e-mail existe. Enquanto o app processa o login ou o cadastro, o botão mostra um indicador de espera.
@@ -117,7 +117,11 @@ Biblioteca de textos curtos sobre emoção e dinheiro. O bloco **Para você agor
 
 ### Configurações
 
-Mostra nome e e-mail da conta. Se o servidor tiver IA configurada, você liga ou desliga o **Assistente de IA**. Ele fica **desligado por padrão**.
+Mostra nome e e-mail do perfil. Em **Contas de dinheiro** você cria, edita o nome/tipo/saldo inicial e arquiva destinos de lançamento (corrente, carteira, cartão…). Arquivar some da lista de lançamentos novos; o histórico continua. Não dá para arquivar a última conta ativa. O saldo inicial entra no Início.
+
+No formulário de lançamento há o atalho **Gerenciar contas**.
+
+Se o servidor tiver IA configurada, você liga ou desliga o **Assistente de IA**. Ele fica **desligado por padrão**.
 
 O assistente só:
 

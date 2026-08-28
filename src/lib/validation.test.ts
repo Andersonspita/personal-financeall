@@ -120,4 +120,17 @@ describe("accountInputSchema", () => {
   it("rejeita nome vazio", () => {
     expect(accountInputSchema.safeParse({ name: "", type: "corrente" }).success).toBe(false);
   });
+
+  it("aceita conta corrente com saldo inicial omitido", () => {
+    const parsed = accountInputSchema.parse({ name: "Nubank", type: "corrente" });
+    expect(parsed.initialBalance).toBe(0);
+  });
+
+  it("rejeita tipo desconhecido", () => {
+    const parsed = accountInputSchema.safeParse({ name: "Carteira", type: "paypal" });
+    expect(parsed.success).toBe(false);
+    if (!parsed.success) {
+      expect(fieldErrorsFromZod(parsed.error).type).toMatch(/tipo/i);
+    }
+  });
 });
