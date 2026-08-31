@@ -53,12 +53,14 @@ export async function getDashboardData(userId: string) {
     daysRemainingInMonth: daysRemaining,
   });
 
-  const budgetsWithSpent = budgets.map((b) => {
-    const spent = transactionsThisMonth
-      .filter((t) => t.categoryId === b.categoryId && t.type === "despesa")
-      .reduce((sum, t) => sum + t.amount, 0);
-    return { ...b, spent, alertLevel: getBudgetAlertLevel(spent, b.limitAmount) };
-  });
+  const budgetsWithSpent = budgets
+    .filter((b) => !b.category.archived)
+    .map((b) => {
+      const spent = transactionsThisMonth
+        .filter((t) => t.categoryId === b.categoryId && t.type === "despesa")
+        .reduce((sum, t) => sum + t.amount, 0);
+      return { ...b, spent, alertLevel: getBudgetAlertLevel(spent, b.limitAmount) };
+    });
 
   const daysInMonth = differenceInCalendarDays(monthEnd, monthStart) + 1;
   const dailyNet = accumulateDailyNet({

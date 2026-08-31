@@ -5,13 +5,15 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/session";
 import { budgetInputSchema } from "@/lib/validation";
 import { syncBudgetAlertsForCategory } from "@/lib/budget-alerts";
+import { DomainError } from "@/lib/errors";
 
 export async function upsertBudget(input: unknown) {
   const user = await requireUser();
   const data = budgetInputSchema.parse(input);
 
   const category = await prisma.category.findFirst({ where: { id: data.categoryId, userId: user.id } });
-  if (!category) throw new Error("Categoria não encontrada.");
+  if (!category) throw new DomainError("Categoria não encontrada.");
+  if (category.archived) throw new DomainError("Reative a categoria antes de definir o teto.");
 
   const budget = await prisma.budget.upsert({
     where: { categoryId_month: { categoryId: data.categoryId, month: data.month } },

@@ -16,16 +16,23 @@ export default async function EditTransactionPage({ params }: { params: Promise<
   const user = await requireUser();
   const { id } = await params;
   await ensureDefaultIncomeCategories(user.id);
-  const [transaction, accounts, categories] = await Promise.all([
-    prisma.transaction.findFirst({
-      where: { id, userId: user.id },
-      include: { emotionLog: true },
-    }),
-    prisma.account.findMany({ where: { userId: user.id, archived: false }, orderBy: { createdAt: "asc" } }),
-    prisma.category.findMany({ where: { userId: user.id }, orderBy: { name: "asc" } }),
-  ]);
+  const transaction = await prisma.transaction.findFirst({
+    where: { id, userId: user.id },
+    include: { emotionLog: true },
+  });
 
   if (!transaction) notFound();
+
+  const [accounts, categories] = await Promise.all([
+    prisma.account.findMany({ where: { userId: user.id, archived: false }, orderBy: { createdAt: "asc" } }),
+    prisma.category.findMany({
+      where: {
+        userId: user.id,
+        OR: [{ archived: false }, ...(transaction.categoryId ? [{ id: transaction.categoryId }] : [])],
+      },
+      orderBy: { name: "asc" },
+    }),
+  ]);
 
   let note = "";
   let noteUnavailable = false;

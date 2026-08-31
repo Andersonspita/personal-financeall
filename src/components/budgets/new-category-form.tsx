@@ -71,7 +71,7 @@ export function NewCategoryForm() {
       </div>
       <p className="text-xs text-foreground-muted">
         Grupo <strong>Renda</strong> = entradas. Essencial, variável e poupança = gastos (50-30-20). Teto mensal só
-        faz sentido para gasto.
+        faz sentido para gasto. Se o nome já existir (mesmo arquivado), reative a categoria em vez de criar outra.
       </p>
       {state.error && !state.fieldErrors && <p className="text-sm text-critical" role="alert">{state.error}</p>}
       <Button type="submit" pending={isPending}>

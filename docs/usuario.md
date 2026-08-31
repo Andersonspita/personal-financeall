@@ -81,6 +81,10 @@ Se o valor for zero, negativo ou a data estiver inválida, o app explica o probl
 - ao cruzar o teto num lançamento, o recado aparece na hora e também no Início (uma vez por mês, por categoria)
 - visão 50-30-20: essencial, variável e poupança em relação à renda do mês
 - cadastro de novas categorias: grupo **Renda** para entradas; os outros grupos para gastos. Nome vazio ou teto inválido são apontados no campo
+- editar nome, ícone e grupo de uma categoria já criada
+- arquivar categoria que não usa mais: some da lista de lançamentos novos e da trava de resfriamento; o histórico continua. Reative quando quiser usar de novo
+- não dá para arquivar a última categoria de renda nem a última de gasto (os lançamentos precisam de pelo menos uma de cada)
+- se o nome já existir (mesmo arquivado), o app pede para reativar em vez de criar outra com o mesmo nome
 - botão **Salvar** ao lado do teto (não é um link sublinhado)
 
 Os avisos usam linguagem de orientação, não de culpa.

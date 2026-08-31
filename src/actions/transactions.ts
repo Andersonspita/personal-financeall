@@ -78,12 +78,16 @@ async function assertOwnedAccountAndCategory(
   accountId: string,
   categoryId: string | undefined,
   launchType: "receita" | "despesa",
+  options?: { allowArchivedCategoryId?: string | null },
 ) {
   const account = await prisma.account.findFirst({ where: { id: accountId, userId } });
   if (!account) throw new DomainError("Conta não encontrada.", "accountId");
   if (!categoryId) return;
   const category = await prisma.category.findFirst({ where: { id: categoryId, userId } });
   if (!category) throw new DomainError("Categoria não encontrada.", "categoryId");
+  if (category.archived && category.id !== options?.allowArchivedCategoryId) {
+    throw new DomainError("Essa categoria está arquivada. Reative-a em Orçamentos ou escolha outra.", "categoryId");
+  }
   const mismatch = categoryLaunchTypeError(launchType, category.group);
   if (mismatch) throw new DomainError(mismatch, "categoryId");
 }
@@ -165,7 +169,9 @@ export async function updateTransaction(transactionId: string, input: unknown): 
     });
     if (!existing) throw new DomainError("Lançamento não encontrado.");
 
-    await assertOwnedAccountAndCategory(user.id, payload.accountId, payload.categoryId, payload.type);
+    await assertOwnedAccountAndCategory(user.id, payload.accountId, payload.categoryId, payload.type, {
+      allowArchivedCategoryId: existing.categoryId,
+    });
 
     const nearby = await loadNearbyAnomalyCandidates(user.id, payload.occurredAt, transactionId);
     const current: AnomalyCandidateTransaction = {

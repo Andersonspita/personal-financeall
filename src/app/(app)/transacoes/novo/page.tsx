@@ -12,7 +12,7 @@ export default async function NewTransactionPage() {
   await ensureDefaultIncomeCategories(user.id);
   const [accounts, categories] = await Promise.all([
     prisma.account.findMany({ where: { userId: user.id, archived: false }, orderBy: { createdAt: "asc" } }),
-    prisma.category.findMany({ where: { userId: user.id }, orderBy: { name: "asc" } }),
+    prisma.category.findMany({ where: { userId: user.id, archived: false }, orderBy: { name: "asc" } }),
   ]);
 
   return (

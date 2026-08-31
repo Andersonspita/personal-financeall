@@ -2,8 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { budgetMonthKey, isIncomeCategoryGroup } from "@/lib/budgeting";
 
 // Conjunto inicial de categorias oferecido a toda conta nova, para que a primeira tela de
-// lançamento já tenha opções sensatas em vez de aparecer vazia. O usuário pode editar/remover
-// livremente depois — isso é só um ponto de partida, não uma imposição.
+// lançamento já tenha opções sensatas em vez de aparecer vazia. O usuário pode editar ou arquivar
+// depois — isso é só um ponto de partida, não uma imposição.
 export const DEFAULT_CATEGORIES = [
   { name: "Moradia", group: "essencial", icon: "🏠" },
   { name: "Alimentação", group: "essencial", icon: "🛒" },

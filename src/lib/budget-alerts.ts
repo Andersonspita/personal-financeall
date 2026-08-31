@@ -13,7 +13,7 @@ export async function ensureCurrentMonthBudgets(userId: string) {
   const month = budgetMonthKey(new Date());
   const [categories, existing] = await Promise.all([
     prisma.category.findMany({
-      where: { userId, monthlyLimit: { not: null } },
+      where: { userId, archived: false, monthlyLimit: { not: null } },
     }),
     prisma.budget.findMany({ where: { userId, month }, select: { categoryId: true } }),
   ]);

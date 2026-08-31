@@ -11,7 +11,7 @@ export default async function WishlistPage() {
   const user = await requireUser();
   const [items, categories, dbUser] = await Promise.all([
     prisma.wishlistItem.findMany({ where: { userId: user.id }, include: { category: true }, orderBy: { createdAt: "desc" } }),
-    prisma.category.findMany({ where: { userId: user.id }, orderBy: { name: "asc" } }),
+    prisma.category.findMany({ where: { userId: user.id, archived: false }, orderBy: { name: "asc" } }),
     prisma.user.findUniqueOrThrow({ where: { id: user.id }, select: { aiAssistantEnabled: true } }),
   ]);
 

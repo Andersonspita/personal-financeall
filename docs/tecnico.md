@@ -70,7 +70,7 @@ src/
 - Lógica de negócio testável fica em `src/lib` sem I/O quando possível (`budgeting.ts`, `cash-flow.ts`, `anomaly-detection.ts`, `vulnerability-score.ts`, `auth/schemas.ts`).
 - Não há uma pasta `domain/application/infrastructure` no estilo Clean Architecture: no App Router isso costuma virar indireção vazia. A divisão real é **página → action → lib**.
 
-Telas grandes foram fatiadas: orçamentos (`components/budgets/`), lista de lançamentos (`transaction-row.tsx`), trava de resfriamento (`wishlist-item-form.tsx`), contas de dinheiro em Configurações (`components/settings/money-account-*.tsx`). CRUD de `Account` em `src/actions/accounts.ts` (criar, editar, arquivar, reativar); a última conta ativa não pode ser arquivada.
+Telas grandes foram fatiadas: orçamentos (`components/budgets/`), lista de lançamentos (`transaction-row.tsx`), trava de resfriamento (`wishlist-item-form.tsx`), contas de dinheiro em Configurações (`components/settings/money-account-*.tsx`). CRUD de `Account` em `src/actions/accounts.ts` e de `Category` em `src/actions/categories.ts` (criar, editar, arquivar, reativar). A última conta ativa, a última categoria de renda e a última de gasto não podem ser arquivadas. Nomes de categoria são únicos por usuário, inclusive entre arquivadas.
 
 ## Autenticação
 
@@ -114,7 +114,7 @@ Isolamento por `userId` em todo dado do usuário. Actions conferem dono da conta
 
 ### Orçamento (RF02)
 
-`src/lib/budgeting.ts`: alerta em 80% e 100% do teto; grupos de **gasto** `essencial` / `variavel` / `poupanca` (50-30-20) e grupo de **renda** `renda` (salário e outras entradas). No lançamento, receita só lista categorias `renda` e despesa só lista as de gasto (`filterCategoriesByLaunchType`). `categoryLaunchTypeError` recusa combinação invertida. `nextBudgetAlertStamps` decide o que gravar; `syncBudgetAlertsForCategory` persiste `alert80SentAt` / `alert100SentAt` (uma vez por teto/mês) e cria um nudge in-app com o texto de `BUDGET_ALERT_COPY`. Sem web push ou e-mail. Lançamentos existentes podem ser alterados em `/transacoes/[id]/editar` (`updateTransaction`).
+`src/lib/budgeting.ts`: alerta em 80% e 100% do teto; grupos de **gasto** `essencial` / `variavel` / `poupanca` (50-30-20) e grupo de **renda** `renda` (salário e outras entradas). No lançamento, receita só lista categorias `renda` e despesa só lista as de gasto (`filterCategoriesByLaunchType`). Categorias com `archived: true` não entram em lançamento novo, na trava de resfriamento nem em `ensureCurrentMonthBudgets`; na edição de um lançamento, a categoria atual permanece selecionável. `categoryLaunchTypeError` recusa combinação invertida. `nextBudgetAlertStamps` decide o que gravar; `syncBudgetAlertsForCategory` persiste `alert80SentAt` / `alert100SentAt` (uma vez por teto/mês) e cria um nudge in-app com o texto de `BUDGET_ALERT_COPY`. Sem web push ou e-mail. Lançamentos existentes podem ser alterados em `/transacoes/[id]/editar` (`updateTransaction`). Regras de arquivar categoria: `src/lib/categories.ts`.
 
 A série do gráfico de fluxo (`accumulateDailyNet`, `buildCashFlowChartSeries`) vive em `src/lib/cash-flow.ts`; `dashboard.ts` só busca dados e monta os totais.
 
@@ -154,7 +154,7 @@ Escopo fechado (`src/lib/ai/prompts.ts`): no máximo 3–4 frases, tom não-puni
 | `/transacoes` | Lista (editar / excluir) |
 | `/transacoes/novo` | Formulário RF01; categorias filtradas por receita/despesa |
 | `/transacoes/[id]/editar` | Correção de lançamento |
-| `/orcamentos` | Renda vs tetos de gasto e 50-30-20 |
+| `/orcamentos` | Renda vs tetos de gasto, editar/arquivar categorias e 50-30-20 |
 | `/desejos` | Cooling-off 24–72h |
 | `/correlacao` | Matriz emoção × gasto |
 | `/panico` | Desvio de foco |
@@ -177,6 +177,7 @@ src/lib/budgeting.test.ts
 src/lib/cash-flow.test.ts
 src/lib/crypto.test.ts
 src/lib/validation.test.ts
+src/lib/categories.test.ts
 src/lib/auth/schemas.test.ts
 src/lib/auth/reset-token.test.ts
 src/lib/rules/anomaly-detection.test.ts

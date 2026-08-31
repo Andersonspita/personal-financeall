@@ -6,7 +6,7 @@ import { BUDGET_GROUPS, type BudgetGroup } from "@/lib/budgeting";
 import { ensureDefaultIncomeCategories } from "@/lib/onboarding";
 import { ensureCurrentMonthBudgets } from "@/lib/budget-alerts";
 import { BudgetDistributionCard } from "@/components/budgets/distribution-card";
-import { CategoryCeilingList } from "@/components/budgets/category-ceiling-list";
+import { CategoryManager } from "@/components/budgets/category-manager";
 import { NewCategoryForm } from "@/components/budgets/new-category-form";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +21,10 @@ export default async function BudgetsPage() {
   const monthEnd = endOfMonth(now);
 
   const [categories, spentByCategory, income, budgets] = await Promise.all([
-    prisma.category.findMany({ where: { userId: user.id }, orderBy: { name: "asc" } }),
+    prisma.category.findMany({
+      where: { userId: user.id },
+      orderBy: [{ archived: "asc" }, { name: "asc" }],
+    }),
     prisma.transaction.groupBy({
       by: ["categoryId"],
       where: { userId: user.id, type: "despesa", occurredAt: { gte: monthStart, lte: monthEnd } },
@@ -44,38 +47,24 @@ export default async function BudgetsPage() {
     groupTotals[category.group as BudgetGroup] += spentMap.get(category.id) ?? 0;
   }
 
-  const incomeCategories = categories.filter((category) => category.group === "renda");
-  const expenseCategories = categories
-    .filter((category) => category.group !== "renda")
-    .map((category) => ({
-      id: category.id,
-      name: category.name,
-      icon: category.icon,
-      spent: spentMap.get(category.id) ?? 0,
-      limit: budgetMap.get(category.id) ?? category.monthlyLimit ?? null,
-    }));
-
   return (
     <div className="flex flex-col gap-5">
       <h1 className="text-xl font-semibold">Orçamentos</h1>
 
       <BudgetDistributionCard groupTotals={groupTotals} totalIncome={totalIncome} />
 
-      <Card>
-        <CardTitle>Categorias de renda</CardTitle>
-        <p className="mb-3 text-sm text-foreground-muted">
-          Usadas só em lançamentos do tipo receita (salário, freelance, 13º). Não entram nos tetos nem no 50-30-20.
-        </p>
-        <ul className="flex flex-col gap-2 text-sm">
-          {incomeCategories.map((category) => (
-            <li key={category.id}>
-              {category.icon} {category.name}
-            </li>
-          ))}
-        </ul>
-      </Card>
-
-      <CategoryCeilingList month={month} categories={expenseCategories} />
+      <CategoryManager
+        month={month}
+        categories={categories.map((category) => ({
+          id: category.id,
+          name: category.name,
+          group: category.group,
+          icon: category.icon,
+          archived: category.archived,
+          spent: spentMap.get(category.id) ?? 0,
+          limit: budgetMap.get(category.id) ?? category.monthlyLimit ?? null,
+        }))}
+      />
 
       <Card>
         <CardTitle>Nova categoria</CardTitle>

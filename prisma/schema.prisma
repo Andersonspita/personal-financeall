@@ -71,6 +71,7 @@ model Category {
   icon          String?
   color         String?
   monthlyLimit  Float?
+  archived      Boolean        @default(false)
   createdAt     DateTime       @default(now())
   transactions  Transaction[]
   budgets       Budget[]

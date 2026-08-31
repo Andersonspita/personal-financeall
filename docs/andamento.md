@@ -42,13 +42,14 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 | Biblioteca educativa com progresso | Pronto (agora em cursos, 3 trilhas) |
 | Assistente de IA de escopo fechado | Pronto (opcional; depende de `OPENAI_API_KEY`) |
 | Seed demo | Pronto (`demo@bussola.app`) |
-| Testes unitários do domínio | Parcial (11 arquivos; sem suíte de banco/UI) |
+| Testes unitários do domínio | Parcial (12 arquivos; sem suíte de banco/UI) |
 | App iOS/Android | Pendente (API já client-agnostic) |
 | Recuperação de senha / verificação de e-mail | Parcial (reset por e-mail; sem verificação de cadastro) |
 | Login Google | Pronto (opcional; `GOOGLE_CLIENT_ID` + secret + redirect) |
 | Postgres / deploy em nuvem | Pendente |
 | Deploy VPS (systemd, porta 3000) | Pronto (roteiro em `docs/tecnico.md`; HTTP com `AUTH_COOKIE_SECURE=false`) |
 | Cadastro de contas de dinheiro | Pronto (Configurações; arquivar, sem apagar histórico) |
+| Cadastro de categorias | Pronto (Orçamentos; editar, arquivar, sem apagar histórico) |
 
 ## Histórico
 
@@ -104,6 +105,10 @@ As 10 leituras curtas passaram a 3 cursos (Emoções e compras, Ferramentas da B
 ### 2026-08-31 — Vídeos do YouTube nas aulas
 
 Cada curso e aula passam a ter um vídeo sugerido (mentalidade financeira, Serasa Ensina, 50-30-20, Banco Central, compras compulsivas). O player usa `youtube-nocookie.com`. O texto da Bússola continua o material principal.
+
+### 2026-08-31 — Editar e arquivar categorias
+
+Em **Orçamentos** dá para mudar nome, ícone e grupo, e arquivar categorias que não entram mais em lançamentos novos. O histórico permanece. A última de renda e a última de gasto ficam ativas. Nome duplicado (inclusive arquivado) pede para reativar em vez de criar outra.
 
 ## Próximos passos sugeridos
 

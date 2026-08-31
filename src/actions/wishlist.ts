@@ -4,12 +4,21 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/session";
 import { wishlistItemInputSchema } from "@/lib/validation";
-import { fieldErrorsFromZod, logAppError, type FormActionState } from "@/lib/errors";
+import { isIncomeCategoryGroup } from "@/lib/budgeting";
+import { DomainError, fieldErrorsFromZod, logAppError, type FormActionState } from "@/lib/errors";
 
 /** Trava de Resfriamento (RF06): cria o item já com a data em que a confirmação será liberada. */
 export async function createWishlistItem(input: unknown) {
   const user = await requireUser();
   const data = wishlistItemInputSchema.parse(input);
+  if (data.categoryId) {
+    const category = await prisma.category.findFirst({
+      where: { id: data.categoryId, userId: user.id, archived: false },
+    });
+    if (!category || isIncomeCategoryGroup(category.group)) {
+      throw new DomainError("Categoria não encontrada.", "categoryId");
+    }
+  }
   const availableAt = new Date(Date.now() + data.cooldownHours * 60 * 60 * 1000);
 
   const item = await prisma.wishlistItem.create({
@@ -39,6 +48,9 @@ export async function createWishlistItemFromForm(
   try {
     await createWishlistItem(parsed.data);
   } catch (err) {
+    if (err instanceof DomainError) {
+      return { error: err.message, fieldErrors: err.field ? { [err.field]: err.message } : undefined };
+    }
     logAppError("wishlist.create", err);
     return { error: "Não foi possível guardar o item. Tente de novo em instantes." };
   }
