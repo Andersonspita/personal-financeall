@@ -66,7 +66,7 @@ export default async function DashboardPage() {
         <CardTitle>Como você está</CardTitle>
         <VulnerabilityBadge level={data.vulnerability.level} />
         <Link href="/aprender" className="mt-3 flex items-center gap-1.5 text-sm font-medium text-primary">
-          <BookOpen size={15} /> Ver dicas para esse momento
+          <BookOpen size={15} /> Ver os cursos
         </Link>
         <VulnerabilityExplainerButton aiEnabled={dbUser.aiAssistantEnabled} />
       </Card>

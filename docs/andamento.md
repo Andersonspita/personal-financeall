@@ -2,7 +2,7 @@
 
 Documento vivo do progresso frente a [`Requisito.MD`](../Requisito.MD). Atualize a tabela de status e acrescente uma linha no histórico **sempre que o sistema mudar**.
 
-**Última revisão:** 2026-08-28
+**Última revisão:** 2026-08-31
 
 ## Resumo
 
@@ -22,7 +22,7 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 | RF04 | Detector de anomalias | Pronto | `anomaly-detection.ts` | Frequência 24h e madrugada; flag descartável |
 | RF05 | Matriz emoção × gasto | Pronto | `/correlacao` | Últimos 30 dias |
 | RF06 | Trava de resfriamento 24–72h | Pronto | `/desejos` | Confirmar ou descartar após o prazo |
-| RF07 | Feed de nudges | Pronto | `nudges.ts` + `/aprender` | Nudge contextual + biblioteca recomendada |
+| RF07 | Feed de nudges | Pronto | `nudges.ts` + `/aprender` | Nudge contextual + 3 cursos com aulas |
 | RF08 | Botão de pânico / desvio de foco | Pronto | `/panico` | Quatro microatividades; desfecho autodeclarado |
 | RF09 | Score de vulnerabilidade e encaminhamento | Pronto | `vulnerability-score.ts`, Zen Engine | Apoio após 3 scores críticos seguidos |
 
@@ -39,10 +39,10 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 | Item | Status |
 |---|---|
 | Contas multiusuário com JWT (web + Bearer) | Pronto |
-| Biblioteca educativa com progresso | Pronto |
+| Biblioteca educativa com progresso | Pronto (agora em cursos, 3 trilhas) |
 | Assistente de IA de escopo fechado | Pronto (opcional; depende de `OPENAI_API_KEY`) |
 | Seed demo | Pronto (`demo@bussola.app`) |
-| Testes unitários do domínio | Parcial (9 arquivos; sem suíte de banco/UI) |
+| Testes unitários do domínio | Parcial (10 arquivos; sem suíte de banco/UI) |
 | App iOS/Android | Pendente (API já client-agnostic) |
 | Recuperação de senha / verificação de e-mail | Parcial (reset por e-mail; sem verificação de cadastro) |
 | Login Google | Pronto (opcional; `GOOGLE_CLIENT_ID` + secret + redirect) |
@@ -96,6 +96,10 @@ Dá para pedir um link em **Esqueci a senha** (token com hash, 1 hora, mensagem 
 ### 2026-08-28 — Contas de dinheiro na UI
 
 Em Configurações dá para criar, editar e arquivar contas (corrente, poupança, cartão, dinheiro, investimento). Sem SMTP/Google nesta etapa. Arquivar não apaga lançamentos; a última conta ativa fica. O saldo inicial de contas arquivadas continua no Início.
+
+### 2026-08-31 — Cursos em Aprender
+
+As 10 leituras curtas passaram a 3 cursos (Emoções e compras, Ferramentas da Bússola, Dinheiro no dia a dia), com progresso por aula, aula anterior/próxima e catálogo gravado na primeira visita a `/aprender` (sem seed demo na VPS).
 
 ## Próximos passos sugeridos
 

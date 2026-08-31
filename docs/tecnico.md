@@ -140,7 +140,7 @@ O flag `Transaction.isImpulse` é informativo; o usuário pode descartar.
 
 ### Educação
 
-Conteúdo curado em `src/lib/education/content.ts`, seed idempotente por `slug`. Recomendação usa a emoção de maior gasto nos últimos 30 dias.
+Cursos curados em `src/lib/education/courses.ts`, aulas em `content.ts`. `ensureEducationalCatalog()` (upsert por slug) roda ao abrir `/aprender` — a VPS não precisa do seed demo. Recomendação usa a emoção de maior gasto nos últimos 30 dias. Progresso de curso é derivado das aulas (`progress.ts`).
 
 ### IA
 
@@ -158,7 +158,9 @@ Escopo fechado (`src/lib/ai/prompts.ts`): no máximo 3–4 frases, tom não-puni
 | `/desejos` | Cooling-off 24–72h |
 | `/correlacao` | Matriz emoção × gasto |
 | `/panico` | Desvio de foco |
-| `/aprender` e `/aprender/[slug]` | Biblioteca |
+| `/aprender` | Cursos e recomendações |
+| `/aprender/cursos/[slug]` | Aulas de um curso |
+| `/aprender/[slug]` | Aula (anterior/próxima se estiver num curso) |
 | `/configuracoes` | Conta e toggle de IA |
 | `/login` `/registrar` | Públicas |
 | `/recuperar-senha` | Pedido de link |

@@ -113,7 +113,9 @@ Qualquer resultado é aceito. O objetivo é criar uma pausa, não pontuar compor
 
 ### Aprender
 
-Biblioteca de textos curtos sobre emoção e dinheiro. O bloco **Para você agora** sugere leituras com base no que mais aparece nos seus gastos. Você pode marcar o conteúdo como concluído.
+Três **cursos** curtos (emoções e compras, ferramentas da Bússola, dinheiro no dia a dia). Cada um tem aulas de 2–4 minutos. Você vê quantas aulas já concluiu; não há prova nem prazo. O bloco **Para você agora** sugere aulas com base no que mais aparece nos seus gastos. Dá para marcar a aula como concluída e ir para a anterior ou a próxima.
+
+No celular, o atalho fica no Início (**Ver os cursos**) e no computador no menu **Aprender**.
 
 ### Configurações
 

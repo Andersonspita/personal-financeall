@@ -3,7 +3,7 @@ import { prisma } from "../src/lib/prisma";
 import { encryptSensitive } from "../src/lib/crypto";
 import { hashPassword } from "../src/lib/auth/password";
 import { evaluateTransactionForAnomalies } from "../src/lib/rules/anomaly-detection";
-import { EDUCATIONAL_CONTENT } from "../src/lib/education/content";
+import { ensureEducationalCatalog } from "../src/lib/education/catalog";
 
 const DEMO_EMAIL = "demo@bussola.app";
 const DEMO_PASSWORD = "demo12345";
@@ -15,21 +15,8 @@ function daysAgo(days: number, hour = 12): Date {
   return d;
 }
 
-/** Conteúdo educativo é compartilhado (não pertence a um usuário) — upsert por slug, idempotente. */
-async function seedEducationalContent() {
-  await Promise.all(
-    EDUCATIONAL_CONTENT.map((c) =>
-      prisma.educationalContent.upsert({
-        where: { slug: c.slug },
-        update: c,
-        create: c,
-      }),
-    ),
-  );
-}
-
 async function main() {
-  await seedEducationalContent();
+  await ensureEducationalCatalog();
 
   // Ordem de limpeza respeita as foreign keys. Apaga só os dados do usuário demo, não o banco todo.
   const existingDemo = await prisma.user.findUnique({ where: { email: DEMO_EMAIL } });

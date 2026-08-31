@@ -40,7 +40,7 @@ Conta demo após o seed: `demo@bussola.app` / `demo12345` (somente desenvolvimen
 | `npm run dev` | Servidor de desenvolvimento |
 | `npm run build` / `npm start` | Produção |
 | `npm test` | Vitest |
-| `npm run db:seed` | Usuário demo + conteúdo educativo |
+| `npm run db:seed` | Usuário demo + cursos educativos |
 
 ## Repositório
 

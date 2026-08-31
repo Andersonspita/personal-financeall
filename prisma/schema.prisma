@@ -192,8 +192,21 @@ model PanicSession {
   @@index([userId])
 }
 
-/// Biblioteca de educação emocional-financeira (extensão do RF07): conteúdo curado, igual para
-/// todo mundo — não tem userId aqui porque não é dado do usuário, é o material em si.
+/// Curso curado (extensão do RF07): agrupamento de aulas. Igual para todo mundo — sem userId.
+model Course {
+  id        String               @id @default(cuid())
+  slug      String               @unique
+  title     String
+  summary   String
+  tag       String
+  order     Int                 @default(0)
+  createdAt DateTime            @default(now())
+  lessons   EducationalContent[]
+
+  @@index([tag])
+}
+
+/// Aula da biblioteca educativa. Pode pertencer a um curso (`courseId`).
 model EducationalContent {
   id               String            @id @default(cuid())
   slug             String            @unique
@@ -203,10 +216,14 @@ model EducationalContent {
   tag              String // emoção (ver src/lib/emotions.ts) ou tema geral (orcamento, poupanca, compulsao, autoconhecimento)
   estimatedMinutes Int
   order            Int               @default(0)
+  lessonOrder      Int               @default(0)
+  courseId         String?
+  course           Course?           @relation(fields: [courseId], references: [id], onDelete: SetNull)
   createdAt        DateTime          @default(now())
   progress         ContentProgress[]
 
   @@index([tag])
+  @@index([courseId])
 }
 
 /// Progresso de leitura por usuário — o conteúdo em si é compartilhado, o progresso não.

@@ -42,7 +42,7 @@ export default async function CorrelationPage() {
             {formatCurrency(top.total)} em {top.count} compra(s)
           </p>
           <Link href="/aprender" className="mt-3 flex items-center gap-1.5 text-sm font-medium text-primary">
-            <BookOpen size={15} /> Ver dicas sobre isso
+            <BookOpen size={15} /> Ver os cursos sobre isso
           </Link>
         </Card>
       )}

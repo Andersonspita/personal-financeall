@@ -15,10 +15,17 @@ export async function markContentViewed(contentId: string) {
 
 export async function markContentCompleted(contentId: string) {
   const user = await requireUser();
+  const content = await prisma.educationalContent.findFirst({
+    where: { id: contentId },
+    include: { course: { select: { slug: true } } },
+  });
+  if (!content) return;
   await prisma.contentProgress.upsert({
     where: { userId_contentId: { userId: user.id, contentId } },
     update: { completedAt: new Date() },
     create: { userId: user.id, contentId, viewedAt: new Date(), completedAt: new Date() },
   });
   revalidatePath("/aprender");
+  revalidatePath(`/aprender/${content.slug}`);
+  if (content.course) revalidatePath(`/aprender/cursos/${content.course.slug}`);
 }
