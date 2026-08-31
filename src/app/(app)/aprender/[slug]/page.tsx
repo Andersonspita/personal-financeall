@@ -7,6 +7,8 @@ import { markContentViewed, markContentCompleted } from "@/actions/education";
 import { Badge } from "@/components/ui/badge";
 import { tagEmoji, tagLabel } from "@/lib/education/tags";
 import { Button } from "@/components/ui/button";
+import { YoutubeEmbed } from "@/components/education/youtube-embed";
+import { videoForLesson } from "@/lib/education/videos";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +24,7 @@ export default async function EducationDetailPage({ params }: { params: Promise<
   const neighbors = content.course?.neighbors;
   const backHref = content.course ? `/aprender/cursos/${content.course.slug}` : "/aprender";
   const backLabel = content.course ? content.course.title : "Aprender";
+  const clip = videoForLesson(content.slug, content.course?.slug);
 
   return (
     <div className="flex flex-col gap-4">
@@ -44,6 +47,8 @@ export default async function EducationDetailPage({ params }: { params: Promise<
       </div>
 
       <h1 className="text-xl font-semibold">{content.title}</h1>
+
+      {clip ? <YoutubeEmbed clip={clip} /> : null}
 
       <div className="flex flex-col gap-3 text-sm leading-relaxed text-foreground">
         {paragraphs.map((p, i) => (

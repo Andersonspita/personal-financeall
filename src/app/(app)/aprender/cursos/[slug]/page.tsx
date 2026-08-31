@@ -6,6 +6,8 @@ import { getCourseBySlug } from "@/lib/education/service";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { tagEmoji, tagLabel } from "@/lib/education/tags";
+import { YoutubeEmbed } from "@/components/education/youtube-embed";
+import { videoForCourse } from "@/lib/education/videos";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +16,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
   const user = await requireUser();
   const course = await getCourseBySlug(user.id, slug);
   if (!course) notFound();
+  const clip = videoForCourse(course.slug);
 
   return (
     <div className="flex flex-col gap-4">
@@ -34,6 +37,8 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
         <h1 className="text-xl font-semibold">{course.title}</h1>
         <p className="mt-1 text-sm text-foreground-muted">{course.summary}</p>
       </div>
+
+      {clip ? <YoutubeEmbed clip={clip} /> : null}
 
       <ProgressBar ratio={course.progress.ratio} tone="dentro_do_limite" />
       <p className="text-xs text-foreground-muted">

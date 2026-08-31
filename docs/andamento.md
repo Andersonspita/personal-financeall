@@ -42,7 +42,7 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 | Biblioteca educativa com progresso | Pronto (agora em cursos, 3 trilhas) |
 | Assistente de IA de escopo fechado | Pronto (opcional; depende de `OPENAI_API_KEY`) |
 | Seed demo | Pronto (`demo@bussola.app`) |
-| Testes unitários do domínio | Parcial (10 arquivos; sem suíte de banco/UI) |
+| Testes unitários do domínio | Parcial (11 arquivos; sem suíte de banco/UI) |
 | App iOS/Android | Pendente (API já client-agnostic) |
 | Recuperação de senha / verificação de e-mail | Parcial (reset por e-mail; sem verificação de cadastro) |
 | Login Google | Pronto (opcional; `GOOGLE_CLIENT_ID` + secret + redirect) |
@@ -100,6 +100,10 @@ Em Configurações dá para criar, editar e arquivar contas (corrente, poupança
 ### 2026-08-31 — Cursos em Aprender
 
 As 10 leituras curtas passaram a 3 cursos (Emoções e compras, Ferramentas da Bússola, Dinheiro no dia a dia), com progresso por aula, aula anterior/próxima e catálogo gravado na primeira visita a `/aprender` (sem seed demo na VPS).
+
+### 2026-08-31 — Vídeos do YouTube nas aulas
+
+Cada curso e aula passam a ter um vídeo sugerido (mentalidade financeira, Serasa Ensina, 50-30-20, Banco Central, compras compulsivas). O player usa `youtube-nocookie.com`. O texto da Bússola continua o material principal.
 
 ## Próximos passos sugeridos
 

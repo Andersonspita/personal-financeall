@@ -140,7 +140,7 @@ O flag `Transaction.isImpulse` é informativo; o usuário pode descartar.
 
 ### Educação
 
-Cursos curados em `src/lib/education/courses.ts`, aulas em `content.ts`. `ensureEducationalCatalog()` (upsert por slug) roda ao abrir `/aprender` — a VPS não precisa do seed demo. Recomendação usa a emoção de maior gasto nos últimos 30 dias. Progresso de curso é derivado das aulas (`progress.ts`).
+Cursos curados em `src/lib/education/courses.ts`, aulas em `content.ts`, vídeos em `videos.ts` (embed `youtube-nocookie.com`). `ensureEducationalCatalog()` (upsert por slug) roda ao abrir `/aprender` — a VPS não precisa do seed demo. Recomendação usa a emoção de maior gasto nos últimos 30 dias. Progresso de curso é derivado das aulas (`progress.ts`).
 
 ### IA
 
