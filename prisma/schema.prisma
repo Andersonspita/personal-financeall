@@ -36,6 +36,7 @@ model User {
   updatedAt          DateTime @updatedAt
 
   behavioralProfile   BehavioralProfile?
+  dailyMoodLogs       DailyMoodLog[]
   accounts            Account[]
   categories          Category[]
   transactions        Transaction[]
@@ -242,6 +243,21 @@ model ContentProgress {
 
   @@unique([userId, contentId])
   @@index([userId])
+}
+
+/// Check-in diário de humor (RF11). Separado de EmotionLog (emoção na compra) e do export financeiro (RNF02).
+model DailyMoodLog {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date          String // "YYYY-MM-DD" — um registro por dia
+  mood          String // ver src/lib/emotions.ts
+  noteEncrypted String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId, date])
 }
 
 /// Perfil comportamental declarado no onboarding (RF10). Tabela isolada — dados sensíveis de

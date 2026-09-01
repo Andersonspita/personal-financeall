@@ -33,16 +33,13 @@ No celular, a navegação fica na barra inferior (acima da faixa do iPhone). No 
 
 ### Início
 
-Visão geral do mês:
+Visão geral do mês — com **seletor de mês** (‹ ›) no topo. No mês atual você vê o saldo disponível; em meses passados, o **resultado líquido** (receitas − despesas) e o saldo no último dia com movimento.
 
-- saldo disponível
-- despesas fixas versus variáveis
-- gráfico de projeção até o fim do mês
-- um recado pontual (teto de gasto ou dica contextual), se houver, com botão **Entendi**
-- orçamentos com barra de progresso
-- lançamentos recentes
-- um indicador de “como você está”, baseado nos padrões recentes de gasto — não é um diagnóstico
-- se você respondeu ao questionário inicial e ainda não lançou despesas com emoção, um recado lembra o gatilho que você declarou (sem nota de comportamento)
+- **Como você acordou hoje?** — check-in diário de humor (ansioso, tédio, estresse…), separado dos lançamentos. Só no mês atual; anotação privada opcional.
+- **Fluxo do mês (dados reais)** — saldo acumulado dia a dia com base nos lançamentos, **sem projeção** de gastos futuros.
+- **Gasto por emoção** — barras das despesas com emoção registrada naquele mês.
+- **Humor ao longo do mês** — grade com os check-ins diários (emoji por dia).
+- recado pontual (teto ou dica), orçamentos, lançamentos do mês, indicador de vulnerabilidade (sempre últimos 7 dias)
 
 O botão **Lançar** abre o cadastro de uma nova receita ou despesa.
 

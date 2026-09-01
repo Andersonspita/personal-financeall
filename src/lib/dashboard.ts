@@ -1,22 +1,53 @@
-import { differenceInCalendarDays, endOfMonth, format, startOfMonth } from "date-fns";
+import "server-only";
+import { differenceInCalendarDays } from "date-fns";
 import { prisma } from "@/lib/prisma";
-import { getBudgetAlertLevel, projectEndOfMonthBalance } from "@/lib/budgeting";
-import { accumulateDailyNet, buildCashFlowChartSeries, openingBalanceBeforeSeries } from "@/lib/cash-flow";
-import { computeCurrentVulnerability } from "@/lib/insights";
+import { getBudgetAlertLevel } from "@/lib/budgeting";
+import { accumulateDailyNet, buildRealCashFlowChartSeries } from "@/lib/cash-flow";
+import { resolveDashboardMonth, type DashboardMonth } from "@/lib/dashboard-month";
+import { computeCurrentVulnerability, getEmotionSpendMatrixForRange } from "@/lib/insights";
 import { ensureCurrentMonthBudgets } from "@/lib/budget-alerts";
+import { buildMoodTimeline } from "@/lib/mood/timeline";
+import { getMoodLogsForMonth } from "@/lib/mood/service";
+import { EMOTION_EMOJI, EMOTION_LABELS, type Emotion } from "@/lib/emotions";
 
-export async function getDashboardData(userId: string) {
-  await ensureCurrentMonthBudgets(userId);
-  const now = new Date();
-  const monthStart = startOfMonth(now);
-  const monthEnd = endOfMonth(now);
-  const month = format(now, "yyyy-MM");
+async function getBalanceBefore(userId: string, before: Date): Promise<number> {
+  const [accounts, movements] = await Promise.all([
+    prisma.account.findMany({ where: { userId }, select: { initialBalance: true } }),
+    prisma.transaction.findMany({
+      where: { userId, occurredAt: { lt: before } },
+      select: { type: true, amount: true },
+    }),
+  ]);
 
-  const [accounts, transactionsThisMonth, totalReceitas, totalDespesas, budgets, vulnerability, openNudge] =
-    await Promise.all([
+  const initial = accounts.reduce((sum, account) => sum + account.initialBalance, 0);
+  const net = movements.reduce(
+    (sum, movement) => sum + (movement.type === "receita" ? movement.amount : -movement.amount),
+    0,
+  );
+  return initial + net;
+}
+
+export async function getDashboardData(userId: string, monthParam?: string | null) {
+  const period = resolveDashboardMonth(monthParam);
+  if (period.isCurrent) await ensureCurrentMonthBudgets(userId);
+
+  const month = period.key;
+  const daysInMonth = differenceInCalendarDays(period.end, period.start) + 1;
+
+  const [
+    accounts,
+    transactionsInMonth,
+    allTimeReceitas,
+    allTimeDespesas,
+    budgets,
+    vulnerability,
+    openNudge,
+    emotionMatrix,
+    moodLogs,
+  ] = await Promise.all([
     prisma.account.findMany({ where: { userId }, orderBy: { createdAt: "asc" } }),
     prisma.transaction.findMany({
-      where: { userId, occurredAt: { gte: monthStart, lte: monthEnd } },
+      where: { userId, occurredAt: { gte: period.start, lte: period.end } },
       include: { category: true, emotionLog: true },
       orderBy: { occurredAt: "desc" },
     }),
@@ -24,73 +55,90 @@ export async function getDashboardData(userId: string) {
     prisma.transaction.aggregate({ where: { userId, type: "despesa" }, _sum: { amount: true } }),
     prisma.budget.findMany({ where: { userId, month }, include: { category: true } }),
     computeCurrentVulnerability(userId),
-    prisma.nudge.findFirst({
-      where: { userId, dismissedAt: null },
-      orderBy: { createdAt: "desc" },
-    }),
+    period.isCurrent
+      ? prisma.nudge.findFirst({
+          where: { userId, dismissedAt: null },
+          orderBy: { createdAt: "desc" },
+        })
+      : Promise.resolve(null),
+    getEmotionSpendMatrixForRange(userId, period.start, period.end),
+    getMoodLogsForMonth(userId, month),
   ]);
 
-  const initialBalanceSum = accounts.reduce((sum, a) => sum + a.initialBalance, 0);
-  const saldoDisponivel = initialBalanceSum + (totalReceitas._sum.amount ?? 0) - (totalDespesas._sum.amount ?? 0);
+  const saldoDisponivel =
+    accounts.reduce((sum, account) => sum + account.initialBalance, 0) +
+    (allTimeReceitas._sum.amount ?? 0) -
+    (allTimeDespesas._sum.amount ?? 0);
 
-  const despesasFixas = transactionsThisMonth
-    .filter((t) => t.type === "despesa" && t.essential)
-    .reduce((sum, t) => sum + t.amount, 0);
-  const despesasVariaveis = transactionsThisMonth
-    .filter((t) => t.type === "despesa" && !t.essential)
-    .reduce((sum, t) => sum + t.amount, 0);
-  const receitasMes = transactionsThisMonth
-    .filter((t) => t.type === "receita")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const despesasFixas = transactionsInMonth
+    .filter((transaction) => transaction.type === "despesa" && transaction.essential)
+    .reduce((sum, transaction) => sum + transaction.amount, 0);
+  const despesasVariaveis = transactionsInMonth
+    .filter((transaction) => transaction.type === "despesa" && !transaction.essential)
+    .reduce((sum, transaction) => sum + transaction.amount, 0);
+  const receitasMes = transactionsInMonth
+    .filter((transaction) => transaction.type === "receita")
+    .reduce((sum, transaction) => sum + transaction.amount, 0);
+  const despesasMes = despesasFixas + despesasVariaveis;
+  const resultadoMes = receitasMes - despesasMes;
 
-  const daysElapsed = Math.max(1, differenceInCalendarDays(now, monthStart) + 1);
-  const daysRemaining = Math.max(0, differenceInCalendarDays(monthEnd, now));
-  const averageDailyExpense = (despesasFixas + despesasVariaveis) / daysElapsed;
-  const projectedEndBalance = projectEndOfMonthBalance({
-    currentBalance: saldoDisponivel,
-    incomeRemainingThisMonth: 0,
-    averageDailyExpense,
-    daysRemainingInMonth: daysRemaining,
-  });
-
-  const budgetsWithSpent = budgets
-    .filter((b) => !b.category.archived)
-    .map((b) => {
-      const spent = transactionsThisMonth
-        .filter((t) => t.categoryId === b.categoryId && t.type === "despesa")
-        .reduce((sum, t) => sum + t.amount, 0);
-      return { ...b, spent, alertLevel: getBudgetAlertLevel(spent, b.limitAmount) };
-    });
-
-  const daysInMonth = differenceInCalendarDays(monthEnd, monthStart) + 1;
+  const monthStartBalance = await getBalanceBefore(userId, period.start);
   const dailyNet = accumulateDailyNet({
     daysInMonth,
-    monthStart,
-    movements: transactionsThisMonth.map((row) => ({
+    monthStart: period.start,
+    movements: transactionsInMonth.map((row) => ({
       occurredAt: row.occurredAt,
       type: row.type as "receita" | "despesa",
       amount: row.amount,
     })),
   });
-  const todayIndex = differenceInCalendarDays(now, monthStart);
-  const chartData = buildCashFlowChartSeries({
+
+  const chartData = buildRealCashFlowChartSeries({
     dailyNet,
-    todayIndex,
-    monthStartBalance: openingBalanceBeforeSeries(saldoDisponivel, dailyNet, todayIndex),
-    averageDailyExpense,
+    monthStartBalance,
+    lastDayIndex: period.todayIndex,
   });
+  const saldoFimMes = chartData.at(-1)?.saldo ?? monthStartBalance;
+
+  const budgetsWithSpent = budgets
+    .filter((budget) => !budget.category.archived)
+    .map((budget) => {
+      const spent = transactionsInMonth
+        .filter((transaction) => transaction.categoryId === budget.categoryId && transaction.type === "despesa")
+        .reduce((sum, transaction) => sum + transaction.amount, 0);
+      return { ...budget, spent, alertLevel: getBudgetAlertLevel(spent, budget.limitAmount) };
+    });
+
+  const emotionChartData = emotionMatrix
+    .filter((row) => row.count > 0)
+    .map((row) => ({
+      emotion: row.emotion,
+      label: `${EMOTION_EMOJI[row.emotion]} ${EMOTION_LABELS[row.emotion]}`,
+      total: row.total,
+      count: row.count,
+    }));
+
+  const moodTimeline = buildMoodTimeline(month, moodLogs, daysInMonth);
 
   return {
+    period,
     accounts,
     saldoDisponivel,
+    saldoFimMes,
+    resultadoMes,
     despesasFixas,
     despesasVariaveis,
     receitasMes,
-    projectedEndBalance,
+    despesasMes,
     budgetsWithSpent,
     chartData,
+    emotionChartData,
+    moodTimeline,
     vulnerability,
-    recentTransactions: transactionsThisMonth.slice(0, 6),
+    recentTransactions: transactionsInMonth.slice(0, 6),
     openNudge,
   };
 }
+
+export type DashboardData = Awaited<ReturnType<typeof getDashboardData>>;
+export type { DashboardMonth };

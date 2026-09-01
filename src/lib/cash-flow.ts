@@ -1,10 +1,17 @@
 import { differenceInCalendarDays } from "date-fns";
 
-export type CashFlowChartPoint = {
+export type RealCashFlowChartPoint = {
+  day: number;
+  saldo: number;
+};
+
+export type LegacyCashFlowChartPoint = {
   day: number;
   saldoReal: number | null;
   saldoProjetado: number | null;
 };
+
+export type CashFlowChartPoint = RealCashFlowChartPoint | LegacyCashFlowChartPoint;
 
 export type DailyCashMovement = {
   occurredAt: Date;
@@ -47,13 +54,13 @@ export function buildCashFlowChartSeries(input: {
   todayIndex: number;
   monthStartBalance: number;
   averageDailyExpense: number;
-}): CashFlowChartPoint[] {
+}): LegacyCashFlowChartPoint[] {
   const daysInMonth = input.dailyNet.length;
   if (daysInMonth === 0) return [];
 
   const todayIndex = Math.min(Math.max(input.todayIndex, 0), daysInMonth - 1);
   let running = input.monthStartBalance;
-  const points: CashFlowChartPoint[] = [];
+  const points: LegacyCashFlowChartPoint[] = [];
 
   for (let index = 0; index < daysInMonth; index++) {
     if (index <= todayIndex) {
@@ -68,6 +75,33 @@ export function buildCashFlowChartSeries(input: {
       running += -input.averageDailyExpense;
       points.push({ day: index + 1, saldoReal: null, saldoProjetado: Math.round(running) });
     }
+  }
+
+  return points;
+}
+
+/**
+ * Série só com saldo real acumulado dia a dia. Em meses atuais, para no último dia com dado (`lastDayIndex`).
+ */
+export function buildRealCashFlowChartSeries(input: {
+  dailyNet: number[];
+  monthStartBalance: number;
+  lastDayIndex?: number | null;
+}): RealCashFlowChartPoint[] {
+  const daysInMonth = input.dailyNet.length;
+  if (daysInMonth === 0) return [];
+
+  const lastIndex =
+    input.lastDayIndex == null
+      ? daysInMonth - 1
+      : Math.min(Math.max(input.lastDayIndex, 0), daysInMonth - 1);
+
+  let running = input.monthStartBalance;
+  const points: RealCashFlowChartPoint[] = [];
+
+  for (let index = 0; index <= lastIndex; index++) {
+    running += input.dailyNet[index] ?? 0;
+    points.push({ day: index + 1, saldo: Math.round(running) });
   }
 
   return points;

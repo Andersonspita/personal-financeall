@@ -11,9 +11,12 @@ export const CRITICAL_STREAK_THRESHOLD = 3;
 export async function getEmotionSpendMatrix(userId: string, days = 30) {
   const since = new Date();
   since.setDate(since.getDate() - days);
+  return getEmotionSpendMatrixForRange(userId, since, new Date());
+}
 
+export async function getEmotionSpendMatrixForRange(userId: string, start: Date, end: Date) {
   const logs = await prisma.emotionLog.findMany({
-    where: { transaction: { userId, type: "despesa", occurredAt: { gte: since } } },
+    where: { transaction: { userId, type: "despesa", occurredAt: { gte: start, lte: end } } },
     include: { transaction: true },
   });
 

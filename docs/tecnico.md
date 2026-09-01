@@ -109,6 +109,7 @@ Isolamento por `userId` em todo dado do usuário. Actions conferem dono da conta
 - O campo `emotion` (rótulo fechado) fica em claro na tabela isolada; a **nota livre** é que é cifrada.
 - `/api/export` seleciona só campos financeiros.
 - `BehavioralProfile` (RF10) é tabela separada do lançamento; respostas do onboarding não entram no score de vulnerabilidade nem no export.
+- `DailyMoodLog` (RF11): check-in diário isolado; nota cifrada; fora do export.
 - IA desligada por padrão (`User.aiAssistantEnabled`). Só envia sinais agregados depois do opt-in.
 
 ## Regras de domínio
@@ -134,6 +135,15 @@ O flag `Transaction.isImpulse` é informativo; o usuário pode descartar.
 2. Score 0–100 em `computeVulnerabilityScore` (pesos de impulso, madrugada e mix emocional).
 3. Nível (`baixo` / `medio` / `alto` / `critico`) via decision table Zen (`vulnerability-level.json`): crítico ≥ 80, alto 55–79, médio 30–54, senão baixo.
 4. Persistência em `VulnerabilityScore`. Três avaliações críticas consecutivas disparam canais de apoio (`CRITICAL_STREAK_THRESHOLD`). O perfil declarado no onboarding **não** entra no cálculo numérico.
+
+### Dashboard por mês (RF12)
+
+`/?month=YYYY-MM` (padrão: mês atual). `resolveDashboardMonth` em `src/lib/dashboard-month.ts`; dados em `getDashboardData(userId, month)`.
+
+- Saldo: no mês atual, `saldoDisponivel` (todas as contas, histórico completo). Em meses passados, `resultadoMes` e `saldoFimMes`.
+- Gráfico: `buildRealCashFlowChartSeries` — saldo acumulado real por dia; no mês atual para no dia de hoje. A projeção linear legada (`buildCashFlowChartSeries`) permanece no código para testes, mas saiu do Início.
+- Emoção: `getEmotionSpendMatrixForRange` + `EmotionSpendChart` no Início.
+- Humor: `DailyMoodLog`, `upsertDailyMood`, timeline em `src/lib/mood/timeline.ts`, UI `DailyMoodCheckIn` + `MoodTimelineChart`.
 
 ### Perfil comportamental (RF10)
 
@@ -164,7 +174,7 @@ Escopo fechado (`src/lib/ai/prompts.ts`): no máximo 3–4 frases, tom não-puni
 
 | Rota | Função |
 |---|---|
-| `/` | Dashboard |
+| `/` | Dashboard (RF12: mês, fluxo real, emoção, check-in) |
 | `/transacoes` | Lista (editar / excluir) |
 | `/transacoes/novo` | Formulário RF01; categorias filtradas por receita/despesa |
 | `/transacoes/[id]/editar` | Correção de lançamento |
@@ -198,6 +208,7 @@ src/lib/auth/reset-token.test.ts
 src/lib/rules/anomaly-detection.test.ts
 src/lib/rules/vulnerability-score.test.ts
 src/lib/profile/profile.test.ts
+src/lib/dashboard-bi.test.ts
 ```
 
 Cubram lógica pura e bordas (valor zero/NaN/Infinity, mês 13, cooldown 23h/73h, payload de cifra adulterado, lançamento fora do mês no gráfico). Mutações de banco e UI ainda não têm suíte de integração com SQLite. Falhas inesperadas nas actions/APIs vão para `logAppError` (JSON em stderr), não para `console.log(error)` solto.

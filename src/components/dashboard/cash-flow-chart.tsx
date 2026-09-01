@@ -5,8 +5,7 @@ import { formatCompactCurrency, formatCurrency } from "@/lib/format";
 
 interface Point {
   day: number;
-  saldoReal: number | null;
-  saldoProjetado: number | null;
+  saldo: number;
 }
 
 function paddedDomain([dataMin, dataMax]: readonly [number, number]): [number, number] {
@@ -18,6 +17,10 @@ function paddedDomain([dataMin, dataMax]: readonly [number, number]): [number, n
 }
 
 export function CashFlowChart({ data }: { data: Point[] }) {
+  if (data.length === 0) {
+    return <p className="text-sm text-foreground-muted">Sem movimentação neste mês.</p>;
+  }
+
   return (
     <div className="mt-2 h-56 w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -52,23 +55,12 @@ export function CashFlowChart({ data }: { data: Point[] }) {
           />
           <Line
             type="monotone"
-            dataKey="saldoReal"
+            dataKey="saldo"
             name="Saldo"
             stroke="var(--color-primary)"
             strokeWidth={2.5}
             dot={false}
-            connectNulls={false}
             activeDot={{ r: 4 }}
-          />
-          <Line
-            type="monotone"
-            dataKey="saldoProjetado"
-            name="Projeção"
-            stroke="var(--color-calm)"
-            strokeWidth={2}
-            strokeDasharray="6 5"
-            dot={false}
-            connectNulls
           />
         </LineChart>
       </ResponsiveContainer>

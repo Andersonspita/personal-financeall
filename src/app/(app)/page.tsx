@@ -4,17 +4,19 @@ import { getDashboardData } from "@/lib/dashboard";
 import { requireUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { getBehavioralProfile } from "@/lib/profile/service";
+import { getTodayMoodLog } from "@/lib/mood/service";
 import { dashboardProfileHint } from "@/lib/profile/copy";
 import type { ProfileTrigger } from "@/lib/profile/constants";
+import type { DailyMood } from "@/lib/mood/constants";
 import { VulnerabilityExplainerButton } from "@/components/ai/vulnerability-explainer-button";
-
-// Dados financeiros e o score de vulnerabilidade têm que refletir o estado atual do banco
-// a cada carregamento — nunca uma versão em cache da página.
-export const dynamic = "force-dynamic";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { CashFlowChart } from "@/components/dashboard/cash-flow-chart";
+import { MonthSelector } from "@/components/dashboard/month-selector";
+import { DailyMoodCheckIn } from "@/components/dashboard/daily-mood-check-in";
+import { MoodTimelineChart } from "@/components/dashboard/mood-timeline-chart";
+import { EmotionSpendChart } from "@/components/behavioral/emotion-spend-chart";
 import { VulnerabilityBadge } from "@/components/vulnerability-badge";
 import { BUDGET_ALERT_COPY } from "@/lib/copy";
 import { formatCurrency, formatDate } from "@/lib/format";
@@ -22,15 +24,23 @@ import { EMOTION_EMOJI, EMOTION_LABELS, type Emotion } from "@/lib/emotions";
 import { NudgeBanner } from "@/components/nudge-banner";
 import { buttonClass } from "@/components/ui/control";
 
-export default async function DashboardPage() {
+export const dynamic = "force-dynamic";
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ month?: string }>;
+}) {
   const user = await requireUser();
-  const [data, dbUser, profile] = await Promise.all([
-    getDashboardData(user.id),
+  const { month } = await searchParams;
+  const [data, dbUser, profile, todayMood] = await Promise.all([
+    getDashboardData(user.id, month),
     prisma.user.findUniqueOrThrow({ where: { id: user.id }, select: { aiAssistantEnabled: true } }),
     getBehavioralProfile(user.id),
+    getTodayMoodLog(user.id),
   ]);
   const profileHint = dashboardProfileHint(profile?.typicalTrigger as ProfileTrigger | undefined);
-  const hasEmotionData = data.recentTransactions.some((t) => t.emotionLog);
+  const hasEmotionData = data.recentTransactions.some((transaction) => transaction.emotionLog);
 
   return (
     <div className="flex flex-col gap-5">
@@ -41,18 +51,43 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
+      <MonthSelector monthKey={data.period.key} label={data.period.label} isCurrent={data.period.isCurrent} />
+
       {data.openNudge && <NudgeBanner id={data.openNudge.id} message={data.openNudge.message} />}
 
+      <DailyMoodCheckIn
+        initialMood={(todayMood?.mood as DailyMood | undefined) ?? null}
+        disabled={!data.period.isCurrent}
+      />
+
       <Card>
-        <CardTitle>Saldo disponível</CardTitle>
-        <p className="text-3xl font-semibold tabular-nums">{formatCurrency(data.saldoDisponivel)}</p>
+        <CardTitle>{data.period.isCurrent ? "Saldo disponível" : "Resultado do mês"}</CardTitle>
+        <p className="text-3xl font-semibold tabular-nums">
+          {formatCurrency(data.period.isCurrent ? data.saldoDisponivel : data.resultadoMes)}
+        </p>
+        {data.period.isCurrent ? (
+          <p className="mt-1 text-xs text-foreground-muted">Todas as contas, até agora.</p>
+        ) : (
+          <p className="mt-1 text-xs text-foreground-muted">
+            Receitas − despesas em {data.period.label}. Saldo no último dia com movimento:{" "}
+            {formatCurrency(data.saldoFimMes)}.
+          </p>
+        )}
         <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
           <div>
-            <p className="text-foreground-muted">Despesas fixas (mês)</p>
+            <p className="text-foreground-muted">Receitas (mês)</p>
+            <p className="font-medium tabular-nums">{formatCurrency(data.receitasMes)}</p>
+          </div>
+          <div>
+            <p className="text-foreground-muted">Despesas (mês)</p>
+            <p className="font-medium tabular-nums">{formatCurrency(data.despesasMes)}</p>
+          </div>
+          <div>
+            <p className="text-foreground-muted">Fixas</p>
             <p className="font-medium tabular-nums">{formatCurrency(data.despesasFixas)}</p>
           </div>
           <div>
-            <p className="text-foreground-muted">Despesas variáveis (mês)</p>
+            <p className="text-foreground-muted">Variáveis</p>
             <p className="font-medium tabular-nums">{formatCurrency(data.despesasVariaveis)}</p>
           </div>
         </div>
@@ -60,18 +95,42 @@ export default async function DashboardPage() {
 
       <Card>
         <div className="mb-2 flex items-center justify-between">
-          <CardTitle className="mb-0">Projeção até o fim do mês</CardTitle>
+          <CardTitle className="mb-0">Fluxo do mês (dados reais)</CardTitle>
           <span className="text-sm font-medium tabular-nums text-foreground-muted">
-            {formatCurrency(data.projectedEndBalance)}
+            {formatCurrency(data.saldoFimMes)}
           </span>
         </div>
+        <p className="mb-2 text-xs text-foreground-muted">
+          Saldo acumulado dia a dia com base nos lançamentos — sem projeção de gastos futuros.
+        </p>
         <CashFlowChart data={data.chartData} />
+      </Card>
+
+      <Card>
+        <CardTitle>Gasto por emoção</CardTitle>
+        <p className="mb-3 text-xs text-foreground-muted">
+          Despesas com estado emocional registrado em {data.period.label}.
+        </p>
+        {data.emotionChartData.length > 0 ? (
+          <EmotionSpendChart data={data.emotionChartData} />
+        ) : (
+          <p className="text-sm text-foreground-muted">
+            Ainda não há lançamentos com emoção neste mês. Ao registrar despesas, marque como você estava.
+          </p>
+        )}
+      </Card>
+
+      <Card>
+        <CardTitle>Humor ao longo do mês</CardTitle>
+        <p className="mb-3 text-xs text-foreground-muted">Check-ins diários — como você acordou ou está.</p>
+        <MoodTimelineChart data={data.moodTimeline} />
       </Card>
 
       <Card>
         <CardTitle>Como você está</CardTitle>
         <VulnerabilityBadge level={data.vulnerability.level} />
-        {profileHint && !hasEmotionData && (
+        <p className="mt-2 text-xs text-foreground-muted">Baseado nos últimos 7 dias de gasto — não é diagnóstico.</p>
+        {profileHint && !hasEmotionData && data.period.isCurrent && (
           <p className="mt-3 text-sm text-foreground-muted">{profileHint}</p>
         )}
         <Link href="/aprender" className="mt-3 flex items-center gap-1.5 text-sm font-medium text-primary">
@@ -89,22 +148,22 @@ export default async function DashboardPage() {
             </Link>
           </div>
           <div className="flex flex-col gap-5">
-            {data.budgetsWithSpent.slice(0, 4).map((b) => (
-              <div key={b.id} className="flex flex-col gap-2">
+            {data.budgetsWithSpent.slice(0, 4).map((budget) => (
+              <div key={budget.id} className="flex flex-col gap-2">
                 <div className="flex items-baseline justify-between gap-3">
                   <span className="min-w-0 truncate font-medium">
-                    {b.category.icon} {b.category.name}
+                    {budget.category.icon} {budget.category.name}
                   </span>
                   <span className="shrink-0 tabular-nums text-sm text-foreground-muted">
-                    {formatCurrency(b.spent)} / {formatCurrency(b.limitAmount)}
+                    {formatCurrency(budget.spent)} / {formatCurrency(budget.limitAmount)}
                   </span>
                 </div>
-                <ProgressBar ratio={b.limitAmount > 0 ? b.spent / b.limitAmount : 0} tone={b.alertLevel} />
-                {b.alertLevel !== "dentro_do_limite" && (
+                <ProgressBar ratio={budget.limitAmount > 0 ? budget.spent / budget.limitAmount : 0} tone={budget.alertLevel} />
+                {budget.alertLevel !== "dentro_do_limite" && (
                   <p className="mt-1 text-xs text-foreground-muted">
-                    {b.alertLevel === "alerta_80"
-                      ? BUDGET_ALERT_COPY.at80(b.category.name)
-                      : BUDGET_ALERT_COPY.at100(b.category.name)}
+                    {budget.alertLevel === "alerta_80"
+                      ? BUDGET_ALERT_COPY.at80(budget.category.name)
+                      : BUDGET_ALERT_COPY.at100(budget.category.name)}
                   </p>
                 )}
               </div>
@@ -115,33 +174,35 @@ export default async function DashboardPage() {
 
       <Card>
         <div className="mb-2 flex items-center justify-between">
-          <CardTitle className="mb-0">Lançamentos recentes</CardTitle>
+          <CardTitle className="mb-0">Lançamentos do mês</CardTitle>
           <Link href="/transacoes" className="text-xs font-medium text-primary">
             ver todos
           </Link>
         </div>
         <ul className="flex flex-col divide-y divide-border">
           {data.recentTransactions.length === 0 && (
-            <li className="py-3 text-sm text-foreground-muted">Nenhum lançamento este mês ainda.</li>
+            <li className="py-3 text-sm text-foreground-muted">Nenhum lançamento neste mês ainda.</li>
           )}
-          {data.recentTransactions.map((t) => (
-            <li key={t.id} className="flex items-center justify-between gap-3 py-3">
+          {data.recentTransactions.map((transaction) => (
+            <li key={transaction.id} className="flex items-center justify-between gap-3 py-3">
               <div className="min-w-0">
-                <p className="truncate text-base font-medium">{t.description || t.category?.name || "Lançamento"}</p>
+                <p className="truncate text-base font-medium">
+                  {transaction.description || transaction.category?.name || "Lançamento"}
+                </p>
                 <p className="mt-0.5 flex items-center gap-1 text-xs text-foreground-muted/80">
-                  {formatDate(t.occurredAt)} · {t.category?.name ?? "Sem categoria"}
-                  {t.emotionLog && (
-                    <span title={EMOTION_LABELS[t.emotionLog.emotion as Emotion]}>
-                      {EMOTION_EMOJI[t.emotionLog.emotion as Emotion]}
+                  {formatDate(transaction.occurredAt)} · {transaction.category?.name ?? "Sem categoria"}
+                  {transaction.emotionLog && (
+                    <span title={EMOTION_LABELS[transaction.emotionLog.emotion as Emotion]}>
+                      {EMOTION_EMOJI[transaction.emotionLog.emotion as Emotion]}
                     </span>
                   )}
-                  {t.isImpulse && <Badge tone="warm">possível impulso</Badge>}
+                  {transaction.isImpulse && <Badge tone="warm">possível impulso</Badge>}
                 </p>
               </div>
               <span
-                className={`shrink-0 tabular-nums text-base font-semibold ${t.type === "receita" ? "text-primary" : ""}`}
+                className={`shrink-0 tabular-nums text-base font-semibold ${transaction.type === "receita" ? "text-primary" : ""}`}
               >
-                {t.type === "receita" ? "+" : "-"} {formatCurrency(t.amount)}
+                {transaction.type === "receita" ? "+" : "-"} {formatCurrency(transaction.amount)}
               </span>
             </li>
           ))}

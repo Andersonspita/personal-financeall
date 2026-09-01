@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth/session";
 
-// RNF02: exportação financeira nunca inclui EmotionLog (emoção, intensidade ou nota) —
+// RNF02: exportação financeira nunca inclui EmotionLog, DailyMoodLog (emoção, intensidade ou nota) —
 // esse relatório é para uso externo (contador, planilha pessoal) e não deve carregar dados
 // de saúde mental. Quem quiser os próprios dados emocionais deve acessá-los na tela de correlação.
 export async function GET() {

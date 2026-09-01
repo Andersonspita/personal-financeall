@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { accumulateDailyNet, buildCashFlowChartSeries, openingBalanceBeforeSeries } from "./cash-flow";
+import { accumulateDailyNet, buildCashFlowChartSeries, buildRealCashFlowChartSeries, openingBalanceBeforeSeries } from "./cash-flow";
 
 describe("accumulateDailyNet", () => {
   const monthStart = new Date(2026, 7, 1);
@@ -32,6 +32,30 @@ describe("accumulateDailyNet", () => {
 
   it("mês vazio gera zeros", () => {
     expect(accumulateDailyNet({ daysInMonth: 0, monthStart, movements: [] })).toEqual([]);
+  });
+});
+
+describe("buildRealCashFlowChartSeries", () => {
+  it("acumula saldo real dia a dia", () => {
+    const points = buildRealCashFlowChartSeries({
+      dailyNet: [50, -20, 10],
+      monthStartBalance: 100,
+    });
+    expect(points).toEqual([
+      { day: 1, saldo: 150 },
+      { day: 2, saldo: 130 },
+      { day: 3, saldo: 140 },
+    ]);
+  });
+
+  it("para no último dia informado (mês atual)", () => {
+    const points = buildRealCashFlowChartSeries({
+      dailyNet: [50, 0, 0],
+      monthStartBalance: 100,
+      lastDayIndex: 0,
+    });
+    expect(points).toHaveLength(1);
+    expect(points[0]?.saldo).toBe(150);
   });
 });
 

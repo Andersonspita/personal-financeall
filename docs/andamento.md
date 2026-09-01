@@ -6,7 +6,7 @@ Documento vivo do progresso frente a [`Requisito.MD`](../Requisito.MD). Atualize
 
 ## Resumo
 
-O núcleo dos 10 requisitos funcionais e dos 3 não funcionais está implementado em um app web autenticado, mobile-first, com PWA básico, SQLite local e testes da lógica de orçamento, anomalia, score e perfil comportamental. Falta endurecer produção (banco compartilhado, app nativo, cobrança Plus).
+O núcleo dos 12 requisitos funcionais e dos 3 não funcionais está implementado em um app web autenticado, mobile-first, com PWA básico, SQLite local e testes da lógica de orçamento, anomalia, score, perfil e painel por mês.
 
 ## Status dos requisitos
 
@@ -26,6 +26,8 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 | RF08 | Botão de pânico / desvio de foco | Pronto | `/panico` | Quatro microatividades; desfecho autodeclarado |
 | RF09 | Score de vulnerabilidade e encaminhamento | Pronto | `vulnerability-score.ts`, Zen Engine | Apoio após 3 scores críticos seguidos |
 | RF10 | Perfil comportamental no onboarding | Pronto | `/onboarding`, `BehavioralProfile`, Configurações | 5 perguntas puláveis; não entra no score |
+| RF11 | Check-in diário de humor | Pronto | `DailyMoodLog`, card no Início | Um registro/dia; nota cifrada; só mês atual |
+| RF12 | Painel do Início por mês | Pronto | `/?month=`, `dashboard.ts`, gráficos | Fluxo real; gasto × emoção; timeline de humor |
 
 ### Não funcionais
 
@@ -43,7 +45,7 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 | Biblioteca educativa com progresso | Pronto (agora em cursos, 3 trilhas) |
 | Assistente de IA de escopo fechado | Pronto (opcional; depende de `OPENAI_API_KEY`) |
 | Seed demo | Pronto (`demo@bussola.app`) |
-| Testes unitários do domínio | Parcial (13 arquivos; sem suíte de banco/UI) |
+| Testes unitários do domínio | Parcial (14 arquivos; sem suíte de banco/UI) |
 | App iOS/Android | Pendente (API já client-agnostic; plano Plus documentado) |
 | Bússola Plus (assinatura) | Pendente (modelo freemium documentado; sem paywall no código) |
 | Recuperação de senha / verificação de e-mail | Parcial (reset por e-mail; sem verificação de cadastro) |
@@ -115,6 +117,10 @@ Em **Orçamentos** dá para mudar nome, ícone e grupo, e arquivar categorias qu
 ### 2026-09-01 — Perfil comportamental (RF10) e plano Plus
 
 Questionário pós-cadastro em `/onboarding` (5 passos, pulável, editável em Configurações → **Seu jeito**). Tabela `BehavioralProfile` isolada; `User.onboardingStatus` controla o fluxo. O perfil personaliza pausa padrão na trava, recomendações de curso sem histórico e recado no Início — **não** altera o score de vulnerabilidade. Documentado o modelo freemium **Bússola Plus** (web + iOS + Android) em `docs/tecnico.md`; cobrança ainda não implementada.
+
+### 2026-09-01 — Painel BI no Início (RF11–RF12)
+
+Seletor de mês no dashboard (`?month=YYYY-MM`). Gráfico financeiro passou a mostrar **saldo real acumulado** (sem projeção linear). Gráfico de gasto por emoção e timeline de check-ins no mesmo período. Novo `DailyMoodLog` para registrar como a pessoa acordou/está — separado de `EmotionLog` nos lançamentos.
 
 ## Próximos passos sugeridos
 
