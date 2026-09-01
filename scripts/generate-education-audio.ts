@@ -34,7 +34,7 @@ async function synthesizeWithOpenAi(text: string): Promise<Buffer> {
 
 async function synthesizeWithEdge(text: string): Promise<Buffer> {
   const { MsEdgeTTS, OUTPUT_FORMAT } = await import("edge-tts-node");
-  const tts = new MsEdgeTTS();
+  const tts = new MsEdgeTTS({});
   await tts.setMetadata(voiceEdge, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
   const readable = tts.toStream(text);
   const chunks: Buffer[] = [];

@@ -331,7 +331,7 @@ npm run build
 sudo systemctl restart bussola-financeira
 ```
 
-Só rode o `restart` se o `build` terminar com as rotas, sem erro de TypeScript. Um restart depois de `Failed to type check` derruba o processo e a porta 3000 fica fora.
+Só rode o `restart` se o `build` terminar com as rotas, sem erro de TypeScript. Um restart depois de `Failed to type check` derruba o processo e a porta 3000 fica fora. Scripts em `scripts/` (ex. `videos:generate`) não entram no type-check do `next build`.
 
 Prisma 7 + SQLite **não** aceita `createMany({ skipDuplicates })` (o tipo vira `never` e o build quebra). Filtre duplicatas no código antes do insert.
 
