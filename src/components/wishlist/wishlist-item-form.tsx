@@ -13,7 +13,13 @@ const initialState: FormActionState = {};
 
 type CategoryOption = { id: string; name: string; icon: string | null };
 
-export function WishlistItemForm({ categories }: { categories: CategoryOption[] }) {
+export function WishlistItemForm({
+  categories,
+  defaultCooldownHours = 48,
+}: {
+  categories: CategoryOption[];
+  defaultCooldownHours?: number;
+}) {
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction, isPending] = useActionState(createWishlistItemFromForm, initialState);
 
@@ -60,7 +66,7 @@ export function WishlistItemForm({ categories }: { categories: CategoryOption[] 
           </Select>
         </Field>
         <Field label="Tempo de espera" htmlFor="wish-cooldown" error={state.fieldErrors?.cooldownHours}>
-          <Select id="wish-cooldown" name="cooldownHours" defaultValue="48" invalid={Boolean(state.fieldErrors?.cooldownHours)}>
+          <Select id="wish-cooldown" name="cooldownHours" defaultValue={String(defaultCooldownHours)} invalid={Boolean(state.fieldErrors?.cooldownHours)}>
             <option value="24">24 horas</option>
             <option value="48">48 horas</option>
             <option value="72">72 horas</option>

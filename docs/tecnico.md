@@ -108,6 +108,7 @@ Isolamento por `userId` em todo dado do usuário. Actions conferem dono da conta
 - `noteEncrypted`: AES-256-GCM (`src/lib/crypto.ts`), chave derivada de `EMOTION_ENCRYPTION_KEY` via scrypt.
 - O campo `emotion` (rótulo fechado) fica em claro na tabela isolada; a **nota livre** é que é cifrada.
 - `/api/export` seleciona só campos financeiros.
+- `BehavioralProfile` (RF10) é tabela separada do lançamento; respostas do onboarding não entram no score de vulnerabilidade nem no export.
 - IA desligada por padrão (`User.aiAssistantEnabled`). Só envia sinais agregados depois do opt-in.
 
 ## Regras de domínio
@@ -132,7 +133,20 @@ O flag `Transaction.isImpulse` é informativo; o usuário pode descartar.
 1. Sinais dos últimos 7 dias em `computeCurrentVulnerability`.
 2. Score 0–100 em `computeVulnerabilityScore` (pesos de impulso, madrugada e mix emocional).
 3. Nível (`baixo` / `medio` / `alto` / `critico`) via decision table Zen (`vulnerability-level.json`): crítico ≥ 80, alto 55–79, médio 30–54, senão baixo.
-4. Persistência em `VulnerabilityScore`. Três avaliações críticas consecutivas disparam canais de apoio (`CRITICAL_STREAK_THRESHOLD`).
+4. Persistência em `VulnerabilityScore`. Três avaliações críticas consecutivas disparam canais de apoio (`CRITICAL_STREAK_THRESHOLD`). O perfil declarado no onboarding **não** entra no cálculo numérico.
+
+### Perfil comportamental (RF10)
+
+`User.onboardingStatus`: `pending` | `completed` | `skipped` (padrão `pending` em conta nova). Após cadastro/login, redireciona para `/onboarding` se `pending`; o layout `(app)` também redireciona quem tentar pular a etapa.
+
+`BehavioralProfile` (1:1 com `User`): `primaryGoal`, `typicalTrigger`, `cooldownHours`, `incomeRhythm`, `supportStyle`, `completedAt`, `skippedAt`. Validação em `src/lib/profile/schemas.ts`; serviço em `src/lib/profile/service.ts`; textos em `src/lib/profile/copy.ts`.
+
+Efeitos:
+
+- trava de resfriamento: `getDefaultCooldownHours` → `WishlistItemForm`
+- recomendação em `/aprender`: `rankRecommendedContent` usa emoção observada (RF05) ou, sem histórico, `typicalTrigger` declarado
+- Início: `dashboardProfileHint` enquanto não houver `EmotionLog` nos lançamentos recentes
+- Configurações: `ProfileSettingsForm` edita o perfil
 
 ### Nudges (RF07)
 
@@ -140,7 +154,7 @@ O flag `Transaction.isImpulse` é informativo; o usuário pode descartar.
 
 ### Educação
 
-Cursos curados em `src/lib/education/courses.ts`, aulas em `content.ts`, vídeos em `videos.ts` (embed `youtube-nocookie.com`). `ensureEducationalCatalog()` (upsert por slug) roda ao abrir `/aprender` — a VPS não precisa do seed demo. Recomendação usa a emoção de maior gasto nos últimos 30 dias. Progresso de curso é derivado das aulas (`progress.ts`).
+Cursos curados em `src/lib/education/courses.ts`, aulas em `content.ts`, vídeos em `videos.ts` (embed `youtube-nocookie.com`). `ensureEducationalCatalog()` (upsert por slug) roda ao abrir `/aprender` — a VPS não precisa do seed demo. Recomendação usa a emoção de maior gasto nos últimos 30 dias; sem dados, o gatilho do `BehavioralProfile`. Progresso de curso é derivado das aulas (`progress.ts`).
 
 ### IA
 
@@ -161,7 +175,8 @@ Escopo fechado (`src/lib/ai/prompts.ts`): no máximo 3–4 frases, tom não-puni
 | `/aprender` | Cursos e recomendações |
 | `/aprender/cursos/[slug]` | Aulas de um curso |
 | `/aprender/[slug]` | Aula (anterior/próxima se estiver num curso) |
-| `/configuracoes` | Conta e toggle de IA |
+| `/configuracoes` | Conta, **Seu jeito** (perfil RF10) e toggle de IA |
+| `/onboarding` | Questionário pós-cadastro (5 passos, pulável) |
 | `/login` `/registrar` | Públicas |
 | `/recuperar-senha` | Pedido de link |
 | `/recuperar-senha/[token]` | Nova senha |
@@ -182,6 +197,7 @@ src/lib/auth/schemas.test.ts
 src/lib/auth/reset-token.test.ts
 src/lib/rules/anomaly-detection.test.ts
 src/lib/rules/vulnerability-score.test.ts
+src/lib/profile/profile.test.ts
 ```
 
 Cubram lógica pura e bordas (valor zero/NaN/Infinity, mês 13, cooldown 23h/73h, payload de cifra adulterado, lançamento fora do mês no gráfico). Mutações de banco e UI ainda não têm suíte de integração com SQLite. Falhas inesperadas nas actions/APIs vão para `logAppError` (JSON em stderr), não para `console.log(error)` solto.
@@ -309,6 +325,19 @@ Só rode o `restart` se o `build` terminar com as rotas, sem erro de TypeScript.
 Prisma 7 + SQLite **não** aceita `createMany({ skipDuplicates })` (o tipo vira `never` e o build quebra). Filtre duplicatas no código antes do insert.
 
 ## Extensão futura (já prevista no desenho)
+
+### Web + iOS + Android
+
+Três clientes, **um backend** (JWT cookie na web, Bearer nos apps). Hoje: Next.js + PWA. Apps nativos: provável wrapper (Capacitor/WebView) reutilizando a UI; login Google nativo e IAP depois.
+
+### Bússola Plus (freemium — ainda sem cobrança no código)
+
+Princípio: cuidado no momento da compra (trava, pânico, score básico, correlação 30 dias) permanece **grátis**.
+
+| Grátis | Plus (assinatura mensal/anual, mesma conta nas três plataformas) |
+|---|---|
+| Lançamentos, orçamentos, dashboard, detector, score, correlação 30d, trava, pânico, encaminhamento, perfil RF10, curso “Ferramentas da Bússola” | IA, biblioteca completa de cursos, histórico além de 30d, export, push/e-mail de teto, mais contas |
+| | Cobrança prevista: RevenueCat (iOS/Android IAP) + Stripe (web), mesmo `productId`. Flags futuras no `User`: `plan`, `plusExpiresAt`. |
 
 - App iOS/Android: reutilizar `/api/auth/*` + Bearer; schema já é `userId`-centric.
 - Postgres: trocar provider/adapter no Prisma; o restante do domínio não depende de SQL específico além do SQLite atual.

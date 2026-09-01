@@ -11,6 +11,7 @@ import {
   AuthError,
 } from "@/lib/auth/service";
 import { createSession, destroySession } from "@/lib/auth/session";
+import { getOnboardingStatus } from "@/lib/profile/service";
 import { fieldErrorsFromZod, logAppError, type FormActionState } from "@/lib/errors";
 import { appBaseUrl } from "@/lib/auth/config";
 
@@ -47,7 +48,7 @@ export async function registerAction(_prevState: AuthFormState, formData: FormDa
     return stateFromError(err);
   }
   await createSession(user.id, user.email);
-  redirect("/");
+  redirect("/onboarding");
 }
 
 export async function loginAction(_prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {
@@ -61,7 +62,8 @@ export async function loginAction(_prevState: AuthFormState, formData: FormData)
     return stateFromError(err);
   }
   await createSession(user.id, user.email);
-  redirect("/");
+  const status = await getOnboardingStatus(user.id);
+  redirect(status === "pending" ? "/onboarding" : "/");
 }
 
 export async function requestPasswordResetAction(
@@ -88,7 +90,8 @@ export async function resetPasswordAction(_prevState: AuthFormState, formData: F
     return stateFromError(err);
   }
   await createSession(user.id, user.email);
-  redirect("/");
+  const status = await getOnboardingStatus(user.id);
+  redirect(status === "pending" ? "/onboarding" : "/");
 }
 
 export async function logoutAction(): Promise<void> {

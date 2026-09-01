@@ -30,9 +30,12 @@ model User {
   // Opt-in explícito: liga o assistente de IA (RNF02 — envia sinais agregados a um provedor
   // externo, então fica desligado por padrão até o usuário decidir ativar em /configuracoes).
   aiAssistantEnabled Boolean  @default(false)
+  // pending = ainda não passou pelo questionário; completed | skipped = liberado para o app.
+  onboardingStatus   String   @default("pending")
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
+  behavioralProfile   BehavioralProfile?
   accounts            Account[]
   categories          Category[]
   transactions        Transaction[]
@@ -239,6 +242,23 @@ model ContentProgress {
 
   @@unique([userId, contentId])
   @@index([userId])
+}
+
+/// Perfil comportamental declarado no onboarding (RF10). Tabela isolada — dados sensíveis de
+/// autoconhecimento, não misturados com lançamentos financeiros (RNF02).
+model BehavioralProfile {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  primaryGoal    String? // juntar | sair_aperto | entender_gastos | menos_impulso
+  typicalTrigger String? // emoção de src/lib/emotions.ts ou "nao_sei"
+  cooldownHours  Int? // 24 | 48 | 72 — padrão da trava de resfriamento
+  incomeRhythm   String? // salario_mensal | irregular | ambos
+  supportStyle   String? // suave | firme | conteudo
+  completedAt    DateTime?
+  skippedAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 /// Token de recuperação de senha. Guarda só o hash SHA-256; o valor cru vai no e-mail.

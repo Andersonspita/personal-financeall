@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { getEmotionSpendMatrix } from "@/lib/insights";
 import { ensureEducationalCatalog } from "@/lib/education/catalog";
 import { adjacentLessons, courseProgress } from "@/lib/education/progress";
+import { rankRecommendedContent } from "@/lib/profile/recommendation";
+import { getBehavioralProfile } from "@/lib/profile/service";
 
 export interface ContentListItem {
   id: string;
@@ -168,15 +170,16 @@ export async function getContentBySlug(userId: string, slug: string) {
  * Matriz Emoção × Gasto, RF05) — prioriza o que ainda não foi concluído.
  */
 export async function getRecommendedContent(userId: string, limit = 3): Promise<ContentListItem[]> {
-  const matrix = await getEmotionSpendMatrix(userId, 30);
+  const [matrix, library, profile] = await Promise.all([
+    getEmotionSpendMatrix(userId, 30),
+    getContentLibrary(userId),
+    getBehavioralProfile(userId),
+  ]);
   const topEmotion = matrix.find((m) => m.count > 0)?.emotion;
 
-  const library = await getContentLibrary(userId);
-  const notCompleted = library.filter((c) => !c.completedAt);
-
-  if (!topEmotion) return notCompleted.slice(0, limit);
-
-  const matching = notCompleted.filter((c) => c.tag === topEmotion);
-  const rest = notCompleted.filter((c) => c.tag !== topEmotion);
-  return [...matching, ...rest].slice(0, limit);
+  return rankRecommendedContent(library, {
+    topObservedEmotion: topEmotion,
+    declaredTrigger: profile?.typicalTrigger,
+    limit,
+  });
 }

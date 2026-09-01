@@ -26,6 +26,8 @@ RF08 - Botão de Pânico / Desvio de Foco: Recurso rápido na tela inicial acion
 
 RF09 - Rastreio de Risco e Encaminhamento: Pontuação de propensão à compulsão (Score de Vulnerabilidade). Se o usuário atingir nível crítico de forma consecutiva, exibir mensagens humanizadas com canais de apoio (contatos de profissionais de TCC, clínicas-escola de psicologia e grupos de apoio como Devedores Anônimos).
 
+RF10 - Perfil Comportamental no Onboarding: Após criar conta (e-mail ou Google), questionário curto e pulável (5 perguntas) para declarar foco financeiro, gatilho emocional mais comum, pausa preferida na trava de resfriamento, ritmo de renda e tom de apoio. Os dados ficam em tabela isolada (`BehavioralProfile`), não entram no score de vulnerabilidade e personalizam trava, recomendações de curso e empty states antes de existir histórico de lançamentos.
+
 2. Requisitos Não Funcionais (RNF)
 
 RNF01 - Design Mobile-First & PWA: Interface totalmente fluida e responsiva, com suporte a Progressive Web App para acesso ágil via celular no momento da compra.

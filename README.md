@@ -1,6 +1,6 @@
 # Bússola Financeira
 
-Finanças pessoais com apoio emocional: lançamentos com estado de humor, tetos de gasto, detecção de compras por impulso, trava de resfriamento e encaminhamento acolhedor quando o padrão pede cuidado.
+Finanças pessoais com apoio emocional: lançamentos com estado de humor, tetos de gasto, detecção de compras por impulso, trava de resfriamento e encaminhamento acolhedor quando o padrão pede cuidado. Após o cadastro, um questionário curto personaliza a experiência antes do primeiro lançamento.
 
 Não é um app de cobrança. O tom é de consciência, não de culpa. Requisitos de produto: [`Requisito.MD`](Requisito.MD).
 

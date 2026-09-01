@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { AuthError, upsertUserFromGoogle } from "@/lib/auth/service";
 import { createSession } from "@/lib/auth/session";
+import { getOnboardingStatus } from "@/lib/profile/service";
 import {
   GOOGLE_OAUTH_STATE_COOKIE,
   GOOGLE_OAUTH_VERIFIER_COOKIE,
@@ -36,7 +37,8 @@ export async function GET(request: NextRequest) {
     });
     const user = await upsertUserFromGoogle(profile);
     await createSession(user.id, user.email);
-    return NextResponse.redirect(new URL("/", request.url));
+    const status = await getOnboardingStatus(user.id);
+    return NextResponse.redirect(new URL(status === "pending" ? "/onboarding" : "/", request.url));
   } catch (err) {
     if (!(err instanceof AuthError)) logAppError("auth.google.callback", err);
     return loginError("google");

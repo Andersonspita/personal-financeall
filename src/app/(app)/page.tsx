@@ -3,6 +3,9 @@ import { Plus, BookOpen } from "lucide-react";
 import { getDashboardData } from "@/lib/dashboard";
 import { requireUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
+import { getBehavioralProfile } from "@/lib/profile/service";
+import { dashboardProfileHint } from "@/lib/profile/copy";
+import type { ProfileTrigger } from "@/lib/profile/constants";
 import { VulnerabilityExplainerButton } from "@/components/ai/vulnerability-explainer-button";
 
 // Dados financeiros e o score de vulnerabilidade têm que refletir o estado atual do banco
@@ -21,10 +24,13 @@ import { buttonClass } from "@/components/ui/control";
 
 export default async function DashboardPage() {
   const user = await requireUser();
-  const [data, dbUser] = await Promise.all([
+  const [data, dbUser, profile] = await Promise.all([
     getDashboardData(user.id),
     prisma.user.findUniqueOrThrow({ where: { id: user.id }, select: { aiAssistantEnabled: true } }),
+    getBehavioralProfile(user.id),
   ]);
+  const profileHint = dashboardProfileHint(profile?.typicalTrigger as ProfileTrigger | undefined);
+  const hasEmotionData = data.recentTransactions.some((t) => t.emotionLog);
 
   return (
     <div className="flex flex-col gap-5">
@@ -65,6 +71,9 @@ export default async function DashboardPage() {
       <Card>
         <CardTitle>Como você está</CardTitle>
         <VulnerabilityBadge level={data.vulnerability.level} />
+        {profileHint && !hasEmotionData && (
+          <p className="mt-3 text-sm text-foreground-muted">{profileHint}</p>
+        )}
         <Link href="/aprender" className="mt-3 flex items-center gap-1.5 text-sm font-medium text-primary">
           <BookOpen size={15} /> Ver os cursos
         </Link>

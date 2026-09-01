@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/session";
+import { getDefaultCooldownHours } from "@/lib/profile/service";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PendingWishCard } from "@/components/wishlist/pending-item-card";
@@ -9,10 +10,11 @@ export const dynamic = "force-dynamic";
 
 export default async function WishlistPage() {
   const user = await requireUser();
-  const [items, categories, dbUser] = await Promise.all([
+  const [items, categories, dbUser, defaultCooldownHours] = await Promise.all([
     prisma.wishlistItem.findMany({ where: { userId: user.id }, include: { category: true }, orderBy: { createdAt: "desc" } }),
     prisma.category.findMany({ where: { userId: user.id, archived: false }, orderBy: { name: "asc" } }),
     prisma.user.findUniqueOrThrow({ where: { id: user.id }, select: { aiAssistantEnabled: true } }),
+    getDefaultCooldownHours(user.id),
   ]);
 
   const pending = items.filter((item) => item.status === "pendente");
@@ -27,6 +29,7 @@ export default async function WishlistPage() {
       </p>
 
       <WishlistItemForm
+        defaultCooldownHours={defaultCooldownHours}
         categories={categories
           .filter((category) => category.group !== "renda")
           .map((category) => ({ id: category.id, name: category.name, icon: category.icon }))}

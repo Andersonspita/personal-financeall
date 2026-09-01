@@ -9,7 +9,8 @@ Este guia descreve o que você consegue fazer hoje no app.
 1. Abra o app e escolha **Criar conta** (`/registrar`), ou **Continuar com Google** se o servidor tiver o login Google ligado.
 2. No cadastro por e-mail, informe nome, e-mail e uma senha com pelo menos 8 caracteres. Se algum campo estiver incompleto (nome em branco, e-mail inválido, senha curta), o aviso aparece **embaixo do campo** que precisa de correção.
 3. Na primeira conta, o app já cria uma **Conta Principal** e categorias iniciais de gasto (Moradia, Alimentação, Delivery…) mais **Salário** (renda). Outras contas de dinheiro (carteira, cartão, poupança) você cria em **Configurações**.
-4. Para sair, use **Sair** no menu (computador) ou no topo da tela (celular).
+4. Depois do cadastro (e-mail ou Google), o app abre o **questionário de boas-vindas** (`/onboarding`): cinco perguntas rápidas sobre foco, gatilhos emocionais, pausa na trava, ritmo de renda e tom de apoio. **Não é diagnóstico** — você pode **pular** ou mudar depois em **Configurações** → **Seu jeito**.
+5. Para sair, use **Sair** no menu (computador) ou no topo da tela (celular).
 
 Quem já tem conta entra em **Entrar** (`/login`). E-mail inválido ou senha em branco são apontados no próprio campo; e-mail ou senha incorretos aparecem como recado geral, sem dizer se o e-mail existe. Enquanto o app processa o login ou o cadastro, o botão mostra um indicador de espera.
 
@@ -41,6 +42,7 @@ Visão geral do mês:
 - orçamentos com barra de progresso
 - lançamentos recentes
 - um indicador de “como você está”, baseado nos padrões recentes de gasto — não é um diagnóstico
+- se você respondeu ao questionário inicial e ainda não lançou despesas com emoção, um recado lembra o gatilho que você declarou (sem nota de comportamento)
 
 O botão **Lançar** abre o cadastro de uma nova receita ou despesa.
 
@@ -93,7 +95,7 @@ Os avisos usam linguagem de orientação, não de culpa.
 
 Quando bater vontade de comprar algo que não é urgente:
 
-1. Cadastre o item, o valor estimado e o tempo de espera (24h, 48h ou 72h). Nome em branco, valor zero ou espera fora desse intervalo são apontados no campo.
+1. Cadastre o item, o valor estimado e o tempo de espera (24h, 48h ou 72h). O padrão segue o que você escolheu no questionário inicial (ou 48h). Nome em branco, valor zero ou espera fora desse intervalo são apontados no campo.
 2. Espere o prazo. O app mostra a contagem regressiva.
 3. Depois, confirme se ainda faz sentido ou descarte o item.
 
@@ -117,13 +119,13 @@ Qualquer resultado é aceito. O objetivo é criar uma pausa, não pontuar compor
 
 ### Aprender
 
-Três **cursos** curtos (emoções e compras, ferramentas da Bússola, dinheiro no dia a dia). Cada um tem aulas de 2–4 minutos, com um **vídeo do YouTube** sugerido sobre o tema (o vídeo é de canais de educação financeira ou saúde, não da Bússola). Você vê quantas aulas já concluiu; não há prova nem prazo. O bloco **Para você agora** sugere aulas com base no que mais aparece nos seus gastos. Dá para marcar a aula como concluída e ir para a anterior ou a próxima.
+Três **cursos** curtos (emoções e compras, ferramentas da Bússola, dinheiro no dia a dia). Cada um tem aulas de 2–4 minutos, com um **vídeo do YouTube** sugerido sobre o tema (o vídeo é de canais de educação financeira ou saúde, não da Bússola). Você vê quantas aulas já concluiu; não há prova nem prazo. O bloco **Para você agora** sugere aulas com base no que mais aparece nos seus gastos; se ainda não houver histórico, usa o gatilho que você declarou no onboarding. Dá para marcar a aula como concluída e ir para a anterior ou a próxima.
 
 No celular, o atalho fica no Início (**Ver os cursos**) e no computador no menu **Aprender**.
 
 ### Configurações
 
-Mostra nome e e-mail do perfil. Em **Contas de dinheiro** você cria, edita o nome/tipo/saldo inicial e arquiva destinos de lançamento (corrente, carteira, cartão…). Arquivar some da lista de lançamentos novos; o histórico continua. Não dá para arquivar a última conta ativa. O saldo inicial entra no Início.
+Mostra nome e e-mail do perfil. Em **Seu jeito** você revisa ou altera as respostas do questionário inicial (foco, gatilho, pausa na trava, ritmo de renda, tom de apoio). Em **Contas de dinheiro** você cria, edita o nome/tipo/saldo inicial e arquiva destinos de lançamento (corrente, carteira, cartão…). Arquivar some da lista de lançamentos novos; o histórico continua. Não dá para arquivar a última conta ativa. O saldo inicial entra no Início.
 
 No formulário de lançamento há o atalho **Gerenciar contas**.
 

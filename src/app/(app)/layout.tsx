@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { LogOut, Settings } from "lucide-react";
 import { requireUser } from "@/lib/auth/session";
+import { getOnboardingStatus } from "@/lib/profile/service";
 import { logoutAction } from "@/actions/auth";
 import { Nav } from "@/components/nav";
 
@@ -10,6 +12,8 @@ import { Nav } from "@/components/nav";
 // e como segunda camada de defesa caso este layout um dia seja usado fora do middleware atual.
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const user = await requireUser();
+  const onboardingStatus = await getOnboardingStatus(user.id);
+  if (onboardingStatus === "pending") redirect("/onboarding");
 
   return (
     <>

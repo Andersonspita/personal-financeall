@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth/session";
 import { isAiConfigured } from "@/lib/ai/client";
 import { Card, CardTitle } from "@/components/ui/card";
 import { AiToggle } from "@/components/settings/ai-toggle";
+import { ProfileSettingsForm } from "@/components/settings/profile-settings-form";
 import { NewMoneyAccountForm } from "@/components/settings/money-account-forms";
 import { MoneyAccountList } from "@/components/settings/money-account-list";
 
@@ -10,9 +11,10 @@ export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const authUser = await requireUser();
-  const [user, accounts] = await Promise.all([
+  const [user, accounts, profile] = await Promise.all([
     prisma.user.findUniqueOrThrow({ where: { id: authUser.id } }),
     prisma.account.findMany({ where: { userId: authUser.id }, orderBy: [{ archived: "asc" }, { createdAt: "asc" }] }),
+    prisma.behavioralProfile.findUnique({ where: { userId: authUser.id } }),
   ]);
 
   return (
@@ -31,6 +33,8 @@ export default async function SettingsPage() {
               : "Você entra com e-mail e senha."}
         </p>
       </Card>
+
+      <ProfileSettingsForm profile={profile} />
 
       <Card>
         <CardTitle>Assistente de IA</CardTitle>

@@ -2,11 +2,11 @@
 
 Documento vivo do progresso frente a [`Requisito.MD`](../Requisito.MD). Atualize a tabela de status e acrescente uma linha no histórico **sempre que o sistema mudar**.
 
-**Última revisão:** 2026-08-31
+**Última revisão:** 2026-09-01
 
 ## Resumo
 
-O núcleo dos 9 requisitos funcionais e dos 3 não funcionais está implementado em um app web autenticado, mobile-first, com PWA básico, SQLite local e testes da lógica de orçamento, anomalia e score. Falta endurecer produção (banco compartilhado, recuperação de senha, app nativo).
+O núcleo dos 10 requisitos funcionais e dos 3 não funcionais está implementado em um app web autenticado, mobile-first, com PWA básico, SQLite local e testes da lógica de orçamento, anomalia, score e perfil comportamental. Falta endurecer produção (banco compartilhado, app nativo, cobrança Plus).
 
 ## Status dos requisitos
 
@@ -25,6 +25,7 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 | RF07 | Feed de nudges | Pronto | `nudges.ts` + `/aprender` | Nudge contextual + 3 cursos com aulas |
 | RF08 | Botão de pânico / desvio de foco | Pronto | `/panico` | Quatro microatividades; desfecho autodeclarado |
 | RF09 | Score de vulnerabilidade e encaminhamento | Pronto | `vulnerability-score.ts`, Zen Engine | Apoio após 3 scores críticos seguidos |
+| RF10 | Perfil comportamental no onboarding | Pronto | `/onboarding`, `BehavioralProfile`, Configurações | 5 perguntas puláveis; não entra no score |
 
 ### Não funcionais
 
@@ -42,8 +43,9 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 | Biblioteca educativa com progresso | Pronto (agora em cursos, 3 trilhas) |
 | Assistente de IA de escopo fechado | Pronto (opcional; depende de `OPENAI_API_KEY`) |
 | Seed demo | Pronto (`demo@bussola.app`) |
-| Testes unitários do domínio | Parcial (12 arquivos; sem suíte de banco/UI) |
-| App iOS/Android | Pendente (API já client-agnostic) |
+| Testes unitários do domínio | Parcial (13 arquivos; sem suíte de banco/UI) |
+| App iOS/Android | Pendente (API já client-agnostic; plano Plus documentado) |
+| Bússola Plus (assinatura) | Pendente (modelo freemium documentado; sem paywall no código) |
 | Recuperação de senha / verificação de e-mail | Parcial (reset por e-mail; sem verificação de cadastro) |
 | Login Google | Pronto (opcional; `GOOGLE_CLIENT_ID` + secret + redirect) |
 | Postgres / deploy em nuvem | Pendente |
@@ -110,6 +112,10 @@ Cada curso e aula passam a ter um vídeo sugerido (mentalidade financeira, Seras
 
 Em **Orçamentos** dá para mudar nome, ícone e grupo, e arquivar categorias que não entram mais em lançamentos novos. O histórico permanece. A última de renda e a última de gasto ficam ativas. Nome duplicado (inclusive arquivado) pede para reativar em vez de criar outra.
 
+### 2026-09-01 — Perfil comportamental (RF10) e plano Plus
+
+Questionário pós-cadastro em `/onboarding` (5 passos, pulável, editável em Configurações → **Seu jeito**). Tabela `BehavioralProfile` isolada; `User.onboardingStatus` controla o fluxo. O perfil personaliza pausa padrão na trava, recomendações de curso sem histórico e recado no Início — **não** altera o score de vulnerabilidade. Documentado o modelo freemium **Bússola Plus** (web + iOS + Android) em `docs/tecnico.md`; cobrança ainda não implementada.
+
 ## Próximos passos sugeridos
 
 1. Trocar SQLite por Postgres quando houver deploy multi-usuário.
@@ -119,6 +125,7 @@ Em **Orçamentos** dá para mudar nome, ícone e grupo, e arquivar categorias qu
 5. Cliente móvel usando as rotas `/api/auth/*` e Bearer.
 6. Cifrar ou tokenizar o rótulo `emotion` se a política de sigilo exigir mais do que o isolamento atual.
 7. Web push ou e-mail no teto, reusando os timestamps já gravados.
+8. Implementar flags de plano (`free` / `plus`) e integração Stripe + RevenueCat quando for lançar o Plus.
 
 ## Como manter este arquivo
 
