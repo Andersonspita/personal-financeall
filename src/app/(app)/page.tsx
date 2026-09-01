@@ -12,6 +12,7 @@ import { VulnerabilityExplainerButton } from "@/components/ai/vulnerability-expl
 import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { PageHeader } from "@/components/ui/page-header";
 import { CashFlowChart } from "@/components/dashboard/cash-flow-chart";
 import { MonthSelector } from "@/components/dashboard/month-selector";
 import { DailyMoodCheckIn } from "@/components/dashboard/daily-mood-check-in";
@@ -47,56 +48,62 @@ export default async function DashboardPage({
     (transaction: DashboardTransaction) => transaction.emotionLog,
   );
 
+  const firstName = user.name.split(" ")[0];
+
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Visão geral</h1>
-        <Link href="/transacoes/novo" className={buttonClass("primary", "px-4 py-2")}>
-          <Plus size={16} /> Lançar
-        </Link>
-      </div>
+      <PageHeader
+        title={`Olá, ${firstName}`}
+        subtitle={data.period.isCurrent ? "Seu mês até agora" : data.period.label}
+        trailing={
+          <Link href="/transacoes/novo" className={buttonClass("primary", "hidden px-4 py-2 md:inline-flex")}>
+            <Plus size={16} /> Lançar
+          </Link>
+        }
+      />
 
       <MonthSelector monthKey={data.period.key} label={data.period.label} isCurrent={data.period.isCurrent} />
 
       {data.openNudge && <NudgeBanner id={data.openNudge.id} message={data.openNudge.message} />}
 
+      <section className="rounded-3xl bg-primary px-5 py-6 text-white shadow-[0_12px_32px_rgba(63,111,94,0.28)]">
+        <p className="text-sm font-medium text-white/75">
+          {data.period.isCurrent ? "Saldo disponível" : "Resultado do mês"}
+        </p>
+        <p className="mt-1 text-[2.15rem] font-semibold leading-none tracking-tight tabular-nums">
+          {formatCurrency(data.period.isCurrent ? data.saldoDisponivel : data.resultadoMes)}
+        </p>
+        {data.period.isCurrent ? (
+          <p className="mt-2 text-xs text-white/65">Todas as contas, até agora.</p>
+        ) : (
+          <p className="mt-2 text-xs text-white/65">
+            Receitas − despesas em {data.period.label}. Saldo no último dia: {formatCurrency(data.saldoFimMes)}.
+          </p>
+        )}
+        <div className="mt-5 grid grid-cols-2 gap-2">
+          <div className="rounded-2xl bg-white/12 px-3 py-3">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-white/65">Receitas</p>
+            <p className="mt-0.5 text-base font-semibold tabular-nums">{formatCurrency(data.receitasMes)}</p>
+          </div>
+          <div className="rounded-2xl bg-white/12 px-3 py-3">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-white/65">Despesas</p>
+            <p className="mt-0.5 text-base font-semibold tabular-nums">{formatCurrency(data.despesasMes)}</p>
+          </div>
+          <div className="rounded-2xl bg-white/12 px-3 py-3">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-white/65">Fixas</p>
+            <p className="mt-0.5 text-base font-semibold tabular-nums">{formatCurrency(data.despesasFixas)}</p>
+          </div>
+          <div className="rounded-2xl bg-white/12 px-3 py-3">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-white/65">Variáveis</p>
+            <p className="mt-0.5 text-base font-semibold tabular-nums">{formatCurrency(data.despesasVariaveis)}</p>
+          </div>
+        </div>
+      </section>
+
       <DailyMoodCheckIn
         initialMood={(todayMood?.mood as DailyMood | undefined) ?? null}
         disabled={!data.period.isCurrent}
       />
-
-      <Card>
-        <CardTitle>{data.period.isCurrent ? "Saldo disponível" : "Resultado do mês"}</CardTitle>
-        <p className="text-3xl font-semibold tabular-nums">
-          {formatCurrency(data.period.isCurrent ? data.saldoDisponivel : data.resultadoMes)}
-        </p>
-        {data.period.isCurrent ? (
-          <p className="mt-1 text-xs text-foreground-muted">Todas as contas, até agora.</p>
-        ) : (
-          <p className="mt-1 text-xs text-foreground-muted">
-            Receitas − despesas em {data.period.label}. Saldo no último dia com movimento:{" "}
-            {formatCurrency(data.saldoFimMes)}.
-          </p>
-        )}
-        <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-          <div>
-            <p className="text-foreground-muted">Receitas (mês)</p>
-            <p className="font-medium tabular-nums">{formatCurrency(data.receitasMes)}</p>
-          </div>
-          <div>
-            <p className="text-foreground-muted">Despesas (mês)</p>
-            <p className="font-medium tabular-nums">{formatCurrency(data.despesasMes)}</p>
-          </div>
-          <div>
-            <p className="text-foreground-muted">Fixas</p>
-            <p className="font-medium tabular-nums">{formatCurrency(data.despesasFixas)}</p>
-          </div>
-          <div>
-            <p className="text-foreground-muted">Variáveis</p>
-            <p className="font-medium tabular-nums">{formatCurrency(data.despesasVariaveis)}</p>
-          </div>
-        </div>
-      </Card>
 
       <Card>
         <div className="mb-2 flex items-center justify-between">

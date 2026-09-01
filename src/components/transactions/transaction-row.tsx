@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { iconActionClass } from "@/components/ui/control";
@@ -24,7 +23,7 @@ export function TransactionRow({ transaction }: { transaction: TransactionListIt
   const emotion = transaction.emotion as Emotion | null;
 
   return (
-    <Card className="flex items-center justify-between gap-3">
+    <div className="flex items-center justify-between gap-3 px-4 py-3.5">
       <div className="min-w-0">
         <p className="truncate text-base font-medium">
           {transaction.description || transaction.categoryName || "Lançamento"}
@@ -65,6 +64,6 @@ export function TransactionRow({ transaction }: { transaction: TransactionListIt
           </form>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

@@ -185,6 +185,7 @@ Escopo fechado (`src/lib/ai/prompts.ts`): no máximo 3–4 frases, tom não-puni
 | `/aprender` | Cursos e recomendações |
 | `/aprender/cursos/[slug]` | Aulas de um curso |
 | `/aprender/[slug]` | Aula (anterior/próxima se estiver num curso) |
+| `/mais` | Menu extra no celular (desejos, emoções, aprender, pânico, config, sair) |
 | `/configuracoes` | Conta, **Seu jeito** (perfil RF10) e toggle de IA |
 | `/onboarding` | Questionário pós-cadastro (5 passos, pulável) |
 | `/login` `/registrar` | Públicas |
@@ -215,9 +216,11 @@ Cubram lógica pura e bordas (valor zero/NaN/Infinity, mês 13, cooldown 23h/73h
 
 ## UI
 
-- Títulos `h1` usam Source Serif 4 (identidade editorial); o restante permanece Geist.
-- Botões: `src/components/ui/button.tsx` (`rounded-xl`, `pending` com spinner, `active:scale-[0.98]`). Não usar link sublinhado para ação primária/secundária.
-- Campos: `Field` + `fieldControlClass` (borda crítica + `aria-invalid` + texto de erro no campo). Selects: `Select` (`appearance-none` + chevron). Cards: `rounded-2xl`, `p-5`.
+- Títulos de tela: `PageHeader` em Geist sans (sem serifa), tamanho grande, tracking apertado — cara de app, não de blog.
+- Botões: `src/components/ui/button.tsx` (`rounded-2xl`, `min-h-11`, `pending` com spinner, `active:scale-[0.98]`). Não usar link sublinhado para ação primária/secundária.
+- Campos: `Field` + `fieldControlClass` (borda crítica + `aria-invalid` + texto de erro no campo). Selects: `Select` (`appearance-none` + chevron). Cards: `rounded-3xl`, `p-5`.
+- Login/cadastro: `AuthShell` + cartão (`BrandMark`).
+- Celular: 4 abas + FAB `+` (`src/components/nav.tsx`); Pânico na boia do topo; destinos extras em `/mais`. Computador: sidebar com **Novo lançamento**.
 - Mensagens de Zod em `src/lib/validation.ts` e `src/lib/auth/schemas.ts` estão em português.
 - Relógio da trava de resfriamento (`Countdown`, `PendingWishCard`) só calcula `Date.now()` no cliente, depois do mount — evita mismatch de hidratação.
 - Barra inferior: `env(safe-area-inset-bottom)` e `viewportFit: cover` para não ficar sob o indicador do iOS.

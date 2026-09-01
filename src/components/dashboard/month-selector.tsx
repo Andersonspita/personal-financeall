@@ -19,12 +19,12 @@ export function MonthSelector({
   const next = shiftDashboardMonthKey(monthKey, 1);
 
   return (
-    <div className="flex items-center justify-between gap-2 rounded-2xl border border-border bg-surface px-3 py-2">
+    <div className="flex items-center justify-between gap-2 rounded-full border border-border bg-surface px-2 py-1">
       <button
         type="button"
         aria-label="Mês anterior"
         onClick={() => router.push(`/?month=${prev}`)}
-        className="flex h-9 w-9 items-center justify-center rounded-xl text-foreground-muted hover:bg-surface-muted"
+        className="flex h-10 w-10 items-center justify-center rounded-full text-foreground-muted hover:bg-surface-muted"
       >
         <ChevronLeft size={18} />
       </button>
@@ -40,7 +40,7 @@ export function MonthSelector({
         type="button"
         aria-label="Próximo mês"
         onClick={() => router.push(`/?month=${next}`)}
-        className="flex h-9 w-9 items-center justify-center rounded-xl text-foreground-muted hover:bg-surface-muted"
+        className="flex h-10 w-10 items-center justify-center rounded-full text-foreground-muted hover:bg-surface-muted"
       >
         <ChevronRight size={18} />
       </button>

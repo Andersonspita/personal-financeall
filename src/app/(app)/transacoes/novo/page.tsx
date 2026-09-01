@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/session";
+import { PageHeader } from "@/components/ui/page-header";
 import { TransactionForm } from "@/components/transactions/transaction-form";
 import { ensureDefaultIncomeCategories } from "@/lib/onboarding";
 
@@ -20,7 +21,7 @@ export default async function NewTransactionPage() {
       <Link href="/transacoes" className="flex items-center gap-1 text-sm text-foreground-muted">
         <ArrowLeft size={16} /> Voltar
       </Link>
-      <h1 className="text-xl font-semibold">Novo lançamento</h1>
+      <PageHeader title="Novo lançamento" subtitle="Receita ou despesa, no seu tempo" />
       <TransactionForm accounts={accounts} categories={categories} />
     </div>
   );

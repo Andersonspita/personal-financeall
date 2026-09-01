@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CheckCircle2, Clock } from "lucide-react";
 import { requireUser } from "@/lib/auth/session";
 import { getCourses, getRecommendedContent, type ContentListItem } from "@/lib/education/service";
+import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -42,12 +43,10 @@ export default async function EducationPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-xl font-semibold">Aprender</h1>
-        <p className="text-sm text-foreground-muted">
-          Cursos curtos sobre emoção e dinheiro, com vídeo-aula da Bússola em cada um. Sem prova, sem prazo — no seu tempo.
-        </p>
-      </div>
+      <PageHeader
+        title="Aprender"
+        subtitle="Cursos curtos sobre emoção e dinheiro, com vídeo-aula da Bússola. Sem prova, sem prazo — no seu tempo."
+      />
 
       {recommended.length > 0 && (
         <Card>

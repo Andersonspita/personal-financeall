@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Clock } from "lucide-react";
 import { requireUser } from "@/lib/auth/session";
 import { getCourseBySlug } from "@/lib/education/service";
+import { PageHeader } from "@/components/ui/page-header";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { tagEmoji, tagLabel } from "@/lib/education/tags";
@@ -33,10 +34,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
         </span>
       </div>
 
-      <div>
-        <h1 className="text-xl font-semibold">{course.title}</h1>
-        <p className="mt-1 text-sm text-foreground-muted">{course.summary}</p>
-      </div>
+      <PageHeader title={course.title} subtitle={course.summary} />
 
       {clip ? <LessonVideoPlayer video={clip} /> : null}
 

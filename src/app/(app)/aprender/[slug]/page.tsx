@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
 import { requireUser } from "@/lib/auth/session";
 import { getContentBySlug } from "@/lib/education/service";
 import { markContentViewed, markContentCompleted } from "@/actions/education";
+import { PageHeader } from "@/components/ui/page-header";
 import { Badge } from "@/components/ui/badge";
 import { tagEmoji, tagLabel } from "@/lib/education/tags";
 import { Button } from "@/components/ui/button";
@@ -46,7 +47,7 @@ export default async function EducationDetailPage({ params }: { params: Promise<
         )}
       </div>
 
-      <h1 className="text-xl font-semibold">{content.title}</h1>
+      <PageHeader title={content.title} />
 
       {clip ? <LessonVideoPlayer video={clip} /> : null}
 

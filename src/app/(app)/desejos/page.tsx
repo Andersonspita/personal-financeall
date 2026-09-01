@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/session";
 import { getDefaultCooldownHours } from "@/lib/profile/service";
+import { PageHeader } from "@/components/ui/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PendingWishCard } from "@/components/wishlist/pending-item-card";
@@ -22,11 +23,10 @@ export default async function WishlistPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="text-xl font-semibold">Trava de resfriamento</h1>
-      <p className="text-sm text-foreground-muted">
-        Antes de comprar algo por impulso, registre aqui e espere o prazo passar. Se ainda fizer sentido depois, é
-        provavelmente uma necessidade real — não uma urgência do momento.
-      </p>
+      <PageHeader
+        title="Desejos"
+        subtitle="Antes de comprar por impulso, registre aqui e espere o prazo passar. Se ainda fizer sentido depois, é provavelmente uma necessidade real."
+      />
 
       <WishlistItemForm
         defaultCooldownHours={defaultCooldownHours}

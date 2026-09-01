@@ -10,7 +10,7 @@ Este guia descreve o que você consegue fazer hoje no app.
 2. No cadastro por e-mail, informe nome, e-mail e uma senha com pelo menos 8 caracteres. Se algum campo estiver incompleto (nome em branco, e-mail inválido, senha curta), o aviso aparece **embaixo do campo** que precisa de correção.
 3. Na primeira conta, o app já cria uma **Conta Principal** e categorias iniciais de gasto (Moradia, Alimentação, Delivery…) mais **Salário** (renda). Outras contas de dinheiro (carteira, cartão, poupança) você cria em **Configurações**.
 4. Depois do cadastro (e-mail ou Google), o app abre o **questionário de boas-vindas** (`/onboarding`): cinco perguntas rápidas sobre foco, gatilhos emocionais, pausa na trava, ritmo de renda e tom de apoio. **Não é diagnóstico** — você pode **pular** ou mudar depois em **Configurações** → **Seu jeito**.
-5. Para sair, use **Sair** no menu (computador) ou no topo da tela (celular).
+5. Para sair, use **Sair da conta** em **Mais** ou em **Configurações** (no computador, também no rodapé do menu).
 
 Quem já tem conta entra em **Entrar** (`/login`). E-mail inválido ou senha em branco são apontados no próprio campo; e-mail ou senha incorretos aparecem como recado geral, sem dizer se o e-mail existe. Enquanto o app processa o login ou o cadastro, o botão mostra um indicador de espera.
 
@@ -29,7 +29,7 @@ Essa conta **não** deve ser usada em produção.
 
 ## Telas
 
-No celular, a navegação fica na barra inferior (acima da faixa do iPhone). No computador, fica na coluna à esquerda.
+No celular, a barra inferior tem quatro destinos (**Início**, **Lançar**, **Tetos**, **Mais**) e um botão **+** no centro para novo lançamento — como nos apps de finanças. O ícone de boia no topo abre o **Pânico** em um toque. **Desejos**, **Emoções**, **Aprender**, **Configurações** e **Sair** ficam em **Mais**. No computador, o menu completo fica na coluna à esquerda, com **Novo lançamento** no topo.
 
 ### Início
 
@@ -41,7 +41,7 @@ Visão geral do mês — com **seletor de mês** (‹ ›) no topo. No mês atua
 - **Humor ao longo do mês** — grade com os check-ins diários (emoji por dia).
 - recado pontual (teto ou dica), orçamentos, lançamentos do mês, indicador de vulnerabilidade (sempre últimos 7 dias)
 
-O botão **Lançar** abre o cadastro de uma nova receita ou despesa.
+O botão **+** (ou **Lançar** no computador) abre o cadastro de uma nova receita ou despesa. O saldo aparece em destaque no card verde do topo.
 
 ### Lançamentos
 

@@ -5,6 +5,7 @@ import { Card, CardTitle } from "@/components/ui/card";
 import { BUDGET_GROUPS, type BudgetGroup } from "@/lib/budgeting";
 import { ensureDefaultIncomeCategories } from "@/lib/onboarding";
 import { ensureCurrentMonthBudgets } from "@/lib/budget-alerts";
+import { PageHeader } from "@/components/ui/page-header";
 import { BudgetDistributionCard } from "@/components/budgets/distribution-card";
 import { CategoryManager } from "@/components/budgets/category-manager";
 import { NewCategoryForm } from "@/components/budgets/new-category-form";
@@ -49,7 +50,7 @@ export default async function BudgetsPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="text-xl font-semibold">Orçamentos</h1>
+      <PageHeader title="Orçamentos" subtitle="Tetos do mês e categorias" />
 
       <BudgetDistributionCard groupTotals={groupTotals} totalIncome={totalIncome} />
 

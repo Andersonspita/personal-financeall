@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/auth/login-form";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { isGoogleAuthConfigured } from "@/lib/auth/config";
 
 export default async function LoginPage({
@@ -8,12 +9,8 @@ export default async function LoginPage({
 }) {
   const { error } = await searchParams;
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10">
-      <div className="w-full max-w-sm">
-        <h1 className="mb-1 text-center text-xl font-semibold text-primary">Bússola Financeira</h1>
-        <p className="mb-6 text-center text-sm text-foreground-muted">Bom te ver de novo.</p>
-        <LoginForm googleEnabled={isGoogleAuthConfigured()} oauthError={error} />
-      </div>
-    </div>
+    <AuthShell subtitle="Bom te ver de novo.">
+      <LoginForm googleEnabled={isGoogleAuthConfigured()} oauthError={error} />
+    </AuthShell>
   );
 }

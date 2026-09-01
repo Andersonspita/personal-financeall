@@ -33,7 +33,7 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 
 | ID | Requisito | Status | Observação |
 |---|---|---|---|
-| RNF01 | Mobile-first e PWA | Parcial | Layout responsivo + installable + safe-area no menu. SW não oferece modo offline das telas (de propósito, para não cachear saldo) |
+| RNF01 | Mobile-first e PWA | Parcial | Barra com 4 abas + FAB, hero de saldo, `/mais`. SW não oferece modo offline das telas (de propósito, para não cachear saldo) |
 | RNF02 | Sigilo e isolamento (LGPD) | Parcial | EmotionLog separado, nota AES-256-GCM, export sem emoção, IA opt-in. O rótulo `emotion` não é cifrado; SQLite em arquivo local não é isolamento multi-tenant de nuvem |
 | RNF03 | Tom não-punitivo | Pronto | `src/lib/copy.ts` e textos das telas |
 
@@ -129,6 +129,10 @@ O `npm run build` passou a rodar `prisma generate` antes do `next build`, evitan
 ### 2026-09-01 — Vídeo-aulas próprias (substitui YouTube)
 
 Cursos e aulas passam a ter **vídeo-aula da Bússola**: slides com identidade visual do app + narração sintética (roteiro em `video-scripts.ts`, áudio em `public/audio/education/`). Remove embeds do YouTube para evitar direitos de imagem de terceiros. Regenerar áudio: `npm run videos:generate`.
+
+### 2026-09-01 — UI com cara de aplicativo
+
+A navegação no celular passou do padrão “site” (6 itens + Config/Sair no topo) para o padrão de apps de finanças: **4 abas + botão + no centro**, boia de **Pânico** no topo e tela **Mais**. Início com saldo em destaque (hero verde). Títulos grandes sem serifa. Login/cadastro em cartão com marca. Lista de lançamentos em lista agrupada.
 
 ## Próximos passos sugeridos
 

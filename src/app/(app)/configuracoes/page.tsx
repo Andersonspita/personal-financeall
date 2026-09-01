@@ -1,7 +1,10 @@
+import { LogOut } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/session";
+import { logoutAction } from "@/actions/auth";
 import { isAiConfigured } from "@/lib/ai/client";
 import { Card, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 import { AiToggle } from "@/components/settings/ai-toggle";
 import { ProfileSettingsForm } from "@/components/settings/profile-settings-form";
 import { NewMoneyAccountForm } from "@/components/settings/money-account-forms";
@@ -19,7 +22,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">Configurações</h1>
+      <PageHeader title="Configurações" subtitle="Sua conta e o jeito que a Bússola te apoia" />
 
       <Card>
         <CardTitle>Perfil</CardTitle>
@@ -72,6 +75,16 @@ export default async function SettingsPage() {
         <CardTitle>Nova conta</CardTitle>
         <NewMoneyAccountForm />
       </Card>
+
+      <form action={logoutAction}>
+        <button
+          type="submit"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-surface py-3.5 text-sm font-medium text-foreground-muted transition active:bg-surface-muted md:hidden"
+        >
+          <LogOut size={16} />
+          Sair da conta
+        </button>
+      </form>
     </div>
   );
 }

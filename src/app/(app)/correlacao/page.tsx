@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import { getEmotionSpendMatrix, getConsecutiveCriticalStreak, CRITICAL_STREAK_THRESHOLD } from "@/lib/insights";
 import { requireUser } from "@/lib/auth/session";
+import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardTitle } from "@/components/ui/card";
 import { EmotionSpendChart } from "@/components/behavioral/emotion-spend-chart";
 import { SupportChannels } from "@/components/support-channels";
@@ -25,10 +26,10 @@ export default async function CorrelationPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">Emoção × Gasto</h1>
-      <p className="text-sm text-foreground-muted">
-        Últimos 30 dias. Nenhum sentimento é &ldquo;errado&rdquo; — a ideia é só enxergar padrões, sem julgamento.
-      </p>
+      <PageHeader
+        title="Emoção × gasto"
+        subtitle="Últimos 30 dias. Nenhum sentimento é “errado” — a ideia é só enxergar padrões, sem julgamento."
+      />
 
       {criticalStreak >= CRITICAL_STREAK_THRESHOLD && <SupportChannels />}
 

@@ -60,17 +60,20 @@
   --color-calm-soft: var(--color-calm-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+html {
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   overflow-x: hidden;
+  font-feature-settings: "ss01" on, "cv11" on;
 }
 
 h1 {
-  font-family: var(--font-source-serif), ui-serif, Georgia, "Times New Roman", serif;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
 }
 
 @keyframes fadeIn {
