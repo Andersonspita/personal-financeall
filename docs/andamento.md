@@ -122,6 +122,10 @@ Questionário pós-cadastro em `/onboarding` (5 passos, pulável, editável em C
 
 Seletor de mês no dashboard (`?month=YYYY-MM`). Gráfico financeiro passou a mostrar **saldo real acumulado** (sem projeção linear). Gráfico de gasto por emoção e timeline de check-ins no mesmo período. Novo `DailyMoodLog` para registrar como a pessoa acordou/está — separado de `EmotionLog` nos lançamentos.
 
+### 2026-09-01 — Build na VPS: Prisma generate no script
+
+O `npm run build` passou a rodar `prisma generate` antes do `next build`, evitando falha de tipo quando o client em `src/generated/prisma` está desatualizado (ex.: `dailyMoodLog` ausente). Tipos explícitos em `dashboard.ts` e na página do Início. Na VPS, após `git pull`, ainda é necessário `npx prisma migrate deploy` quando houver migration nova.
+
 ## Próximos passos sugeridos
 
 1. Trocar SQLite por Postgres quando houver deploy multi-usuário.

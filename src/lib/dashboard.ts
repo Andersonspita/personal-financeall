@@ -1,5 +1,6 @@
 import "server-only";
 import { differenceInCalendarDays } from "date-fns";
+import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getBudgetAlertLevel } from "@/lib/budgeting";
 import { accumulateDailyNet, buildRealCashFlowChartSeries } from "@/lib/cash-flow";
@@ -10,6 +11,12 @@ import { buildMoodTimeline } from "@/lib/mood/timeline";
 import { getMoodLogsForMonth } from "@/lib/mood/service";
 import { EMOTION_EMOJI, EMOTION_LABELS, type Emotion } from "@/lib/emotions";
 
+type MonthTransaction = Prisma.TransactionGetPayload<{
+  include: { category: true; emotionLog: true };
+}>;
+
+type MonthBudget = Prisma.BudgetGetPayload<{ include: { category: true } }>;
+
 async function getBalanceBefore(userId: string, before: Date): Promise<number> {
   const [accounts, movements] = await Promise.all([
     prisma.account.findMany({ where: { userId }, select: { initialBalance: true } }),
@@ -19,9 +26,9 @@ async function getBalanceBefore(userId: string, before: Date): Promise<number> {
     }),
   ]);
 
-  const initial = accounts.reduce((sum, account) => sum + account.initialBalance, 0);
+  const initial = accounts.reduce((sum: number, account) => sum + account.initialBalance, 0);
   const net = movements.reduce(
-    (sum, movement) => sum + (movement.type === "receita" ? movement.amount : -movement.amount),
+    (sum: number, movement) => sum + (movement.type === "receita" ? movement.amount : -movement.amount),
     0,
   );
   return initial + net;
@@ -65,20 +72,23 @@ export async function getDashboardData(userId: string, monthParam?: string | nul
     getMoodLogsForMonth(userId, month),
   ]);
 
+  const txs: MonthTransaction[] = transactionsInMonth;
+  const monthBudgets: MonthBudget[] = budgets;
+
   const saldoDisponivel =
-    accounts.reduce((sum, account) => sum + account.initialBalance, 0) +
+    accounts.reduce((sum: number, account) => sum + account.initialBalance, 0) +
     (allTimeReceitas._sum.amount ?? 0) -
     (allTimeDespesas._sum.amount ?? 0);
 
-  const despesasFixas = transactionsInMonth
+  const despesasFixas = txs
     .filter((transaction) => transaction.type === "despesa" && transaction.essential)
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
-  const despesasVariaveis = transactionsInMonth
+    .reduce((sum: number, transaction) => sum + transaction.amount, 0);
+  const despesasVariaveis = txs
     .filter((transaction) => transaction.type === "despesa" && !transaction.essential)
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
-  const receitasMes = transactionsInMonth
+    .reduce((sum: number, transaction) => sum + transaction.amount, 0);
+  const receitasMes = txs
     .filter((transaction) => transaction.type === "receita")
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
+    .reduce((sum: number, transaction) => sum + transaction.amount, 0);
   const despesasMes = despesasFixas + despesasVariaveis;
   const resultadoMes = receitasMes - despesasMes;
 
@@ -86,7 +96,7 @@ export async function getDashboardData(userId: string, monthParam?: string | nul
   const dailyNet = accumulateDailyNet({
     daysInMonth,
     monthStart: period.start,
-    movements: transactionsInMonth.map((row) => ({
+    movements: txs.map((row) => ({
       occurredAt: row.occurredAt,
       type: row.type as "receita" | "despesa",
       amount: row.amount,
@@ -100,23 +110,26 @@ export async function getDashboardData(userId: string, monthParam?: string | nul
   });
   const saldoFimMes = chartData.at(-1)?.saldo ?? monthStartBalance;
 
-  const budgetsWithSpent = budgets
+  const budgetsWithSpent = monthBudgets
     .filter((budget) => !budget.category.archived)
     .map((budget) => {
-      const spent = transactionsInMonth
+      const spent = txs
         .filter((transaction) => transaction.categoryId === budget.categoryId && transaction.type === "despesa")
-        .reduce((sum, transaction) => sum + transaction.amount, 0);
+        .reduce((sum: number, transaction) => sum + transaction.amount, 0);
       return { ...budget, spent, alertLevel: getBudgetAlertLevel(spent, budget.limitAmount) };
     });
 
   const emotionChartData = emotionMatrix
     .filter((row) => row.count > 0)
-    .map((row) => ({
-      emotion: row.emotion,
-      label: `${EMOTION_EMOJI[row.emotion]} ${EMOTION_LABELS[row.emotion]}`,
-      total: row.total,
-      count: row.count,
-    }));
+    .map((row) => {
+      const emotion = row.emotion as Emotion;
+      return {
+        emotion,
+        label: `${EMOTION_EMOJI[emotion]} ${EMOTION_LABELS[emotion]}`,
+        total: row.total,
+        count: row.count,
+      };
+    });
 
   const moodTimeline = buildMoodTimeline(month, moodLogs, daysInMonth);
 
@@ -135,7 +148,7 @@ export async function getDashboardData(userId: string, monthParam?: string | nul
     emotionChartData,
     moodTimeline,
     vulnerability,
-    recentTransactions: transactionsInMonth.slice(0, 6),
+    recentTransactions: txs.slice(0, 6),
     openNudge,
   };
 }

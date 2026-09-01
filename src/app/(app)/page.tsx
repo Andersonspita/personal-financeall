@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Plus, BookOpen } from "lucide-react";
-import { getDashboardData } from "@/lib/dashboard";
+import { getDashboardData, type DashboardData } from "@/lib/dashboard";
 import { requireUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { getBehavioralProfile } from "@/lib/profile/service";
@@ -24,6 +24,9 @@ import { EMOTION_EMOJI, EMOTION_LABELS, type Emotion } from "@/lib/emotions";
 import { NudgeBanner } from "@/components/nudge-banner";
 import { buttonClass } from "@/components/ui/control";
 
+type DashboardBudget = DashboardData["budgetsWithSpent"][number];
+type DashboardTransaction = DashboardData["recentTransactions"][number];
+
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage({
@@ -40,7 +43,9 @@ export default async function DashboardPage({
     getTodayMoodLog(user.id),
   ]);
   const profileHint = dashboardProfileHint(profile?.typicalTrigger as ProfileTrigger | undefined);
-  const hasEmotionData = data.recentTransactions.some((transaction) => transaction.emotionLog);
+  const hasEmotionData = data.recentTransactions.some(
+    (transaction: DashboardTransaction) => transaction.emotionLog,
+  );
 
   return (
     <div className="flex flex-col gap-5">
@@ -148,7 +153,7 @@ export default async function DashboardPage({
             </Link>
           </div>
           <div className="flex flex-col gap-5">
-            {data.budgetsWithSpent.slice(0, 4).map((budget) => (
+            {data.budgetsWithSpent.slice(0, 4).map((budget: DashboardBudget) => (
               <div key={budget.id} className="flex flex-col gap-2">
                 <div className="flex items-baseline justify-between gap-3">
                   <span className="min-w-0 truncate font-medium">
@@ -183,7 +188,7 @@ export default async function DashboardPage({
           {data.recentTransactions.length === 0 && (
             <li className="py-3 text-sm text-foreground-muted">Nenhum lançamento neste mês ainda.</li>
           )}
-          {data.recentTransactions.map((transaction) => (
+          {data.recentTransactions.map((transaction: DashboardTransaction) => (
             <li key={transaction.id} className="flex items-center justify-between gap-3 py-3">
               <div className="min-w-0">
                 <p className="truncate text-base font-medium">

@@ -47,7 +47,7 @@ npm run build
 
 Não commitar `.env`, `prisma/dev.db` nem `node_modules`. Pastas `actual/`, `maybe/`, `daylio-web/`, `mindlogger-web/`, `pattern/` e `zen/` são clones de pesquisa e estão no `.gitignore`.
 
-O client Prisma é gerado em `src/generated/prisma` (também ignorado). Sem `prisma generate` o build falha.
+O client Prisma é gerado em `src/generated/prisma` (também ignorado). O script `npm run build` executa `prisma generate` antes do `next build`; em deploy manual, rode `npx prisma migrate deploy` antes do build quando houver migrations novas.
 
 ## Arquitetura
 
