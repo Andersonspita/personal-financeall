@@ -60,6 +60,7 @@
   --color-calm-soft: var(--color-calm-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
 
 html {
   -webkit-tap-highlight-color: transparent;
