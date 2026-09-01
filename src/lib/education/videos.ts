@@ -1,58 +1,44 @@
-export type YoutubeClip = {
-  id: string;
+import {
+  COURSE_VIDEO_SCRIPTS,
+  LESSON_VIDEO_SCRIPTS,
+  type LessonVideoScript,
+} from "@/lib/education/video-scripts";
+
+export type { LessonVideoScript, VideoSlide } from "@/lib/education/video-scripts";
+
+/** Vídeo-aula próprio da Bússola (narração TTS + slides). Sem conteúdo de terceiros. */
+export type LessonVideo = {
+  slug: string;
   title: string;
-  author: string;
+  script: LessonVideoScript;
+  /** Áudio gerado em public/audio/education/{slug}.mp3 */
+  audioSrc: string;
 };
 
-/** IDs públicos do YouTube, checados via oEmbed. Conteúdo de terceiros, não da Bússola. */
-export const COURSE_VIDEOS: Record<string, YoutubeClip> = {
-  "emocoes-e-compras": {
-    id: "KSC58wt4Tbc",
-    title: "Educação financeira — A mentalidade financeira",
-    author: "PAE — Programa de Aprendizagem Eficiente",
-  },
-  "ferramentas-da-bussola": {
-    id: "kdZiy5g4rKI",
-    title: "Aprendendo a não se endividar",
-    author: "Serasa Ensina",
-  },
-  "dinheiro-no-dia-a-dia": {
-    id: "-RfLYjZ9J6E",
-    title: "Regra 50-30-20: como dividir seu dinheiro",
-    author: "Portal It's Money",
-  },
-};
+const AUDIO_BASE = "/audio/education";
 
-export const LESSON_VIDEOS: Record<string, YoutubeClip> = {
-  "ansiedade-e-compras": COURSE_VIDEOS["emocoes-e-compras"]!,
-  "compras-por-estresse": {
-    id: "OX-fI0_ouYo",
-    title: "Como evitar compras compulsivas?",
-    author: "Casule Saúde e Bem-estar",
-  },
-  "como-funciona-a-trava-de-resfriamento": COURSE_VIDEOS["emocoes-e-compras"]!,
-  "entendendo-o-score-de-vulnerabilidade": COURSE_VIDEOS["ferramentas-da-bussola"]!,
-  "metodo-50-30-20-explicado": COURSE_VIDEOS["dinheiro-no-dia-a-dia"]!,
-  "construindo-reserva-de-emergencia": {
-    id: "qGWGbYm218U",
-    title: "BC te Explica: resiliência financeira e imprevistos",
-    author: "Banco Central do Brasil",
-  },
-  "saindo-do-ciclo-de-compensacao-emocional": {
-    id: "OX-fI0_ouYo",
-    title: "Como evitar compras compulsivas?",
-    author: "Casule Saúde e Bem-estar",
-  },
-};
-
-export function youtubeEmbedUrl(id: string): string {
-  return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}`;
+function toLessonVideo(slug: string, script: LessonVideoScript): LessonVideo {
+  return {
+    slug,
+    title: script.title,
+    script,
+    audioSrc: `${AUDIO_BASE}/${slug}.mp3`,
+  };
 }
 
-export function videoForLesson(lessonSlug: string, courseSlug?: string | null): YoutubeClip | null {
+export const COURSE_VIDEOS: Record<string, LessonVideo> = Object.fromEntries(
+  Object.entries(COURSE_VIDEO_SCRIPTS).map(([slug, script]) => [slug, toLessonVideo(slug, script)]),
+);
+
+/** Aulas com roteiro próprio; as demais herdam o vídeo do curso na UI. */
+export const LESSON_VIDEOS: Record<string, LessonVideo> = Object.fromEntries(
+  Object.entries(LESSON_VIDEO_SCRIPTS).map(([slug, script]) => [slug, toLessonVideo(slug, script)]),
+);
+
+export function videoForLesson(lessonSlug: string, courseSlug?: string | null): LessonVideo | null {
   return LESSON_VIDEOS[lessonSlug] ?? (courseSlug ? COURSE_VIDEOS[courseSlug] : undefined) ?? null;
 }
 
-export function videoForCourse(courseSlug: string): YoutubeClip | null {
+export function videoForCourse(courseSlug: string): LessonVideo | null {
   return COURSE_VIDEOS[courseSlug] ?? null;
 }

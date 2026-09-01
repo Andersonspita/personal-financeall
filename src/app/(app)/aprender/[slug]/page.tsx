@@ -7,7 +7,7 @@ import { markContentViewed, markContentCompleted } from "@/actions/education";
 import { Badge } from "@/components/ui/badge";
 import { tagEmoji, tagLabel } from "@/lib/education/tags";
 import { Button } from "@/components/ui/button";
-import { YoutubeEmbed } from "@/components/education/youtube-embed";
+import { LessonVideoPlayer } from "@/components/education/lesson-video-player";
 import { videoForLesson } from "@/lib/education/videos";
 
 export const dynamic = "force-dynamic";
@@ -48,7 +48,7 @@ export default async function EducationDetailPage({ params }: { params: Promise<
 
       <h1 className="text-xl font-semibold">{content.title}</h1>
 
-      {clip ? <YoutubeEmbed clip={clip} /> : null}
+      {clip ? <LessonVideoPlayer video={clip} /> : null}
 
       <div className="flex flex-col gap-3 text-sm leading-relaxed text-foreground">
         {paragraphs.map((p, i) => (

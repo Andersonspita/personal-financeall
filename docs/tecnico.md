@@ -164,7 +164,7 @@ Efeitos:
 
 ### Educação
 
-Cursos curados em `src/lib/education/courses.ts`, aulas em `content.ts`, vídeos em `videos.ts` (embed `youtube-nocookie.com`). `ensureEducationalCatalog()` (upsert por slug) roda ao abrir `/aprender` — a VPS não precisa do seed demo. Recomendação usa a emoção de maior gasto nos últimos 30 dias; sem dados, o gatilho do `BehavioralProfile`. Progresso de curso é derivado das aulas (`progress.ts`).
+Cursos curados em `src/lib/education/courses.ts`, aulas em `content.ts`, roteiros e áudio em `video-scripts.ts` + `public/audio/education/*.mp3`, player em `lesson-video-player.tsx`. Vídeos são slides da Bússola com narração TTS (OpenAI ou Edge); sem YouTube nem imagens de terceiros. Regenerar áudio: `npm run videos:generate` (usa `OPENAI_API_KEY` se existir). `ensureEducationalCatalog()` (upsert por slug) roda ao abrir `/aprender` — a VPS não precisa do seed demo. Recomendação usa a emoção de maior gasto nos últimos 30 dias; sem dados, o gatilho do `BehavioralProfile`. Progresso de curso é derivado das aulas (`progress.ts`).
 
 ### IA
 

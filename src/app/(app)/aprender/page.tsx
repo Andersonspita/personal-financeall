@@ -45,7 +45,7 @@ export default async function EducationPage() {
       <div>
         <h1 className="text-xl font-semibold">Aprender</h1>
         <p className="text-sm text-foreground-muted">
-          Cursos curtos sobre emoção e dinheiro, com vídeo sugerido em cada um. Sem prova, sem prazo — no seu tempo.
+          Cursos curtos sobre emoção e dinheiro, com vídeo-aula da Bússola em cada um. Sem prova, sem prazo — no seu tempo.
         </p>
       </div>
 

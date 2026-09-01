@@ -116,7 +116,7 @@ Qualquer resultado é aceito. O objetivo é criar uma pausa, não pontuar compor
 
 ### Aprender
 
-Três **cursos** curtos (emoções e compras, ferramentas da Bússola, dinheiro no dia a dia). Cada um tem aulas de 2–4 minutos, com um **vídeo do YouTube** sugerido sobre o tema (o vídeo é de canais de educação financeira ou saúde, não da Bússola). Você vê quantas aulas já concluiu; não há prova nem prazo. O bloco **Para você agora** sugere aulas com base no que mais aparece nos seus gastos; se ainda não houver histórico, usa o gatilho que você declarou no onboarding. Dá para marcar a aula como concluída e ir para a anterior ou a próxima.
+Três **cursos** curtos (emoções e compras, ferramentas da Bússola, dinheiro no dia a dia). Cada um tem aulas de 2–4 minutos, com **vídeo-aula própria da Bússola** (slides + narração sintética, roteiro original — sem conteúdo de terceiros). Você vê quantas aulas já concluiu; não há prova nem prazo. O bloco **Para você agora** sugere aulas com base no que mais aparece nos seus gastos; se ainda não houver histórico, usa o gatilho que você declarou no onboarding. Dá para marcar a aula como concluída e ir para a anterior ou a próxima.
 
 No celular, o atalho fica no Início (**Ver os cursos**) e no computador no menu **Aprender**.
 

@@ -6,7 +6,7 @@ import { getCourseBySlug } from "@/lib/education/service";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { tagEmoji, tagLabel } from "@/lib/education/tags";
-import { YoutubeEmbed } from "@/components/education/youtube-embed";
+import { LessonVideoPlayer } from "@/components/education/lesson-video-player";
 import { videoForCourse } from "@/lib/education/videos";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +38,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
         <p className="mt-1 text-sm text-foreground-muted">{course.summary}</p>
       </div>
 
-      {clip ? <YoutubeEmbed clip={clip} /> : null}
+      {clip ? <LessonVideoPlayer video={clip} /> : null}
 
       <ProgressBar ratio={course.progress.ratio} tone="dentro_do_limite" />
       <p className="text-xs text-foreground-muted">

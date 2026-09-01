@@ -1,30 +1,36 @@
 import { describe, expect, it } from "vitest";
+import { EDUCATIONAL_CONTENT } from "./content";
 import { COURSES } from "./courses";
-import { COURSE_VIDEOS, LESSON_VIDEOS, videoForLesson, youtubeEmbedUrl } from "./videos";
-
-const YOUTUBE_ID = /^[\w-]{11}$/;
+import { COURSE_VIDEO_SCRIPTS, LESSON_VIDEO_SCRIPTS } from "./video-scripts";
+import { COURSE_VIDEOS, LESSON_VIDEOS, videoForCourse, videoForLesson } from "./videos";
 
 describe("vídeos dos cursos", () => {
-  it("todo curso tem um vídeo com ID válido", () => {
+  it("todo curso tem roteiro e áudio próprio", () => {
     for (const course of COURSES) {
-      const clip = COURSE_VIDEOS[course.slug];
-      expect(clip, course.slug).toBeDefined();
-      expect(clip!.id).toMatch(YOUTUBE_ID);
+      const video = COURSE_VIDEOS[course.slug];
+      expect(video, course.slug).toBeDefined();
+      expect(video!.audioSrc).toBe(`/audio/education/${course.slug}.mp3`);
+      expect(video!.script.slides.length).toBeGreaterThan(0);
+      expect(video!.script.narration.length).toBeGreaterThan(40);
+      expect(COURSE_VIDEO_SCRIPTS[course.slug]).toBeDefined();
     }
   });
 
-  it("IDs de aula são IDs de YouTube", () => {
-    for (const [slug, clip] of Object.entries(LESSON_VIDEOS)) {
-      expect(clip.id, slug).toMatch(YOUTUBE_ID);
+  it("toda aula da biblioteca tem roteiro de vídeo", () => {
+    for (const lesson of EDUCATIONAL_CONTENT) {
+      expect(LESSON_VIDEO_SCRIPTS[lesson.slug], lesson.slug).toBeDefined();
+      expect(LESSON_VIDEOS[lesson.slug]!.audioSrc).toBe(`/audio/education/${lesson.slug}.mp3`);
     }
   });
 
-  it("aula sem vídeo próprio usa o do curso", () => {
+  it("aula sem vídeo próprio na UI usa o do curso", () => {
     const clip = videoForLesson("tedio-e-consumo", "emocoes-e-compras");
-    expect(clip?.id).toBe(COURSE_VIDEOS["emocoes-e-compras"]!.id);
+    expect(clip?.slug).toBe("tedio-e-consumo");
+    expect(clip?.audioSrc).toBe("/audio/education/tedio-e-consumo.mp3");
   });
 
-  it("monta URL de embed sem cookies de rastreio", () => {
-    expect(youtubeEmbedUrl("KSC58wt4Tbc")).toBe("https://www.youtube-nocookie.com/embed/KSC58wt4Tbc");
+  it("curso inexistente retorna null", () => {
+    expect(videoForCourse("nao-existe")).toBeNull();
+    expect(videoForLesson("nao-existe")).toBeNull();
   });
 });
