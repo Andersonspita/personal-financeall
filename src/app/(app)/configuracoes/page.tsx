@@ -21,8 +21,8 @@ export default async function SettingsPage() {
   ]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <PageHeader title="Configurações" subtitle="Sua conta e o jeito que a Bússola te apoia" />
+    <div className="mx-auto w-full max-w-4xl flex flex-col gap-4">
+      <PageHeader title="Configurações" subtitle="Sua conta e o jeito que o Desafoga te apoia" />
 
       <Card>
         <CardTitle>Perfil</CardTitle>

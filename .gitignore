@@ -60,3 +60,6 @@ next-env.d.ts
 /.windsurf
 
 /src/generated/prisma
+
+# arquivos de referência de design enviados pelo Stitch (não fazem parte do app)
+/stitch_redesign_web_e_mobile.zip

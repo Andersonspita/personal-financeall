@@ -20,7 +20,7 @@ export const COURSES: CourseSeed[] = [
   },
   {
     slug: "ferramentas-da-bussola",
-    title: "Ferramentas da Bússola",
+    title: "Ferramentas do Desafoga",
     summary: "Trava de resfriamento, score e a pausa de 10 segundos — o que o app oferece, sem cobrança.",
     tag: "autoconhecimento",
     order: 20,

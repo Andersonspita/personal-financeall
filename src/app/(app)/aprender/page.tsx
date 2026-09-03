@@ -42,10 +42,10 @@ export default async function EducationPage() {
   const [courses, recommended] = await Promise.all([getCourses(user.id), getRecommendedContent(user.id)]);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="mx-auto w-full max-w-4xl flex flex-col gap-4">
       <PageHeader
         title="Aprender"
-        subtitle="Cursos curtos sobre emoção e dinheiro, com vídeo-aula da Bússola. Sem prova, sem prazo — no seu tempo."
+        subtitle="Cursos curtos sobre emoção e dinheiro, com vídeo-aula do Desafoga. Sem prova, sem prazo — no seu tempo."
       />
 
       {recommended.length > 0 && (

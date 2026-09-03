@@ -49,7 +49,7 @@ export default async function BudgetsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="mx-auto w-full max-w-4xl flex flex-col gap-5">
       <PageHeader title="Orçamentos" subtitle="Tetos do mês e categorias" />
 
       <BudgetDistributionCard groupTotals={groupTotals} totalIncome={totalIncome} />

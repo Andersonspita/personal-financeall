@@ -20,7 +20,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
   const clip = videoForCourse(course.slug);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="mx-auto w-full max-w-4xl flex flex-col gap-4">
       <Link href="/aprender" className="flex items-center gap-1 text-sm text-foreground-muted">
         <ArrowLeft size={16} /> Aprender
       </Link>

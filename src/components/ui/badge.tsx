@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { clsx } from "clsx";
 
+/** Pílulas de estado emocional/orçamento: pastel + texto escuro, nunca alarme. */
 const TONES = {
   primary: "bg-primary-soft text-primary",
   warm: "bg-warm-soft text-warm",
@@ -11,7 +12,12 @@ const TONES = {
 
 export function Badge({ tone = "neutral", children }: { tone?: keyof typeof TONES; children: ReactNode }) {
   return (
-    <span className={clsx("inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium", TONES[tone])}>
+    <span
+      className={clsx(
+        "inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium leading-4 tracking-[0.02em]",
+        TONES[tone],
+      )}
+    >
       {children}
     </span>
   );

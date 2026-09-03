@@ -11,7 +11,7 @@ export default async function OnboardingLayout({ children }: { children: ReactNo
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10">
       <p className="mb-6 text-center text-sm text-foreground-muted">
-        Olá, {user.name.split(" ")[0]} — vamos personalizar sua Bússola.
+        Olá, {user.name.split(" ")[0]} — vamos personalizar o seu Desafoga.
       </p>
       {children}
     </div>

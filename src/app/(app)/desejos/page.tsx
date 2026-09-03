@@ -22,7 +22,7 @@ export default async function WishlistPage() {
   const resolved = items.filter((item) => item.status !== "pendente");
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="mx-auto w-full max-w-4xl flex flex-col gap-5">
       <PageHeader
         title="Desejos"
         subtitle="Antes de comprar por impulso, registre aqui e espere o prazo passar. Se ainda fizer sentido depois, é provavelmente uma necessidade real."

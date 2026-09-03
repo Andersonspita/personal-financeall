@@ -10,8 +10,8 @@ const TONE: Record<BudgetAlertLevel, string> = {
 export function ProgressBar({ ratio, tone }: { ratio: number; tone: BudgetAlertLevel }) {
   const width = Math.min(100, Math.max(0, ratio * 100));
   return (
-    <div className="h-2.5 w-full overflow-hidden rounded-full bg-surface-muted">
-      <div className={clsx("h-full rounded-full transition-all", TONE[tone])} style={{ width: `${width}%` }} />
+    <div className="h-2 w-full overflow-hidden rounded-full bg-surface-muted">
+      <div className={clsx("h-full rounded-full transition-all duration-500", TONE[tone])} style={{ width: `${width}%` }} />
     </div>
   );
 }
