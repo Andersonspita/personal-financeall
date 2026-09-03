@@ -1,8 +1,8 @@
-# Andamento do projeto — Bússola Financeira
+# Andamento do projeto — Desafoga!
 
 Documento vivo do progresso frente a [`Requisito.MD`](../Requisito.MD). Atualize a tabela de status e acrescente uma linha no histórico **sempre que o sistema mudar**.
 
-**Última revisão:** 2026-09-01
+**Última revisão:** 2026-09-03
 
 ## Resumo
 
@@ -47,7 +47,7 @@ Legenda: **Pronto** · **Parcial** · **Pendente**
 | Seed demo | Pronto (`demo@bussola.app`) |
 | Testes unitários do domínio | Parcial (14 arquivos; sem suíte de banco/UI) |
 | App iOS/Android | Pendente (API já client-agnostic; plano Plus documentado) |
-| Bússola Plus (assinatura) | Pendente (modelo freemium documentado; sem paywall no código) |
+| Desafoga Plus (assinatura) | Pendente (modelo freemium documentado; sem paywall no código) |
 | Recuperação de senha / verificação de e-mail | Parcial (reset por e-mail; sem verificação de cadastro) |
 | Login Google | Pronto (opcional; `GOOGLE_CLIENT_ID` + secret + redirect) |
 | Postgres / deploy em nuvem | Pendente |
@@ -104,11 +104,11 @@ Em Configurações dá para criar, editar e arquivar contas (corrente, poupança
 
 ### 2026-08-31 — Cursos em Aprender
 
-As 10 leituras curtas passaram a 3 cursos (Emoções e compras, Ferramentas da Bússola, Dinheiro no dia a dia), com progresso por aula, aula anterior/próxima e catálogo gravado na primeira visita a `/aprender` (sem seed demo na VPS).
+As 10 leituras curtas passaram a 3 cursos (Emoções e compras, Ferramentas do Desafoga, Dinheiro no dia a dia), com progresso por aula, aula anterior/próxima e catálogo gravado na primeira visita a `/aprender` (sem seed demo na VPS).
 
 ### 2026-08-31 — Vídeos do YouTube nas aulas
 
-Cada curso e aula passam a ter um vídeo sugerido (mentalidade financeira, Serasa Ensina, 50-30-20, Banco Central, compras compulsivas). O player usa `youtube-nocookie.com`. O texto da Bússola continua o material principal.
+Cada curso e aula passam a ter um vídeo sugerido (mentalidade financeira, Serasa Ensina, 50-30-20, Banco Central, compras compulsivas). O player usa `youtube-nocookie.com`. O texto do Desafoga continua o material principal.
 
 ### 2026-08-31 — Editar e arquivar categorias
 
@@ -116,7 +116,7 @@ Em **Orçamentos** dá para mudar nome, ícone e grupo, e arquivar categorias qu
 
 ### 2026-09-01 — Perfil comportamental (RF10) e plano Plus
 
-Questionário pós-cadastro em `/onboarding` (5 passos, pulável, editável em Configurações → **Seu jeito**). Tabela `BehavioralProfile` isolada; `User.onboardingStatus` controla o fluxo. O perfil personaliza pausa padrão na trava, recomendações de curso sem histórico e recado no Início — **não** altera o score de vulnerabilidade. Documentado o modelo freemium **Bússola Plus** (web + iOS + Android) em `docs/tecnico.md`; cobrança ainda não implementada.
+Questionário pós-cadastro em `/onboarding` (5 passos, pulável, editável em Configurações → **Seu jeito**). Tabela `BehavioralProfile` isolada; `User.onboardingStatus` controla o fluxo. O perfil personaliza pausa padrão na trava, recomendações de curso sem histórico e recado no Início — **não** altera o score de vulnerabilidade. Documentado o modelo freemium **Desafoga Plus** (web + iOS + Android) em `docs/tecnico.md`; cobrança ainda não implementada.
 
 ### 2026-09-01 — Painel BI no Início (RF11–RF12)
 
@@ -128,11 +128,17 @@ O `npm run build` passou a rodar `prisma generate` antes do `next build`, evitan
 
 ### 2026-09-01 — Vídeo-aulas próprias (substitui YouTube)
 
-Cursos e aulas passam a ter **vídeo-aula da Bússola**: slides com identidade visual do app + narração sintética (roteiro em `video-scripts.ts`, áudio em `public/audio/education/`). Remove embeds do YouTube para evitar direitos de imagem de terceiros. Regenerar áudio: `npm run videos:generate`.
+Cursos e aulas passam a ter **vídeo-aula do Desafoga**: slides com identidade visual do app + narração sintética (roteiro em `video-scripts.ts`, áudio em `public/audio/education/`). Remove embeds do YouTube para evitar direitos de imagem de terceiros. Regenerar áudio: `npm run videos:generate`.
 
 ### 2026-09-01 — UI com cara de aplicativo
 
 A navegação no celular passou do padrão “site” (6 itens + Config/Sair no topo) para o padrão de apps de finanças: **4 abas + botão + no centro**, boia de **Pânico** no topo e tela **Mais**. Início com saldo em destaque (hero verde). Títulos grandes sem serifa. Login/cadastro em cartão com marca. Lista de lançamentos em lista agrupada.
+
+### 2026-09-03 — Design system do Stitch e renome para Desafoga!
+
+O app passou a se chamar **Desafoga!** (marca, `manifest.json`, e-mails, roteiros das vídeo-aulas; MP3s regerados). Slugs de curso e o e-mail da conta demo ficaram inalterados para não quebrar dados existentes; o serviço systemd na VPS segue `bussola-financeira`.
+
+A interface adotou o design system **Mindful Financial Sanctuary** (arquivos do Stitch): paleta sálvia sobre canvas slate, tipografia Manrope, raio de 12px em controles e 16px em cards, elevação por sombras ambientes. No desktop, sidebar de 256px + barra superior fixa com "Pausa consciente" e perfil; o Início virou grade 7/5 (fluxo à esquerda, insights à direita) e as demais páginas ficaram em largura de leitura. O mobile manteve as 4 abas + FAB, repintados. Novos tokens `on-primary`/`on-warm` corrigem o contraste do texto sobre superfícies sálvia no modo escuro.
 
 ## Próximos passos sugeridos
 
@@ -144,6 +150,8 @@ A navegação no celular passou do padrão “site” (6 itens + Config/Sair no 
 6. Cifrar ou tokenizar o rótulo `emotion` se a política de sigilo exigir mais do que o isolamento atual.
 7. Web push ou e-mail no teto, reusando os timestamps já gravados.
 8. Implementar flags de plano (`free` / `plus`) e integração Stripe + RevenueCat quando for lançar o Plus.
+9. Busca global na barra superior (existe no desenho do Stitch; adiada por não haver backend de busca).
+10. Sino de notificações na barra superior (adiado junto com a busca; hoje os recados aparecem como `NudgeBanner` no Início).
 
 ## Como manter este arquivo
 

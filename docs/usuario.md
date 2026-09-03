@@ -1,6 +1,6 @@
-# Guia do usuário — Bússola Financeira
+# Guia do usuário — Desafoga!
 
-A Bússola Financeira é um aplicativo de finanças pessoais com apoio emocional. Além de registrar receitas e despesas, ele ajuda a perceber a relação entre humor e dinheiro — sem julgamento, sem cobrança.
+O Desafoga! é um aplicativo de finanças pessoais com apoio emocional. Além de registrar receitas e despesas, ele ajuda a perceber a relação entre humor e dinheiro — sem julgamento, sem cobrança.
 
 Este guia descreve o que você consegue fazer hoje no app.
 
@@ -116,7 +116,7 @@ Qualquer resultado é aceito. O objetivo é criar uma pausa, não pontuar compor
 
 ### Aprender
 
-Três **cursos** curtos (emoções e compras, ferramentas da Bússola, dinheiro no dia a dia). Cada um tem aulas de 2–4 minutos, com **vídeo-aula própria da Bússola** (slides + narração sintética, roteiro original — sem conteúdo de terceiros). Você vê quantas aulas já concluiu; não há prova nem prazo. O bloco **Para você agora** sugere aulas com base no que mais aparece nos seus gastos; se ainda não houver histórico, usa o gatilho que você declarou no onboarding. Dá para marcar a aula como concluída e ir para a anterior ou a próxima.
+Três **cursos** curtos (emoções e compras, ferramentas do Desafoga, dinheiro no dia a dia). Cada um tem aulas de 2–4 minutos, com **vídeo-aula própria do Desafoga** (slides + narração sintética, roteiro original — sem conteúdo de terceiros). Você vê quantas aulas já concluiu; não há prova nem prazo. O bloco **Para você agora** sugere aulas com base no que mais aparece nos seus gastos; se ainda não houver histórico, usa o gatilho que você declarou no onboarding. Dá para marcar a aula como concluída e ir para a anterior ou a próxima.
 
 No celular, o atalho fica no Início (**Ver os cursos**) e no computador no menu **Aprender**.
 

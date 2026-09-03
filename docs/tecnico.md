@@ -1,4 +1,4 @@
-# Documentação técnica — Bússola Financeira
+# Documentação técnica — Desafoga!
 
 Aplicação web **Next.js 16** (App Router) + **React 19** + **Prisma 7** (SQLite) para finanças pessoais com apoio emocional. Requisitos de produto: [`Requisito.MD`](../Requisito.MD). Guia de uso: [`docs/usuario.md`](usuario.md).
 
@@ -164,7 +164,7 @@ Efeitos:
 
 ### Educação
 
-Cursos curados em `src/lib/education/courses.ts`, aulas em `content.ts`, roteiros e áudio em `video-scripts.ts` + `public/audio/education/*.mp3`, player em `lesson-video-player.tsx`. Vídeos são slides da Bússola com narração TTS (OpenAI ou Edge); sem YouTube nem imagens de terceiros. Regenerar áudio: `npm run videos:generate` (usa `OPENAI_API_KEY` se existir). `ensureEducationalCatalog()` (upsert por slug) roda ao abrir `/aprender` — a VPS não precisa do seed demo. Recomendação usa a emoção de maior gasto nos últimos 30 dias; sem dados, o gatilho do `BehavioralProfile`. Progresso de curso é derivado das aulas (`progress.ts`).
+Cursos curados em `src/lib/education/courses.ts`, aulas em `content.ts`, roteiros e áudio em `video-scripts.ts` + `public/audio/education/*.mp3`, player em `lesson-video-player.tsx`. Vídeos são slides do Desafoga com narração TTS (OpenAI ou Edge); sem YouTube nem imagens de terceiros. Regenerar áudio: `npm run videos:generate` (usa `OPENAI_API_KEY` se existir). `ensureEducationalCatalog()` (upsert por slug) roda ao abrir `/aprender` — a VPS não precisa do seed demo. Recomendação usa a emoção de maior gasto nos últimos 30 dias; sem dados, o gatilho do `BehavioralProfile`. Progresso de curso é derivado das aulas (`progress.ts`).
 
 ### IA
 
@@ -338,19 +338,39 @@ Só rode o `restart` se o `build` terminar com as rotas, sem erro de TypeScript.
 
 Prisma 7 + SQLite **não** aceita `createMany({ skipDuplicates })` (o tipo vira `never` e o build quebra). Filtre duplicatas no código antes do insert.
 
+## Design system
+
+Tokens em `src/app/globals.css` (`@theme inline`), derivados do "Mindful Financial Sanctuary" (Stitch):
+
+| Token | Claro | Papel |
+|---|---|---|
+| `--color-primary` | `#2d6a4f` | Sálvia profunda: ações, títulos, progresso |
+| `--color-accent` | `#40916c` | Sálvia clara: hover e indicadores |
+| `--color-on-primary` | `#ffffff` | Texto sobre superfícies sálvia cheias (fica escuro no modo noturno) |
+| `--color-warm` | `#b45309` | Âmbar de atenção — nunca "erro" |
+| `--color-critical` | `#b3555a` | Rosé suave; sem vermelho de alarme (RNF03) |
+| `--background` / `--surface` | `#f8fafc` / `#ffffff` | Canvas e cards |
+| `--shadow-soft` / `--shadow-lifted` | — | Elevação nível 1 e 2 (`shadow-soft`, `shadow-lifted`) |
+
+Regras de forma: **12px** em controles (`rounded-xl`), **16px** em cards (`rounded-2xl`), pílula em chips. Tipografia **Manrope** (`next/font`, variável `--font-manrope`).
+
+Sempre use os tokens — `bg-primary`, `text-on-primary`, `shadow-soft` — em vez de hex. Os gráficos (Recharts) leem as mesmas CSS vars, então trocar a paleta repinta o app inteiro. Nunca combine `bg-primary` com `text-white`: no modo escuro o primário vira menta clara e o texto some; use `text-on-primary`.
+
+O shell fica em `src/app/(app)/layout.tsx` (barra superior do desktop) e `src/components/nav.tsx` (sidebar e abas do mobile). O Início é a única página em `max-w-6xl`; as demais embrulham o conteúdo em `max-w-4xl`.
+
 ## Extensão futura (já prevista no desenho)
 
 ### Web + iOS + Android
 
 Três clientes, **um backend** (JWT cookie na web, Bearer nos apps). Hoje: Next.js + PWA. Apps nativos: provável wrapper (Capacitor/WebView) reutilizando a UI; login Google nativo e IAP depois.
 
-### Bússola Plus (freemium — ainda sem cobrança no código)
+### Desafoga Plus (freemium — ainda sem cobrança no código)
 
 Princípio: cuidado no momento da compra (trava, pânico, score básico, correlação 30 dias) permanece **grátis**.
 
 | Grátis | Plus (assinatura mensal/anual, mesma conta nas três plataformas) |
 |---|---|
-| Lançamentos, orçamentos, dashboard, detector, score, correlação 30d, trava, pânico, encaminhamento, perfil RF10, curso “Ferramentas da Bússola” | IA, biblioteca completa de cursos, histórico além de 30d, export, push/e-mail de teto, mais contas |
+| Lançamentos, orçamentos, dashboard, detector, score, correlação 30d, trava, pânico, encaminhamento, perfil RF10, curso “Ferramentas do Desafoga” | IA, biblioteca completa de cursos, histórico além de 30d, export, push/e-mail de teto, mais contas |
 | | Cobrança prevista: RevenueCat (iOS/Android IAP) + Stripe (web), mesmo `productId`. Flags futuras no `User`: `plan`, `plusExpiresAt`. |
 
 - App iOS/Android: reutilizar `/api/auth/*` + Bearer; schema já é `userId`-centric.
