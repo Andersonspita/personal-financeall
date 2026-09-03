@@ -1,4 +1,4 @@
-const CACHE_NAME = "bussola-shell-v2";
+const CACHE_NAME = "desafoga-shell-v3";
 // Importante: nunca incluir "/" (ou qualquer rota de página) aqui. Essas páginas mostram
 // saldo, orçamento e score de vulnerabilidade — servir uma versão em cache seria mostrar
 // dados financeiros desatualizados sem o usuário perceber. Só ativos verdadeiramente estáticos.

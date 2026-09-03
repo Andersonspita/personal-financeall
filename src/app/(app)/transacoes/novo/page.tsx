@@ -17,7 +17,7 @@ export default async function NewTransactionPage() {
   ]);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="mx-auto w-full max-w-4xl flex flex-col gap-4">
       <Link href="/transacoes" className="flex items-center gap-1 text-sm text-foreground-muted">
         <ArrowLeft size={16} /> Voltar
       </Link>

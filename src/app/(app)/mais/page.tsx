@@ -15,7 +15,7 @@ import { PageHeader } from "@/components/ui/page-header";
 const ITEMS = [
   { href: "/desejos", icon: Clock, title: "Desejos", desc: "Trava de 24 a 72h antes de comprar" },
   { href: "/correlacao", icon: HeartHandshake, title: "Emoções", desc: "O que você sente quando gasta" },
-  { href: "/aprender", icon: GraduationCap, title: "Aprender", desc: "Cursos curtos da Bússola" },
+  { href: "/aprender", icon: GraduationCap, title: "Aprender", desc: "Cursos curtos do Desafoga" },
   { href: "/panico", icon: LifeBuoy, title: "Pânico", desc: "Uma pausa agora, sem julgamento", warm: true },
   { href: "/configuracoes", icon: Settings, title: "Configurações", desc: "Conta, contas de dinheiro, seu jeito" },
 ] as const;
@@ -25,10 +25,10 @@ export default async function MorePage() {
   const firstName = user.name.split(" ")[0];
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="mx-auto w-full max-w-4xl flex flex-col gap-5">
       <PageHeader title="Mais" subtitle={`${firstName}, o que você precisa agora?`} />
 
-      <ul className="overflow-hidden rounded-3xl border border-border bg-surface">
+      <ul className="overflow-hidden rounded-2xl border border-border/80 bg-surface shadow-soft">
         {ITEMS.map((item) => {
           const Icon = item.icon;
           return (
@@ -38,7 +38,7 @@ export default async function MorePage() {
                 className="flex items-center gap-3 px-4 py-3.5 transition-colors active:bg-surface-muted"
               >
                 <span
-                  className={`flex size-11 shrink-0 items-center justify-center rounded-2xl ${
+                  className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${
                     "warm" in item && item.warm ? "bg-warm-soft text-warm" : "bg-primary-soft text-primary"
                   }`}
                 >
@@ -58,7 +58,7 @@ export default async function MorePage() {
       <form action={logoutAction}>
         <button
           type="submit"
-          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-surface py-3.5 text-sm font-medium text-foreground-muted transition active:bg-surface-muted"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-surface py-3.5 text-sm font-medium text-foreground-muted transition active:bg-surface-muted"
         >
           <LogOut size={16} />
           Sair da conta

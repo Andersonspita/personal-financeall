@@ -29,7 +29,7 @@ export function MonthSelector({
         <ChevronLeft size={18} />
       </button>
       <div className="min-w-0 text-center">
-        <p className="truncate text-sm font-medium capitalize">{label}</p>
+        <p className="truncate text-sm font-medium first-letter:uppercase">{label}</p>
         {!isCurrent && (
           <Link href="/" className="text-xs text-primary">
             Voltar ao mês atual

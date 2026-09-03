@@ -1,44 +1,50 @@
 @import "tailwindcss";
 
-/* Paleta calma e não-punitiva (RNF03): sem vermelho de alarme — o "crítico" usa um rosé suave,
+/* Design system "Mindful Financial Sanctuary" (Stitch): sálvia profunda sobre canvas slate.
+   Paleta calma e não-punitiva (RNF03): sem vermelho de alarme — o "crítico" usa um rosé suave,
    e alertas de orçamento usam âmbar, nunca tons de "erro"/"falha". */
 :root {
-  --background: #faf9f6;
+  --background: #f8fafc;
   --surface: #ffffff;
-  --surface-muted: #f2f0ea;
-  --foreground: #292524;
-  --foreground-muted: #78716c;
-  --border: #e7e4dc;
+  --surface-muted: #f1f5f9;
+  --foreground: #111c2d;
+  --foreground-muted: #64748b;
+  --border: #e2e8f0;
 
-  --color-primary: #3f6f5e;
-  --color-primary-soft: #e7efe9;
-  --color-accent: #b78a3d;
-  --color-warm: #c98a2b;
-  --color-warm-soft: #faf0dd;
+  --color-primary: #2d6a4f;
+  --color-primary-soft: #e8f5e9;
+  /* Texto/ícone sobre superfícies sálvia cheias — vira tom escuro no modo noturno. */
+  --color-on-primary: #ffffff;
+  --color-on-warm: #ffffff;
+  --color-accent: #40916c;
+  --color-warm: #b45309;
+  --color-warm-soft: #fef3c7;
   --color-critical: #b3555a;
-  --color-critical-soft: #f7e9ea;
-  --color-calm: #4d7c8a;
-  --color-calm-soft: #e5eff1;
+  --color-critical-soft: #fdeceb;
+  --color-calm: #3b82f6;
+  --color-calm-soft: #e6edfd;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #17181a;
-    --surface: #202224;
-    --surface-muted: #26282b;
-    --foreground: #ede9e3;
-    --foreground-muted: #a3a09a;
-    --border: #34363a;
+    --background: #0f1720;
+    --surface: #16202b;
+    --surface-muted: #1d2833;
+    --foreground: #e8eef4;
+    --foreground-muted: #93a3b3;
+    --border: #263241;
 
-    --color-primary: #7fb69d;
-    --color-primary-soft: #223028;
-    --color-accent: #d9b876;
-    --color-warm: #e0ac5c;
-    --color-warm-soft: #322a1c;
-    --color-critical: #d98a8e;
-    --color-critical-soft: #362325;
-    --color-calm: #8fc1cf;
-    --color-calm-soft: #1f2d31;
+    --color-primary: #74c69d;
+    --color-primary-soft: #1b3329;
+    --color-on-primary: #06231a;
+    --color-on-warm: #2f1d05;
+    --color-accent: #95d5b2;
+    --color-warm: #f0b357;
+    --color-warm-soft: #33280f;
+    --color-critical: #e29aa0;
+    --color-critical-soft: #38222a;
+    --color-calm: #8ab4f8;
+    --color-calm-soft: #1a2634;
   }
 }
 
@@ -51,6 +57,8 @@
   --color-border: var(--border);
   --color-primary: var(--color-primary);
   --color-primary-soft: var(--color-primary-soft);
+  --color-on-primary: var(--color-on-primary);
+  --color-on-warm: var(--color-on-warm);
   --color-accent: var(--color-accent);
   --color-warm: var(--color-warm);
   --color-warm-soft: var(--color-warm-soft);
@@ -58,8 +66,13 @@
   --color-critical-soft: var(--color-critical-soft);
   --color-calm: var(--color-calm);
   --color-calm-soft: var(--color-calm-soft);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-manrope);
   --font-mono: var(--font-geist-mono);
+
+  /* Elevação por "sombras botânicas ambientes": nunca drop-shadow duro. */
+  --shadow-soft: 0 4px 20px -2px rgb(30 41 59 / 0.05), 0 2px 6px -1px rgb(45 106 79 / 0.04);
+  --shadow-lifted: 0 12px 28px -4px rgb(30 41 59 / 0.08), 0 4px 10px -2px rgb(45 106 79 / 0.05);
+  --shadow-float: 0 24px 48px -12px rgb(30 41 59 / 0.14);
 }
 
 html {
@@ -70,11 +83,23 @@ body {
   background: var(--background);
   color: var(--foreground);
   overflow-x: hidden;
-  font-feature-settings: "ss01" on, "cv11" on;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.015em;
 }
 
 h1 {
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
+}
+
+/* Cifrões em peso leve e corpo menor: reduz o impacto visual de estresse ao revisar valores. */
+.currency-symbol {
+  font-weight: 400;
+  font-size: 0.72em;
+  opacity: 0.75;
 }
 
 @keyframes fadeIn {

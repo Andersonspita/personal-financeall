@@ -25,7 +25,7 @@ export default async function CorrelationPage() {
   const top = chartData[0];
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="mx-auto w-full max-w-4xl flex flex-col gap-4">
       <PageHeader
         title="Emoção × gasto"
         subtitle="Últimos 30 dias. Nenhum sentimento é “errado” — a ideia é só enxergar padrões, sem julgamento."

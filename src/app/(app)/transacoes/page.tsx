@@ -19,7 +19,7 @@ export default async function TransactionsPage() {
   });
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="mx-auto w-full max-w-4xl flex flex-col gap-5">
       <PageHeader
         title="Lançamentos"
         subtitle="O que entrou e saiu"
@@ -36,7 +36,7 @@ export default async function TransactionsPage() {
           <p className="mt-1 text-sm text-foreground-muted">Toque no + para registrar a primeira movimentação.</p>
         </Card>
       ) : (
-        <ul className="overflow-hidden rounded-3xl border border-border bg-surface">
+        <ul className="overflow-hidden rounded-2xl border border-border/80 bg-surface shadow-soft">
           {transactions.map((transaction) => (
             <li key={transaction.id} className="border-b border-border last:border-b-0">
               <TransactionRow

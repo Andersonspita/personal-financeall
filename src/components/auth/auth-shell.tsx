@@ -5,10 +5,10 @@ export function AuthShell({ children, subtitle }: { children: ReactNode; subtitl
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-12">
       <div className="mb-8 flex flex-col items-center gap-3 text-center">
-        <BrandMark />
+        <BrandMark withTagline />
         <p className="max-w-xs text-sm text-foreground-muted">{subtitle}</p>
       </div>
-      <div className="w-full max-w-sm rounded-3xl border border-border bg-surface p-5 shadow-[0_8px_32px_rgba(41,37,36,0.06)]">
+      <div className="w-full max-w-sm rounded-2xl border border-border/80 bg-surface p-6 shadow-lifted">
         {children}
       </div>
     </div>

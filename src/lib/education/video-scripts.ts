@@ -1,4 +1,4 @@
-/** Slide exibido no player; visual 100% da Bússola (sem imagens de terceiros). */
+/** Slide exibido no player; visual 100% do Desafoga (sem imagens de terceiros). */
 export type VideoSlide = {
   title: string;
   lines: string[];
@@ -12,7 +12,7 @@ export type LessonVideoScript = {
   narration: string;
 };
 
-const brand = "Bússola Financeira";
+const brand = "Desafoga";
 
 function script(slug: string, data: LessonVideoScript): [string, LessonVideoScript] {
   return [slug, data];
@@ -33,16 +33,16 @@ export const COURSE_VIDEO_SCRIPTS: Record<string, LessonVideoScript> = Object.fr
       },
       {
         title: "Neste curso",
-        lines: ["Quatro aulas curtas, no seu ritmo.", "Produzido pela Bússola Financeira."],
+        lines: ["Quatro aulas curtas, no seu ritmo.", "Produzido pelo Desafoga!"],
       },
     ],
     narration: `Bem-vindo ao curso Emoções e compras, da ${brand}. Aqui você vai entender como ansiedade, tédio, estresse e tristeza costumam aparecer na hora de gastar — sem julgamento e sem cobrança. O objetivo não é parar de comprar, e sim reconhecer o padrão e criar um pequeno intervalo entre o impulso e a decisão. São quatro aulas curtas, no seu tempo.`,
   }),
   script("ferramentas-da-bussola", {
-    title: "Ferramentas da Bússola",
+    title: "Ferramentas do Desafoga",
     slides: [
       {
-        title: "Ferramentas da Bússola",
+        title: "Ferramentas do Desafoga",
         lines: ["Trava de resfriamento, score de vulnerabilidade e pausa de 10 segundos."],
       },
       {
@@ -51,10 +51,10 @@ export const COURSE_VIDEO_SCRIPTS: Record<string, LessonVideoScript> = Object.fr
       },
       {
         title: "Neste curso",
-        lines: ["Três aulas práticas sobre o que o app oferece.", "Produzido pela Bússola Financeira."],
+        lines: ["Três aulas práticas sobre o que o app oferece.", "Produzido pelo Desafoga!"],
       },
     ],
-    narration: `Este é o curso Ferramentas da Bússola. Você vai conhecer a Trava de Resfriamento, o Score de Vulnerabilidade e a pausa de dez segundos — recursos do app pensados para apoiar, não para cobrar. Nada aqui é uma nota de comportamento: são ferramentas para você usar quando fizer sentido. Três aulas curtas, produzidas pela ${brand}.`,
+    narration: `Este é o curso Ferramentas do Desafoga. Você vai conhecer a Trava de Resfriamento, o Score de Vulnerabilidade e a pausa de dez segundos — recursos do app pensados para apoiar, não para cobrar. Nada aqui é uma nota de comportamento: são ferramentas para você usar quando fizer sentido. Três aulas curtas, produzidas pelo ${brand}.`,
   }),
   script("dinheiro-no-dia-a-dia", {
     title: "Dinheiro no dia a dia",
@@ -69,7 +69,7 @@ export const COURSE_VIDEO_SCRIPTS: Record<string, LessonVideoScript> = Object.fr
       },
       {
         title: "Neste curso",
-        lines: ["Três aulas para organizar o presente e o futuro.", "Produzido pela Bússola Financeira."],
+        lines: ["Três aulas para organizar o presente e o futuro.", "Produzido pelo Desafoga!"],
       },
     ],
     narration: `Bem-vindo ao curso Dinheiro no dia a dia, da ${brand}. Vamos falar do método 50-30-20, de como começar uma reserva de emergência e de como sair do ciclo emoção, compra, culpa — sempre em linguagem calma. Os números são um ponto de partida, não uma meta perfeita todo mês. Três aulas curtas, no seu ritmo.`,

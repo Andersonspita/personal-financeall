@@ -92,7 +92,7 @@ export function LessonVideoPlayer({ video }: { video: LessonVideo }) {
         <div className="absolute inset-0 flex flex-col justify-between p-5 sm:p-7">
           <div className="flex items-center gap-2 text-xs font-medium text-foreground-muted">
             <Compass className="size-4 text-primary" aria-hidden />
-            <span>Bússola Financeira</span>
+            <span>Desafoga!</span>
           </div>
 
           <div className="flex flex-1 flex-col justify-center gap-3">
@@ -125,7 +125,7 @@ export function LessonVideoPlayer({ video }: { video: LessonVideo }) {
           type="button"
           onClick={() => void togglePlay()}
           disabled={audioError}
-          className="absolute bottom-4 right-4 flex size-11 items-center justify-center rounded-full bg-primary text-white shadow-md transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="absolute bottom-4 right-4 flex size-11 items-center justify-center rounded-full bg-primary text-on-primary shadow-md transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           aria-label={playing ? "Pausar vídeo-aula" : "Reproduzir vídeo-aula"}
         >
           {playing ? <Pause className="size-5" /> : <Play className="size-5 translate-x-0.5" />}
@@ -147,7 +147,7 @@ export function LessonVideoPlayer({ video }: { video: LessonVideo }) {
           />
         </div>
         <figcaption className="text-xs text-foreground-muted">
-          {video.title}. Vídeo-aula produzida pela Bússola (narração sintética e roteiro próprio).
+          {video.title}. Vídeo-aula produzida pelo Desafoga (narração sintética e roteiro próprio).
           {audioError ? " Áudio indisponível no momento — leia o texto da aula abaixo." : null}
         </figcaption>
       </div>

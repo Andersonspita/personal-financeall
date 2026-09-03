@@ -35,7 +35,7 @@ export const ONBOARDING_STEPS = [
   },
   {
     field: "supportStyle" as const,
-    title: "Como você prefere que a Bússola fale com você?",
+    title: "Como você prefere que o Desafoga fale com você?",
     subtitle: "Ajustamos o tom dos recados — nunca para te punir.",
   },
 ];

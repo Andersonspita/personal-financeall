@@ -6,7 +6,7 @@ import {
 
 export type { LessonVideoScript, VideoSlide } from "@/lib/education/video-scripts";
 
-/** Vídeo-aula próprio da Bússola (narração TTS + slides). Sem conteúdo de terceiros. */
+/** Vídeo-aula próprio do Desafoga (narração TTS + slides). Sem conteúdo de terceiros. */
 export type LessonVideo = {
   slug: string;
   title: string;

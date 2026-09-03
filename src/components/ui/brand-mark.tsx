@@ -1,22 +1,37 @@
-import { Compass } from "lucide-react";
+import { Sprout } from "lucide-react";
 import { clsx } from "clsx";
 
-export function BrandMark({ size = "md", className }: { size?: "sm" | "md"; className?: string }) {
+export function BrandMark({
+  size = "md",
+  withTagline = false,
+  className,
+}: {
+  size?: "sm" | "md";
+  withTagline?: boolean;
+  className?: string;
+}) {
   const compact = size === "sm";
   return (
-    <div className={clsx("flex items-center gap-2", className)}>
+    <div className={clsx("flex items-center gap-3", className)}>
       <span
         className={clsx(
-          "flex items-center justify-center rounded-2xl bg-primary text-white",
-          compact ? "size-8" : "size-11",
+          "flex shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary shadow-soft",
+          compact ? "size-9" : "size-10",
         )}
         aria-hidden
       >
-        <Compass size={compact ? 16 : 22} strokeWidth={2.2} />
+        <Sprout size={compact ? 18 : 22} strokeWidth={2.2} />
       </span>
-      <span className={clsx("font-semibold tracking-tight text-foreground", compact ? "text-sm" : "text-lg")}>
-        Bússola
-      </span>
+      <div className="min-w-0">
+        <p className={clsx("font-bold tracking-tight text-primary", compact ? "text-base" : "text-lg")}>
+          Desafoga!
+        </p>
+        {withTagline ? (
+          <p className="text-[11px] font-medium leading-4 tracking-[0.03em] text-foreground-muted">
+            Finanças com autocompaixão
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

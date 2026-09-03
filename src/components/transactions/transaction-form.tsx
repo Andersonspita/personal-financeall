@@ -132,7 +132,7 @@ export function TransactionForm({
             onClick={() => setType(launchType)}
             className={clsx(
               "flex-1 rounded-xl py-2 text-sm font-medium capitalize transition-colors duration-200",
-              type === launchType ? "bg-primary text-white" : "text-foreground-muted",
+              type === launchType ? "bg-primary text-on-primary" : "text-foreground-muted",
             )}
           >
             {launchType}

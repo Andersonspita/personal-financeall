@@ -6,7 +6,7 @@ export function isMailConfigured(): boolean {
 }
 
 export async function sendMail(input: { to: string; subject: string; text: string }): Promise<void> {
-  const from = process.env.MAIL_FROM?.trim() || "Bússola Financeira <noreply@localhost>";
+  const from = process.env.MAIL_FROM?.trim() || "Desafoga! <noreply@localhost>";
 
   if (process.env.RESEND_API_KEY?.trim()) {
     const response = await fetch("https://api.resend.com/emails", {
@@ -56,9 +56,9 @@ export async function sendPasswordResetMail(input: { to: string; resetUrl: strin
   try {
     await sendMail({
       to: input.to,
-      subject: "Redefinir senha — Bússola Financeira",
+      subject: "Redefinir senha — Desafoga!",
       text: [
-        "Você pediu para redefinir a senha da Bússola Financeira.",
+        "Você pediu para redefinir a senha do Desafoga.",
         "",
         "Abra este link (vale por 1 hora):",
         input.resetUrl,

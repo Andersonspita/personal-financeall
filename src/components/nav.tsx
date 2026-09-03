@@ -8,12 +8,12 @@ import {
   PiggyBank,
   Clock,
   HeartHandshake,
-  LifeBuoy,
   LogOut,
   GraduationCap,
   Settings,
   Plus,
   LayoutGrid,
+  Sprout,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { logoutAction } from "@/actions/auth";
@@ -33,8 +33,8 @@ const SIDEBAR_ITEMS = [
   { href: "/", label: "Início", icon: Home },
   { href: "/transacoes", label: "Lançamentos", icon: Receipt },
   { href: "/orcamentos", label: "Orçamentos", icon: PiggyBank },
-  { href: "/desejos", label: "Desejos", icon: Clock },
-  { href: "/correlacao", label: "Emoções", icon: HeartHandshake },
+  { href: "/desejos", label: "Trava de Resfriamento", icon: Clock },
+  { href: "/correlacao", label: "Emoção × Gasto", icon: HeartHandshake },
   { href: "/aprender", label: "Aprender", icon: GraduationCap },
 ] as const;
 
@@ -69,7 +69,7 @@ function TabLink({
     <Link
       href={href}
       className={clsx(
-        "flex min-w-0 flex-1 flex-col items-center gap-0.5 px-1 py-1 text-[11px] font-medium leading-tight",
+        "flex min-w-0 flex-1 flex-col items-center gap-0.5 px-1 py-1 text-[11px] font-medium leading-tight tracking-[0.02em]",
         active ? "text-primary" : "text-foreground-muted",
       )}
     >
@@ -86,6 +86,37 @@ function TabLink({
   );
 }
 
+/** Item da navegação lateral: cápsula sálvia quando ativo, hover tonal quando não. */
+function SidebarLink({
+  href,
+  label,
+  icon: Icon,
+  active,
+  dot,
+}: {
+  href: string;
+  label: string;
+  icon: typeof Home;
+  active: boolean;
+  dot?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={clsx(
+        "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium tracking-[0.01em] transition-colors duration-200",
+        active
+          ? "bg-primary-soft font-semibold text-primary"
+          : "text-foreground-muted hover:bg-surface-muted hover:text-foreground",
+      )}
+    >
+      <Icon size={18} strokeWidth={active ? 2.2 : 1.8} />
+      <span className="min-w-0 truncate">{label}</span>
+      {dot ? <span className="ml-auto size-2 shrink-0 rounded-full bg-accent" aria-hidden /> : null}
+    </Link>
+  );
+}
+
 export function Nav({ userName }: { userName: string }) {
   const pathname = usePathname();
   const showFab = !hideFab(pathname);
@@ -94,7 +125,7 @@ export function Nav({ userName }: { userName: string }) {
     <>
       <nav
         aria-label="Navegação principal"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-border/80 bg-surface/90 shadow-[0_-8px_24px_rgba(41,37,36,0.06)] backdrop-blur-xl md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-border/80 bg-surface/90 shadow-[0_-8px_24px_rgba(30,41,59,0.05)] backdrop-blur-xl md:hidden"
         style={{ paddingBottom: "max(0.55rem, env(safe-area-inset-bottom))" }}
       >
         <div className="relative flex items-end px-1 pt-1">
@@ -108,7 +139,7 @@ export function Nav({ userName }: { userName: string }) {
           {showFab ? (
             <Link
               href="/transacoes/novo"
-              className="absolute left-1/2 top-0 z-10 flex size-[3.35rem] -translate-x-1/2 -translate-y-[1.15rem] items-center justify-center rounded-full bg-primary text-white shadow-[0_8px_20px_rgba(63,111,94,0.38)] transition active:scale-95"
+              className="absolute left-1/2 top-0 z-10 flex size-[3.35rem] -translate-x-1/2 -translate-y-[1.15rem] items-center justify-center rounded-full bg-primary text-on-primary shadow-[0_8px_20px_rgba(45,106,79,0.35)] transition active:scale-95"
               aria-label="Novo lançamento"
             >
               <Plus size={26} strokeWidth={2.4} />
@@ -119,68 +150,55 @@ export function Nav({ userName }: { userName: string }) {
 
       <nav
         aria-label="Navegação principal"
-        className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-border bg-surface p-4 md:flex"
+        className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col justify-between border-r border-border/70 bg-surface p-4 md:flex"
       >
-        <BrandMark className="mb-5 px-1" />
-        <Link
-          href="/transacoes/novo"
-          className="mb-4 flex items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 active:scale-[0.98]"
-        >
-          <Plus size={18} /> Novo lançamento
-        </Link>
-        <div className="flex flex-1 flex-col gap-0.5">
-          {SIDEBAR_ITEMS.map((item) => {
-            const active = isActive(pathname, item.href);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={clsx(
-                  "flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-colors",
-                  active ? "bg-primary-soft text-primary" : "text-foreground-muted hover:bg-surface-muted",
-                )}
-              >
-                <Icon size={18} />
-                {item.label}
-              </Link>
-            );
-          })}
-        </div>
-        <Link
-          href="/panico"
-          className={clsx(
-            "flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold",
-            pathname === "/panico" ? "bg-critical-soft text-critical" : "text-warm hover:bg-warm-soft",
-          )}
-        >
-          <LifeBuoy size={18} />
-          Botão de Pânico
-        </Link>
+        <div className="flex min-h-0 flex-col gap-4">
+          <BrandMark withTagline className="px-2 py-1" />
 
-        <div className="mt-4 flex items-center justify-between border-t border-border px-1 pt-4">
-          <span className="truncate text-sm text-foreground-muted">{userName}</span>
-          <div className="flex items-center gap-1">
-            <Link
+          <Link
+            href="/transacoes/novo"
+            className="flex items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-semibold tracking-[0.01em] text-on-primary shadow-soft transition-colors duration-200 hover:bg-accent active:scale-[0.98]"
+          >
+            <Plus size={18} /> Novo lançamento
+          </Link>
+
+          <div className="flex flex-col gap-1.5 overflow-y-auto">
+            {SIDEBAR_ITEMS.map((item) => (
+              <SidebarLink key={item.href} {...item} active={isActive(pathname, item.href)} />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3 border-t border-border/70 pt-4">
+          {/* Lembrete de rodapé: reforça o tom não-julgador do produto a cada tela. */}
+          <div className="flex items-start gap-2.5 rounded-xl bg-primary-soft/60 p-3">
+            <Sprout size={16} className="mt-0.5 shrink-0 text-primary" aria-hidden />
+            <p className="text-[11px] font-medium leading-4 tracking-[0.02em] text-foreground-muted">
+              Cada gasto tem sua história. Acolha suas escolhas.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <SidebarLink
               href="/configuracoes"
-              title="Configurações"
-              className={clsx(
-                "rounded-xl p-2 hover:bg-surface-muted hover:text-foreground",
-                pathname === "/configuracoes" ? "text-primary" : "text-foreground-muted",
-              )}
-            >
-              <Settings size={16} />
-            </Link>
+              label="Configurações"
+              icon={Settings}
+              active={pathname === "/configuracoes"}
+            />
             <form action={logoutAction}>
               <button
                 type="submit"
-                title="Sair"
-                className="rounded-xl p-2 text-foreground-muted hover:bg-surface-muted hover:text-foreground"
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium tracking-[0.01em] text-foreground-muted transition-colors duration-200 hover:bg-surface-muted hover:text-foreground"
               >
-                <LogOut size={16} />
+                <LogOut size={18} strokeWidth={1.8} />
+                Encerrar sessão
               </button>
             </form>
           </div>
+
+          <p className="truncate px-4 text-[11px] tracking-[0.02em] text-foreground-muted/80" title={userName}>
+            {userName}
+          </p>
         </div>
       </nav>
     </>
